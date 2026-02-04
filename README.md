@@ -10,6 +10,7 @@ A local AI-powered tool for reading academic papers. Highlight text, ask AI to e
 - **PDF Viewer** — Read papers with a clean, modern interface
 - **Multi-Tab** — Open multiple papers at once, switch between them
 - **Highlighting** — Highlight text in multiple colors, saved automatically
+- **Notes** — Attach notes to any text selection, shown as dashed underlines
 - **Select & Ask AI** — Select any passage, type your question, get an AI answer
 - **AI Chat** — Ask questions about the entire paper in a side panel
 - **Pin Folders** — Pin your papers folder so it opens automatically on launch
@@ -174,10 +175,11 @@ The app opens automatically in your browser at `http://localhost:5173`.
 3. **Read** — Click any PDF to open it in the viewer
 4. **Multi-tab** — Open multiple papers; switch with `Option/Alt + 1-9`
 5. **Highlight** — Select text and pick a color to highlight it
-6. **Ask AI** — Select text, click "Ask AI", type your question, and hit Enter
-7. **Chat** — Click the sun button (bottom-right) or press `Option/Alt + /` to chat about the whole paper
-8. **Switch Models** — Use the model dropdown in the chat panel header
-9. **Shortcuts** — Press `Option/Alt + K` to view and customize all keyboard shortcuts
+6. **Note** — Select text, click "Note", type a note, and hit Enter to save
+7. **Ask AI** — Select text, click "Ask AI", type your question, and hit Enter
+8. **Chat** — Click the sun button (bottom-right) or press `Option/Alt + /` to chat about the whole paper
+9. **Switch Models** — Use the model dropdown in the chat panel header
+10. **Shortcuts** — Press `Option/Alt + K` to view and customize all keyboard shortcuts
 
 ## Using Cloud AI Models (Optional)
 

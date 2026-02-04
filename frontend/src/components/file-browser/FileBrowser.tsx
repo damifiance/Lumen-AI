@@ -7,8 +7,10 @@ import {
   PinOff,
   ChevronLeft,
   Keyboard,
+  HelpCircle,
 } from 'lucide-react';
 import { useShortcutStore } from '../../stores/shortcutStore';
+import { openOnboarding } from '../common/OnboardingModal';
 import { getRoots, browseDirectory } from '../../api/files';
 import type { FileEntry, RootEntry } from '../../types/file';
 
@@ -95,13 +97,22 @@ export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
               <p className="text-[10px] text-sidebar-text/40">Paper reader</p>
             </div>
           </div>
-          <button
-            onClick={() => useShortcutStore.getState().openShortcuts()}
-            className="p-1.5 text-sidebar-text/25 hover:text-sidebar-text/50 hover:bg-sidebar-hover rounded-lg cursor-pointer"
-            title="Keyboard shortcuts"
-          >
-            <Keyboard size={13} />
-          </button>
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={openOnboarding}
+              className="p-1.5 text-sidebar-text/25 hover:text-sidebar-text/50 hover:bg-sidebar-hover rounded-lg cursor-pointer"
+              title="Getting started guide"
+            >
+              <HelpCircle size={13} />
+            </button>
+            <button
+              onClick={() => useShortcutStore.getState().openShortcuts()}
+              className="p-1.5 text-sidebar-text/25 hover:text-sidebar-text/50 hover:bg-sidebar-hover rounded-lg cursor-pointer"
+              title="Keyboard shortcuts"
+            >
+              <Keyboard size={13} />
+            </button>
+          </div>
         </div>
       </div>
 

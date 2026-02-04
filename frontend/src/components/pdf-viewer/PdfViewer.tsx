@@ -18,6 +18,7 @@ import { useChatStore } from '../../stores/chatStore';
 import { SelectionTip } from './SelectionTip';
 import { HighlightContainer } from './HighlightContainer';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { createNoteEntry, serializeNotes } from '../../utils/noteHelpers';
 
 interface PdfViewerProps {
   paperPath: string;
@@ -27,7 +28,8 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
   const utilsRef = useRef<PdfHighlighterUtils | null>(null);
   const selectionRef = useRef<PdfSelection | null>(null);
 
-  const { highlights, addHighlight, removeHighlight } = useHighlightStore();
+  const { highlights, addHighlight, removeHighlight, updateHighlight } =
+    useHighlightStore();
   const { askAboutSelection, setOpen } = useChatStore();
 
   const pdfHighlights: Highlight[] = highlights.map((h) => {
@@ -66,6 +68,26 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
     [paperPath, addHighlight]
   );
 
+  const handleNote = useCallback(
+    async (note: string) => {
+      const selection = selectionRef.current;
+      if (!selection) return;
+
+      const ghost = selection.makeGhostHighlight();
+      await addHighlight({
+        paper_path: paperPath,
+        content_text: ghost.content.text || '',
+        position_json: JSON.stringify(ghost.position),
+        color: 'note',
+        comment: serializeNotes([createNoteEntry(note)]),
+      });
+
+      utilsRef.current?.removeGhostHighlight();
+      selectionRef.current = null;
+    },
+    [paperPath, addHighlight]
+  );
+
   const handleAskAI = useCallback(
     (question: string) => {
       const selection = selectionRef.current;
@@ -80,6 +102,21 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
       selectionRef.current = null;
     },
     [paperPath, askAboutSelection, setOpen]
+  );
+
+  const handleHighlightAskAI = useCallback(
+    (text: string, question: string) => {
+      askAboutSelection(paperPath, text, question);
+      setOpen(true);
+    },
+    [paperPath, askAboutSelection, setOpen]
+  );
+
+  const handleUpdateNote = useCallback(
+    async (id: string, comment: string) => {
+      await updateHighlight(id, { comment });
+    },
+    [updateHighlight]
   );
 
   const handleDelete = useCallback(
@@ -115,12 +152,17 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
               <SelectionTip
                 onHighlight={handleHighlight}
                 onAskAI={handleAskAI}
+                onNote={handleNote}
               />
             }
             pdfScaleValue="page-width"
             style={{ height: '100%' }}
           >
-            <HighlightContainer onDelete={handleDelete} />
+            <HighlightContainer
+              onDelete={handleDelete}
+              onAskAI={handleHighlightAskAI}
+              onUpdateNote={handleUpdateNote}
+            />
           </PdfHighlighter>
         )}
       </PdfLoader>

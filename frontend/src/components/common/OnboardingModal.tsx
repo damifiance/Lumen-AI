@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FolderOpen,
   Highlighter,
+  MessageSquare,
   Sparkles,
   Pin,
   ArrowRight,
@@ -9,6 +10,14 @@ import {
 } from 'lucide-react';
 
 const ONBOARDING_KEY = 'onboarding-completed';
+
+// Simple module-level state for re-opening the modal
+type Listener = (open: boolean) => void;
+let _listener: Listener | null = null;
+
+export function openOnboarding() {
+  _listener?.(true);
+}
 
 const steps = [
   {
@@ -36,6 +45,14 @@ const steps = [
       'Select any text in a paper and choose a color to highlight it. Your highlights are saved and will be there next time you open the paper.',
   },
   {
+    icon: MessageSquare,
+    iconBg: 'from-amber-500/10 to-yellow-500/10',
+    iconColor: 'text-amber-500',
+    title: 'Add Notes',
+    description:
+      'Select text and click "Note" to attach a note. Your notes appear as dashed underlines — hover to see them. Great for annotations while reading.',
+  },
+  {
     icon: Sparkles,
     iconBg: 'from-accent/10 to-teal/10',
     iconColor: 'text-accent',
@@ -50,6 +67,18 @@ export function OnboardingModal() {
     !localStorage.getItem(ONBOARDING_KEY)
   );
   const [currentStep, setCurrentStep] = useState(0);
+
+  useEffect(() => {
+    _listener = (open: boolean) => {
+      if (open) {
+        setCurrentStep(0);
+        setIsVisible(true);
+      }
+    };
+    return () => {
+      _listener = null;
+    };
+  }, []);
 
   if (!isVisible) return null;
 
