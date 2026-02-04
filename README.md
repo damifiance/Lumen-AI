@@ -238,6 +238,6 @@ Found a bug or have a question? Reach out:
 - **Instagram:** [@zzhy0](https://instagram.com/zzhy0)
 - **LinkedIn:** [Jaehyung Park](https://www.linkedin.com/in/jaehyung-park-4986b53a5/)
 
-## License
+## Copyright
 
-MIT
+owned  by JaeHyung(Benjamin) Park
