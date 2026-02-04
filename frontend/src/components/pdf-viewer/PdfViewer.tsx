@@ -66,18 +66,21 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
     [paperPath, addHighlight]
   );
 
-  const handleAskAI = useCallback(() => {
-    const selection = selectionRef.current;
-    if (!selection) return;
+  const handleAskAI = useCallback(
+    (question: string) => {
+      const selection = selectionRef.current;
+      if (!selection) return;
 
-    const ghost = selection.makeGhostHighlight();
-    const text = ghost.content.text || '';
+      const ghost = selection.makeGhostHighlight();
+      const text = ghost.content.text || '';
 
-    askAboutSelection(paperPath, text, 'Explain this passage.');
-    setOpen(true);
-    utilsRef.current?.removeGhostHighlight();
-    selectionRef.current = null;
-  }, [paperPath, askAboutSelection, setOpen]);
+      askAboutSelection(paperPath, text, question);
+      setOpen(true);
+      utilsRef.current?.removeGhostHighlight();
+      selectionRef.current = null;
+    },
+    [paperPath, askAboutSelection, setOpen]
+  );
 
   const handleDelete = useCallback(
     async (id: string) => {

@@ -60,9 +60,19 @@ def _split_into_chunks(text: str, chunk_size: int = 1000) -> list[str]:
     return chunks
 
 
+MATH_FORMATTING_INSTRUCTIONS = """
+When writing mathematical expressions:
+- Use $...$ for inline math (e.g. $E = mc^2$, $\\alpha + \\beta$)
+- Use $$...$$ for display/block equations (e.g. $$\\sum_{i=1}^{n} x_i$$)
+- Always use LaTeX notation for formulas, Greek letters, subscripts, superscripts, fractions, etc.
+- Write equations clearly using proper LaTeX commands (\\frac, \\sqrt, \\int, \\sum, \\partial, etc.)
+- Never write raw math symbols like "sigma" or "x_i" — use $\\sigma$ and $x_i$ instead.
+Use markdown formatting for everything else."""
+
 PAPER_SYSTEM_PROMPT = """You are an expert research paper assistant. Below is the content of a research paper.
 Answer questions about it accurately and cite specific sections when possible.
-Be concise but thorough. Use markdown formatting for clarity.
+Be concise but thorough.
+""" + MATH_FORMATTING_INSTRUCTIONS + """
 
 --- PAPER CONTENT ---
 {paper_text}
@@ -72,6 +82,7 @@ ASK_SYSTEM_PROMPT = """You are an expert research paper assistant.
 The user has selected a specific passage from a research paper and wants you to explain it.
 Provide a clear, helpful explanation. If the passage contains technical terms, define them.
 Use the surrounding paper context to give accurate explanations.
+""" + MATH_FORMATTING_INSTRUCTIONS + """
 
 --- PAPER CONTEXT (surrounding pages) ---
 {paper_text}

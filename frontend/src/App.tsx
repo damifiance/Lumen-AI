@@ -1,24 +1,66 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { FileBrowser } from './components/file-browser/FileBrowser';
 import { PdfViewer } from './components/pdf-viewer/PdfViewer';
 import { ChatPanel } from './components/chat/ChatPanel';
+import { TabBar } from './components/layout/TabBar';
 import { usePaperStore } from './stores/paperStore';
 import { useHighlightStore } from './stores/highlightStore';
 import { useChatStore } from './stores/chatStore';
+import { useShortcutStore, isShortcutModifier } from './stores/shortcutStore';
 import { getPaperMetadata } from './api/papers';
-import { BookOpen, ArrowLeft, Sparkles } from 'lucide-react';
+import { Sun, ArrowLeft, Sparkles, Keyboard } from 'lucide-react';
+import { OnboardingModal } from './components/common/OnboardingModal';
+import { KeyboardShortcuts } from './components/common/KeyboardShortcuts';
 
 export default function App() {
-  const { activePaperPath, isLoading, setActivePaper, setLoading } =
+  const { tabs, activeTabIndex, isLoading, setActivePaper, setLoading } =
     usePaperStore();
   const { loadHighlights, clearHighlights } = useHighlightStore();
-  const { clearMessages } = useChatStore();
+  const { clearMessages, toggleOpen: toggleChat } = useChatStore();
+  const { openShortcuts } = useShortcutStore();
+  const matchesEvent = useShortcutStore((s) => s.matchesEvent);
+
+  const activePaperPath =
+    activeTabIndex >= 0 && activeTabIndex < tabs.length
+      ? tabs[activeTabIndex].path
+      : null;
+
+  // Reload highlights when switching tabs
+  useEffect(() => {
+    if (activePaperPath) {
+      loadHighlights(activePaperPath);
+    } else {
+      clearHighlights();
+    }
+  }, [activePaperPath]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isShortcutModifier(e)) return;
+
+      if (matchesEvent('toggle-chat', e)) {
+        e.preventDefault();
+        toggleChat();
+      }
+      if (matchesEvent('show-shortcuts', e)) {
+        e.preventDefault();
+        openShortcuts();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [matchesEvent, toggleChat, openShortcuts]);
 
   const handleFileSelect = useCallback(
     async (path: string) => {
-      if (path === activePaperPath) return;
+      const existingIndex = tabs.findIndex((t) => t.path === path);
+      if (existingIndex >= 0) {
+        usePaperStore.getState().switchTab(existingIndex);
+        return;
+      }
+
       setLoading(true);
-      clearHighlights();
       clearMessages();
       try {
         const metadata = await getPaperMetadata(path);
@@ -29,54 +71,68 @@ export default function App() {
         setLoading(false);
       }
     },
-    [activePaperPath, setActivePaper, setLoading, loadHighlights, clearHighlights, clearMessages]
+    [tabs, setActivePaper, setLoading, loadHighlights, clearMessages]
   );
 
   return (
-    <div className="flex h-screen bg-gray-100/50">
+    <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="shrink-0" style={{ width: 'var(--sidebar-width)' }}>
         <FileBrowser onFileSelect={handleFileSelect} activePath={activePaperPath} />
       </div>
 
-      {/* Main — PDF Viewer */}
-      <div className="flex-1 min-w-0">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-3 border-gray-200 border-t-accent rounded-full animate-spin" />
-              <span className="text-sm text-gray-400">Loading paper...</span>
-            </div>
-          </div>
-        ) : activePaperPath ? (
-          <PdfViewer paperPath={activePaperPath} />
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-accent/5 to-purple-500/5 flex items-center justify-center mb-5">
-              <BookOpen size={36} className="text-accent/25" />
-            </div>
-            <h2 className="text-lg font-semibold text-gray-600 mb-2">
-              Welcome to Paper Reader
-            </h2>
-            <p className="text-sm text-gray-400 mb-6 max-w-sm text-center leading-relaxed">
-              Browse your files in the sidebar and select a PDF to start reading with AI assistance.
-            </p>
-            <div className="flex items-center gap-6 text-xs text-gray-400">
-              <div className="flex items-center gap-2">
-                <ArrowLeft size={14} />
-                <span>Browse files</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Sparkles size={14} />
-                <span>Ask AI about any passage</span>
+      {/* Main — Tab Bar + PDF Viewer */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <TabBar />
+        <div className="flex-1 min-h-0">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full bg-white">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-3 border-gray-200 border-t-accent rounded-full animate-spin" />
+                <span className="text-sm text-gray-400">Loading paper...</span>
               </div>
             </div>
-          </div>
-        )}
+          ) : activePaperPath ? (
+            <PdfViewer key={activePaperPath} paperPath={activePaperPath} />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-gray-400 bg-white">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-accent/8 to-teal-400/8 flex items-center justify-center mb-5">
+                <Sun size={36} className="text-accent/30" />
+              </div>
+              <h2 className="text-lg font-semibold text-gray-700 mb-2">
+                Welcome to Lumen AI
+              </h2>
+              <p className="text-sm text-gray-400 mb-6 max-w-sm text-center leading-relaxed">
+                Browse your files in the sidebar and select a PDF to start reading with AI assistance.
+              </p>
+              <div className="flex items-center gap-6 text-xs text-gray-400">
+                <div className="flex items-center gap-2">
+                  <ArrowLeft size={14} />
+                  <span>Browse files</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Sparkles size={14} />
+                  <span>Ask AI about any passage</span>
+                </div>
+                <button
+                  onClick={openShortcuts}
+                  className="flex items-center gap-2 hover:text-gray-600 cursor-pointer"
+                >
+                  <Keyboard size={14} />
+                  <span>Shortcuts</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Chat Panel */}
       <ChatPanel />
+
+      {/* Modals */}
+      <OnboardingModal />
+      <KeyboardShortcuts />
     </div>
   );
 }

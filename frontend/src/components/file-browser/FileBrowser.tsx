@@ -1,5 +1,14 @@
-import { useEffect, useState } from 'react';
-import { ChevronRight, ChevronDown, FileText, Folder, Home, BookOpen } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import {
+  FileText,
+  Folder,
+  Sun,
+  Pin,
+  PinOff,
+  ChevronLeft,
+  Keyboard,
+} from 'lucide-react';
+import { useShortcutStore } from '../../stores/shortcutStore';
 import { getRoots, browseDirectory } from '../../api/files';
 import type { FileEntry, RootEntry } from '../../types/file';
 
@@ -8,155 +17,218 @@ interface FileBrowserProps {
   activePath: string | null;
 }
 
+const PINNED_DIR_KEY = 'pinned-directory';
+
 export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
   const [roots, setRoots] = useState<RootEntry[]>([]);
-  const [currentPath, setCurrentPath] = useState<string | null>(null);
+  const [currentPath, setCurrentPath] = useState<string | null>(
+    localStorage.getItem(PINNED_DIR_KEY)
+  );
   const [entries, setEntries] = useState<FileEntry[]>([]);
-  const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
-  const [childEntries, setChildEntries] = useState<Map<string, FileEntry[]>>(new Map());
   const [isLoading, setIsLoading] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
 
   useEffect(() => {
     getRoots().then(setRoots).catch(console.error);
   }, []);
 
-  const navigateTo = async (path: string) => {
+  const loadDirectory = useCallback(async (path: string) => {
     setIsLoading(true);
     try {
       const items = await browseDirectory(path);
       setCurrentPath(path);
       setEntries(items);
-      setExpandedDirs(new Set());
-      setChildEntries(new Map());
+      // Check if this path is the pinned one
+      setIsPinned(localStorage.getItem(PINNED_DIR_KEY) === path);
     } catch (err) {
-      console.error('Failed to browse:', err);
+      console.error('Failed to load directory:', err);
     }
     setIsLoading(false);
-  };
+  }, []);
 
-  const toggleDir = async (dirPath: string) => {
-    const next = new Set(expandedDirs);
-    if (next.has(dirPath)) {
-      next.delete(dirPath);
-    } else {
-      next.add(dirPath);
-      if (!childEntries.has(dirPath)) {
-        try {
-          const items = await browseDirectory(dirPath);
-          setChildEntries((prev) => new Map(prev).set(dirPath, items));
-        } catch (err) {
-          console.error('Failed to expand:', err);
-        }
-      }
+  // Auto-load pinned or initial directory
+  useEffect(() => {
+    const pinned = localStorage.getItem(PINNED_DIR_KEY);
+    if (pinned) {
+      loadDirectory(pinned);
     }
-    setExpandedDirs(next);
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goUp = () => {
     if (!currentPath) return;
     const parent = currentPath.split('/').slice(0, -1).join('/') || '/';
-    navigateTo(parent);
+    loadDirectory(parent);
   };
 
-  const renderEntry = (entry: FileEntry, depth: number = 0): React.ReactNode => {
-    const isExpanded = expandedDirs.has(entry.path);
-    const isActive = entry.path === activePath;
+  const goToRoots = () => {
+    setCurrentPath(null);
+    setEntries([]);
+    setIsPinned(false);
+  };
 
-    if (entry.is_dir) {
-      return (
-        <div key={entry.path}>
-          <button
-            onClick={() => toggleDir(entry.path)}
-            className="flex items-center gap-2.5 w-full py-1.5 text-[13px] text-sidebar-text hover:text-sidebar-text-bright hover:bg-sidebar-hover rounded-lg cursor-pointer group"
-            style={{ paddingLeft: `${12 + depth * 14}px`, paddingRight: '12px' }}
-          >
-            {isExpanded ? (
-              <ChevronDown size={13} className="text-sidebar-text/50 shrink-0" />
-            ) : (
-              <ChevronRight size={13} className="text-sidebar-text/50 shrink-0" />
-            )}
-            <Folder size={15} className="text-indigo-400/70 shrink-0" />
-            <span className="truncate">{entry.name}</span>
-          </button>
-          {isExpanded &&
-            childEntries.get(entry.path)?.map((child) => renderEntry(child, depth + 1))}
-        </div>
-      );
+  const togglePin = () => {
+    if (!currentPath) return;
+    if (isPinned) {
+      localStorage.removeItem(PINNED_DIR_KEY);
+      setIsPinned(false);
+    } else {
+      localStorage.setItem(PINNED_DIR_KEY, currentPath);
+      setIsPinned(true);
     }
-
-    return (
-      <button
-        key={entry.path}
-        onClick={() => onFileSelect(entry.path)}
-        className={`flex items-center gap-2.5 w-full py-1.5 text-[13px] rounded-lg cursor-pointer group ${
-          isActive
-            ? 'bg-accent/20 text-accent'
-            : 'text-sidebar-text hover:text-sidebar-text-bright hover:bg-sidebar-hover'
-        }`}
-        style={{ paddingLeft: `${26 + depth * 14}px`, paddingRight: '12px' }}
-      >
-        <FileText size={15} className={`shrink-0 ${isActive ? 'text-accent' : 'text-red-400/60'}`} />
-        <span className="truncate">{entry.name}</span>
-      </button>
-    );
   };
+
+  const folderName = currentPath?.split('/').pop() || '';
+  const parentPath = currentPath?.split('/').slice(0, -1).join('/') || '';
+  const parentName = parentPath?.split('/').pop() || '';
 
   return (
-    <div className="flex flex-col h-full bg-sidebar-bg">
-      {/* Logo / Title */}
-      <div className="px-5 pt-5 pb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center">
-            <BookOpen size={16} className="text-accent" />
+    <div className="flex flex-col h-full bg-sidebar-bg select-none">
+      {/* Logo */}
+      <div className="px-4 pt-4 pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-accent/20 flex items-center justify-center">
+              <Sun size={14} className="text-accent" />
+            </div>
+            <div>
+              <h1 className="text-[13px] font-semibold text-sidebar-text-bright leading-tight tracking-wide">Lumen AI</h1>
+              <p className="text-[10px] text-sidebar-text/40">Paper reader</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-sm font-semibold text-sidebar-text-bright leading-tight">Paper Reader</h1>
-            <p className="text-[10px] text-sidebar-text/50">AI-powered</p>
-          </div>
+          <button
+            onClick={() => useShortcutStore.getState().openShortcuts()}
+            className="p-1.5 text-sidebar-text/25 hover:text-sidebar-text/50 hover:bg-sidebar-hover rounded-lg cursor-pointer"
+            title="Keyboard shortcuts"
+          >
+            <Keyboard size={13} />
+          </button>
         </div>
       </div>
 
       <div className="mx-4 border-t border-white/5" />
 
-      {/* Navigation */}
       {!currentPath ? (
+        /* No folder selected — show starting points */
         <div className="flex-1 overflow-y-auto dark-scrollbar px-3 pt-3">
           <span className="text-[10px] font-medium text-sidebar-text/40 uppercase tracking-wider px-2 mb-2 block">
-            Quick Access
+            Open a folder
           </span>
           {roots.map((root) => (
             <button
               key={root.path}
-              onClick={() => navigateTo(root.path)}
-              className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] text-sidebar-text hover:text-sidebar-text-bright hover:bg-sidebar-hover rounded-lg cursor-pointer"
+              onClick={() => loadDirectory(root.path)}
+              className="flex items-center gap-2.5 w-full px-3 py-2 text-[13px] text-sidebar-text hover:text-sidebar-text-bright hover:bg-sidebar-hover rounded-lg cursor-pointer mb-0.5"
             >
-              <Home size={15} className="text-sidebar-text/40" />
+              <Folder size={14} className="text-sidebar-text/30" />
               <span>{root.name}</span>
             </button>
           ))}
+          <div className="mx-1 border-t border-white/5 my-3" />
+          <p className="text-[10px] text-sidebar-text/25 px-2 leading-relaxed">
+            Navigate into any folder, then pin it to skip this screen next time.
+          </p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto dark-scrollbar px-3 pt-3">
-          <button
-            onClick={goUp}
-            className="flex items-center gap-2 w-full px-3 py-1.5 text-[13px] text-accent hover:bg-sidebar-hover rounded-lg cursor-pointer mb-1"
-          >
-            <ChevronRight size={13} className="rotate-180" />
-            <span>Back</span>
-          </button>
-          <div className="px-3 py-1 text-[10px] text-sidebar-text/30 truncate mb-1">
-            {currentPath}
-          </div>
-          {isLoading ? (
-            <div className="p-4 text-[13px] text-sidebar-text/40 text-center">Loading...</div>
-          ) : entries.length === 0 ? (
-            <div className="p-4 text-[13px] text-sidebar-text/40 text-center">No PDFs found</div>
-          ) : (
-            <div className="space-y-0.5">
-              {entries.map((entry) => renderEntry(entry))}
+        /* Inside a folder */
+        <>
+          {/* Navigation bar */}
+          <div className="flex items-center justify-between px-3 py-2">
+            <button
+              onClick={goUp}
+              className="flex items-center gap-1 text-[11px] text-sidebar-text/40 hover:text-sidebar-text/70 cursor-pointer rounded px-1.5 py-0.5 hover:bg-sidebar-hover"
+              title={`Go to ${parentName || 'parent'}`}
+            >
+              <ChevronLeft size={12} />
+              <span>{parentName || 'Back'}</span>
+            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={togglePin}
+                className={`p-1.5 rounded-lg cursor-pointer transition-colors ${
+                  isPinned
+                    ? 'text-accent bg-accent/10 hover:bg-accent/15'
+                    : 'text-sidebar-text/25 hover:text-sidebar-text/50 hover:bg-sidebar-hover'
+                }`}
+                title={isPinned ? 'Unpin folder' : 'Pin folder (auto-open on launch)'}
+              >
+                {isPinned ? <Pin size={13} /> : <PinOff size={13} />}
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+
+          {/* Current folder name */}
+          <div className="px-4 pb-1.5">
+            <div className="flex items-center gap-2">
+              <Folder size={13} className="text-teal/60 shrink-0" />
+              <span className="text-[12px] font-semibold text-sidebar-text-bright truncate">
+                {folderName}
+              </span>
+              {isPinned && (
+                <span className="text-[9px] bg-accent/15 text-accent px-1.5 py-0.5 rounded-full font-medium shrink-0">
+                  pinned
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="mx-4 border-t border-white/5" />
+
+          {/* File list */}
+          <div className="flex-1 overflow-y-auto dark-scrollbar">
+            {isLoading ? (
+              <div className="px-4 py-8 text-[13px] text-sidebar-text/30 text-center">
+                Loading...
+              </div>
+            ) : entries.length === 0 ? (
+              <div className="px-4 py-8 text-[13px] text-sidebar-text/30 text-center leading-relaxed">
+                No PDFs or folders here
+              </div>
+            ) : (
+              <div className="py-1">
+                {entries.map((entry) =>
+                  entry.is_dir ? (
+                    <button
+                      key={entry.path}
+                      onClick={() => loadDirectory(entry.path)}
+                      className="flex items-center gap-2.5 w-full px-4 py-[6px] text-[13px] text-sidebar-text hover:text-sidebar-text-bright hover:bg-sidebar-hover cursor-pointer"
+                    >
+                      <Folder size={14} className="text-teal/50 shrink-0" />
+                      <span className="truncate">{entry.name}</span>
+                    </button>
+                  ) : (
+                    <button
+                      key={entry.path}
+                      onClick={() => onFileSelect(entry.path)}
+                      className={`flex items-center gap-2.5 w-full px-4 py-[6px] text-[13px] cursor-pointer ${
+                        entry.path === activePath
+                          ? 'bg-accent/15 text-accent'
+                          : 'text-sidebar-text hover:text-sidebar-text-bright hover:bg-sidebar-hover'
+                      }`}
+                    >
+                      <FileText
+                        size={14}
+                        className={`shrink-0 ${
+                          entry.path === activePath ? 'text-accent' : 'text-accent/40'
+                        }`}
+                      />
+                      <span className="truncate">{entry.name}</span>
+                    </button>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Bottom: change folder */}
+          <div className="px-3 py-2 border-t border-white/5">
+            <button
+              onClick={goToRoots}
+              className="w-full px-3 py-1.5 text-[11px] text-sidebar-text/30 hover:text-sidebar-text/50 hover:bg-sidebar-hover rounded-lg cursor-pointer text-center"
+            >
+              Change folder
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

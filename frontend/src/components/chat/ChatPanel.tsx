@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Trash2, Sparkles, PanelRightClose } from 'lucide-react';
+import { Trash2, Sun, PanelRightClose } from 'lucide-react';
 import { useChatStore } from '../../stores/chatStore';
 import { usePaperStore } from '../../stores/paperStore';
 import { ChatMessage } from './ChatMessage';
@@ -27,10 +27,10 @@ export function ChatPanel() {
     return (
       <button
         onClick={toggleOpen}
-        className="fixed bottom-6 right-6 w-12 h-12 bg-gradient-to-br from-accent to-purple-500 text-white rounded-2xl shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:scale-105 flex items-center justify-center cursor-pointer z-50 transition-all"
+        className="fixed bottom-6 right-6 w-12 h-12 bg-accent text-white rounded-2xl shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:scale-105 flex items-center justify-center cursor-pointer z-50 transition-all glow-accent"
         title="Open chat"
       >
-        <Sparkles size={20} />
+        <Sun size={20} />
       </button>
     );
   }
@@ -43,10 +43,10 @@ export function ChatPanel() {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-accent/10 to-purple-500/10 flex items-center justify-center">
-            <Sparkles size={13} className="text-accent" />
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-accent/10 to-teal/10 flex items-center justify-center">
+            <Sun size={13} className="text-accent" />
           </div>
-          <span className="text-sm font-semibold text-gray-800">AI Chat</span>
+          <span className="text-sm font-semibold text-gray-800">Lumen Chat</span>
         </div>
         <div className="flex items-center gap-1">
           <ModelSelector />
@@ -80,8 +80,8 @@ export function ChatPanel() {
       <div className="flex-1 overflow-y-auto">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400 px-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/5 to-purple-500/5 flex items-center justify-center mb-4">
-              <Sparkles size={28} className="text-accent/30" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/5 to-teal/5 flex items-center justify-center mb-4">
+              <Sun size={28} className="text-accent/30" />
             </div>
             <p className="text-sm font-medium text-gray-500 mb-1">
               {activePaperPath ? 'Ask anything about this paper' : 'No paper selected'}

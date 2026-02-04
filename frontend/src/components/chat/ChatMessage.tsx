@@ -1,8 +1,11 @@
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { ChatMessage as ChatMessageType } from '../../types/chat';
-import { User, Sparkles } from 'lucide-react';
+import { User, Sun } from 'lucide-react';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -19,14 +22,14 @@ export function ChatMessage({ message }: ChatMessageProps) {
           className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
             isUser
               ? 'bg-accent/10 text-accent'
-              : 'bg-gradient-to-br from-purple-500/10 to-accent/10 text-purple-600'
+              : 'bg-gradient-to-br from-teal/10 to-accent/10 text-teal'
           }`}
         >
-          {isUser ? <User size={14} /> : <Sparkles size={14} />}
+          {isUser ? <User size={14} /> : <Sun size={14} />}
         </div>
         <div className="flex-1 min-w-0">
           <span className={`text-[11px] font-semibold uppercase tracking-wider ${
-            isUser ? 'text-accent/60' : 'text-purple-500/60'
+            isUser ? 'text-accent/60' : 'text-teal/60'
           }`}>
             {isUser ? 'You' : 'AI'}
           </span>
@@ -41,6 +44,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
               </div>
             ) : (
               <ReactMarkdown
+                remarkPlugins={[remarkMath]}
+                rehypePlugins={[rehypeKatex]}
                 components={{
                   code({ className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');

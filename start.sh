@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AI Paper Reader — One-click launcher
+# Lumen AI — One-click launcher
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 cleanup() {
@@ -26,7 +26,7 @@ sleep 3
 open "http://localhost:5173"
 
 echo ""
-echo "AI Paper Reader is running!"
+echo "Lumen AI is running!"
 echo "  → http://localhost:5173"
 echo ""
 echo "Press Ctrl+C to stop."
