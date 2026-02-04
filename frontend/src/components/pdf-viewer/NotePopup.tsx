@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Plus, Pencil, Trash2, Check } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Plus, Pencil, Trash2, Check, X } from 'lucide-react';
 import {
   parseNotes,
   serializeNotes,
@@ -23,12 +23,14 @@ interface NotePopupProps {
   comment: string;
   onUpdateNote: (comment: string) => void;
   onDelete: () => void;
+  onClose?: () => void;
 }
 
 export function NotePopup({
   comment,
   onUpdateNote,
   onDelete,
+  onClose,
 }: NotePopupProps) {
   const [notes, setNotes] = useState<NoteEntry[]>(() => parseNotes(comment));
   const [newText, setNewText] = useState('');
@@ -36,10 +38,30 @@ export function NotePopup({
   const [editText, setEditText] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const editRef = useRef<HTMLTextAreaElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  const handleClickOutside = useCallback(
+    (e: MouseEvent) => {
+      if (
+        onClose &&
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
+
+  useEffect(() => {
+    if (!onClose) return;
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose, handleClickOutside]);
 
   useEffect(() => {
     if (editingId) editRef.current?.focus();
@@ -90,14 +112,24 @@ export function NotePopup({
 
   return (
     <div
+      ref={containerRef}
       className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 w-72"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
-      <div className="px-3 pt-3 pb-2 border-b border-gray-100">
+      <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between">
         <span className="text-[12px] font-semibold text-gray-700">
           Notes ({notes.length})
         </span>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-0.5 text-gray-300 hover:text-gray-500 cursor-pointer rounded"
+            title="Close"
+          >
+            <X size={14} />
+          </button>
+        )}
       </div>
 
       {/* Thread */}

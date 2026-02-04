@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Trash2, Sparkles, ArrowUp, X } from 'lucide-react';
+import { Trash2, Sparkles, ArrowUp, X, MessageSquare } from 'lucide-react';
 
 interface HighlightPopupProps {
   note: string;
@@ -7,6 +7,7 @@ interface HighlightPopupProps {
   isNote: boolean;
   onDelete: () => void;
   onAskAI: (text: string, question: string) => void;
+  onOpenNotes?: () => void;
 }
 
 export function HighlightPopup({
@@ -15,6 +16,7 @@ export function HighlightPopup({
   isNote,
   onDelete,
   onAskAI,
+  onOpenNotes,
 }: HighlightPopupProps) {
   const [askMode, setAskMode] = useState(false);
   const [question, setQuestion] = useState('');
@@ -94,6 +96,16 @@ export function HighlightPopup({
         >
           <Sparkles size={12} />
           Ask AI
+        </button>
+      )}
+
+      {isNote && onOpenNotes && (
+        <button
+          onClick={onOpenNotes}
+          className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg px-3 py-1.5 mb-2 cursor-pointer transition-colors"
+        >
+          <MessageSquare size={12} />
+          Open notes
         </button>
       )}
 
