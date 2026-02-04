@@ -49,8 +49,8 @@ To customize shortcuts, press `Option/Alt + K` or click the keyboard icon in the
 ollama pull llama3.1
 
 # 2. Clone this repo
-git clone https://github.com/YOUR_USERNAME/AI-paper-reader.git
-cd AI-paper-reader
+git clone https://github.com/damifiance/Lumen-AI.git
+cd Lumen-AI
 
 # 3. Start the app
 docker compose up --build
@@ -68,8 +68,8 @@ open http://localhost:3000
 ollama pull llama3.1
 
 # 2. Clone and install
-git clone https://github.com/YOUR_USERNAME/AI-paper-reader.git
-cd AI-paper-reader
+git clone https://github.com/damifiance/Lumen-AI.git
+cd Lumen-AI
 
 cd backend && pip install -e . && cd ..
 cd frontend && npm install --legacy-peer-deps && cd ..
@@ -112,8 +112,8 @@ Wait for the download to finish (~4.9 GB).
 **Step 3 — Clone and start the app:**
 
 ```
-git clone https://github.com/YOUR_USERNAME/AI-paper-reader.git
-cd AI-paper-reader
+git clone https://github.com/damifiance/Lumen-AI.git
+cd Lumen-AI
 docker compose up --build
 ```
 
@@ -141,8 +141,8 @@ ollama pull llama3.1
 **Step 3 — Clone and install the app:**
 
 ```
-git clone https://github.com/YOUR_USERNAME/AI-paper-reader.git
-cd AI-paper-reader
+git clone https://github.com/damifiance/Lumen-AI.git
+cd Lumen-AI
 
 cd backend
 pip install -e .
