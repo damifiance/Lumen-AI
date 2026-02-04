@@ -1,0 +1,78 @@
+import tiktoken
+
+from app.services.pdf_service import get_full_text
+
+_text_cache: dict[str, str] = {}
+
+TOKEN_THRESHOLD = 30_000
+
+
+def count_tokens(text: str) -> int:
+    enc = tiktoken.encoding_for_model("gpt-4o")
+    return len(enc.encode(text))
+
+
+def get_paper_text(pdf_path: str) -> str:
+    if pdf_path not in _text_cache:
+        _text_cache[pdf_path] = get_full_text(pdf_path)
+    return _text_cache[pdf_path]
+
+
+def prepare_paper_context(pdf_path: str, question: str | None = None) -> str:
+    full_text = get_paper_text(pdf_path)
+    token_count = count_tokens(full_text)
+
+    if token_count < TOKEN_THRESHOLD:
+        return full_text
+
+    return _retrieve_relevant_chunks(full_text, question or "", top_k=15)
+
+
+def _retrieve_relevant_chunks(text: str, query: str, top_k: int = 15) -> str:
+    chunks = _split_into_chunks(text, chunk_size=1000)
+    if not query:
+        return "\n\n".join(chunks[:top_k])
+
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    corpus = chunks + [query]
+    vectorizer = TfidfVectorizer(stop_words="english")
+    tfidf_matrix = vectorizer.fit_transform(corpus)
+
+    query_vec = tfidf_matrix[-1]
+    chunk_vecs = tfidf_matrix[:-1]
+    similarities = cosine_similarity(query_vec, chunk_vecs).flatten()
+
+    top_indices = similarities.argsort()[-top_k:][::-1]
+    top_indices = sorted(top_indices)
+
+    return "\n\n".join(chunks[i] for i in top_indices)
+
+
+def _split_into_chunks(text: str, chunk_size: int = 1000) -> list[str]:
+    words = text.split()
+    chunks = []
+    for i in range(0, len(words), chunk_size):
+        chunk = " ".join(words[i : i + chunk_size])
+        if chunk.strip():
+            chunks.append(chunk)
+    return chunks
+
+
+PAPER_SYSTEM_PROMPT = """You are an expert research paper assistant. Below is the content of a research paper.
+Answer questions about it accurately and cite specific sections when possible.
+Be concise but thorough. Use markdown formatting for clarity.
+
+--- PAPER CONTENT ---
+{paper_text}
+--- END PAPER CONTENT ---"""
+
+ASK_SYSTEM_PROMPT = """You are an expert research paper assistant.
+The user has selected a specific passage from a research paper and wants you to explain it.
+Provide a clear, helpful explanation. If the passage contains technical terms, define them.
+Use the surrounding paper context to give accurate explanations.
+
+--- PAPER CONTEXT (surrounding pages) ---
+{paper_text}
+--- END PAPER CONTEXT ---"""

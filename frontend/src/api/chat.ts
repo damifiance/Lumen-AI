@@ -1,0 +1,112 @@
+import { apiFetch } from './client';
+import type { ModelInfo } from '../types/chat';
+
+export function getModels(): Promise<ModelInfo[]> {
+  return apiFetch('/chat/models');
+}
+
+export interface StreamCallbacks {
+  onToken: (token: string) => void;
+  onDone: () => void;
+  onError: (error: Error) => void;
+}
+
+export function streamAsk(
+  data: {
+    paper_path: string;
+    selected_text: string;
+    question: string;
+    model: string;
+  },
+  callbacks: StreamCallbacks
+): AbortController {
+  const controller = new AbortController();
+
+  fetch('/api/chat/ask', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    signal: controller.signal,
+  })
+    .then((res) => handleSSEResponse(res, callbacks))
+    .catch((err) => {
+      if (err.name !== 'AbortError') callbacks.onError(err);
+    });
+
+  return controller;
+}
+
+export function streamConversation(
+  data: {
+    paper_path: string;
+    messages: { role: string; content: string }[];
+    model: string;
+  },
+  callbacks: StreamCallbacks
+): AbortController {
+  const controller = new AbortController();
+
+  fetch('/api/chat/conversation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    signal: controller.signal,
+  })
+    .then((res) => handleSSEResponse(res, callbacks))
+    .catch((err) => {
+      if (err.name !== 'AbortError') callbacks.onError(err);
+    });
+
+  return controller;
+}
+
+async function handleSSEResponse(
+  response: Response,
+  callbacks: StreamCallbacks
+): Promise<void> {
+  if (!response.ok) {
+    callbacks.onError(new Error(`HTTP ${response.status}`));
+    return;
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    callbacks.onError(new Error('No response body'));
+    return;
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const jsonStr = line.slice(6);
+        if (jsonStr === '{}') {
+          callbacks.onDone();
+          return;
+        }
+        try {
+          const parsed = JSON.parse(jsonStr);
+          if (parsed.content) {
+            callbacks.onToken(parsed.content);
+          }
+        } catch {
+          // skip malformed JSON
+        }
+      }
+      if (line.startsWith('event: done')) {
+        callbacks.onDone();
+        return;
+      }
+    }
+  }
+  callbacks.onDone();
+}
