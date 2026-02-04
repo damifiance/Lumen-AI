@@ -4,7 +4,6 @@ A local AI-powered tool for reading academic papers. Highlight text, ask AI to e
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![React](https://img.shields.io/badge/React-19-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Features
 
