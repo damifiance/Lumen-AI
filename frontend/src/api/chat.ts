@@ -77,6 +77,7 @@ async function handleSSEResponse(
 
   const decoder = new TextDecoder();
   let buffer = '';
+  let currentEvent = 'token';
 
   while (true) {
     const { done, value } = await reader.read();
@@ -87,12 +88,28 @@ async function handleSSEResponse(
     buffer = lines.pop() || '';
 
     for (const line of lines) {
+      if (line.startsWith('event: ')) {
+        currentEvent = line.slice(7).trim();
+        continue;
+      }
       if (line.startsWith('data: ')) {
         const jsonStr = line.slice(6);
-        if (jsonStr === '{}') {
+
+        if (currentEvent === 'done') {
           callbacks.onDone();
           return;
         }
+
+        if (currentEvent === 'error') {
+          try {
+            const parsed = JSON.parse(jsonStr);
+            callbacks.onError(new Error(parsed.error || 'Unknown error'));
+          } catch {
+            callbacks.onError(new Error(jsonStr));
+          }
+          return;
+        }
+
         try {
           const parsed = JSON.parse(jsonStr);
           if (parsed.content) {
@@ -101,10 +118,8 @@ async function handleSSEResponse(
         } catch {
           // skip malformed JSON
         }
-      }
-      if (line.startsWith('event: done')) {
-        callbacks.onDone();
-        return;
+
+        currentEvent = 'token';
       }
     }
   }

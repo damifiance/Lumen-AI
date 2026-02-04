@@ -11,7 +11,7 @@ import 'react-pdf-highlighter-extended/dist/esm/style/TextHighlight.css';
 import 'react-pdf-highlighter-extended/dist/esm/style/AreaHighlight.css';
 import 'react-pdf-highlighter-extended/dist/esm/style/MouseSelection.css';
 import 'react-pdf-highlighter-extended/dist/esm/style/pdf_viewer.css';
-import { version as pdfjsVersion } from 'pdfjs-dist';
+import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { getPdfUrl } from '../../api/papers';
 import { useHighlightStore } from '../../stores/highlightStore';
 import { useChatStore } from '../../stores/chatStore';
@@ -90,13 +90,12 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
   );
 
   const pdfUrl = getPdfUrl(paperPath);
-  const workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.mjs`;
 
   return (
     <div className="h-full w-full relative">
       <PdfLoader
         document={pdfUrl}
-        workerSrc={workerSrc}
+        workerSrc={pdfjsWorkerUrl}
         beforeLoad={() => <LoadingSpinner message="Loading PDF..." />}
         errorMessage={(error) => (
           <div className="flex items-center justify-center h-full text-red-500">

@@ -63,27 +63,33 @@ def _split_into_chunks(text: str, chunk_size: int = 1000) -> list[str]:
 MATH_FORMATTING_INSTRUCTIONS = """
 When writing mathematical expressions:
 - Use $...$ for inline math (e.g. $E = mc^2$, $\\alpha + \\beta$)
-- Use $$...$$ for display/block equations (e.g. $$\\sum_{i=1}^{n} x_i$$)
+- Use $$...$$ for display/block equations
 - Always use LaTeX notation for formulas, Greek letters, subscripts, superscripts, fractions, etc.
 - Write equations clearly using proper LaTeX commands (\\frac, \\sqrt, \\int, \\sum, \\partial, etc.)
-- Never write raw math symbols like "sigma" or "x_i" — use $\\sigma$ and $x_i$ instead.
+- Never write raw math symbols like "sigma" — always use LaTeX notation instead.
 Use markdown formatting for everything else."""
 
-PAPER_SYSTEM_PROMPT = """You are an expert research paper assistant. Below is the content of a research paper.
-Answer questions about it accurately and cite specific sections when possible.
-Be concise but thorough.
-""" + MATH_FORMATTING_INSTRUCTIONS + """
+_PAPER_TEMPLATE = (
+    "You are an expert research paper assistant. Below is the content of a research paper.\n"
+    "Answer questions about it accurately and cite specific sections when possible.\n"
+    "Be concise but thorough.\n"
+    + MATH_FORMATTING_INSTRUCTIONS
+    + "\n\n--- PAPER CONTENT ---\n{paper_text}\n--- END PAPER CONTENT ---"
+)
 
---- PAPER CONTENT ---
-{paper_text}
---- END PAPER CONTENT ---"""
+_ASK_TEMPLATE = (
+    "You are an expert research paper assistant.\n"
+    "The user has selected a specific passage from a research paper and wants you to explain it.\n"
+    "Provide a clear, helpful explanation. If the passage contains technical terms, define them.\n"
+    "Use the surrounding paper context to give accurate explanations.\n"
+    + MATH_FORMATTING_INSTRUCTIONS
+    + "\n\n--- PAPER CONTEXT (surrounding pages) ---\n{paper_text}\n--- END PAPER CONTEXT ---"
+)
 
-ASK_SYSTEM_PROMPT = """You are an expert research paper assistant.
-The user has selected a specific passage from a research paper and wants you to explain it.
-Provide a clear, helpful explanation. If the passage contains technical terms, define them.
-Use the surrounding paper context to give accurate explanations.
-""" + MATH_FORMATTING_INSTRUCTIONS + """
 
---- PAPER CONTEXT (surrounding pages) ---
-{paper_text}
---- END PAPER CONTEXT ---"""
+def build_paper_prompt(paper_text: str) -> str:
+    return _PAPER_TEMPLATE.replace("{paper_text}", paper_text)
+
+
+def build_ask_prompt(paper_text: str) -> str:
+    return _ASK_TEMPLATE.replace("{paper_text}", paper_text)
