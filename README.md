@@ -230,6 +230,14 @@ AI-paper-reader/
 └── start.bat           # One-click launcher (Windows)
 ```
 
+## Contact
+
+Found a bug or have a question? Reach out:
+
+- **Email:** jh0420park@gmail.com
+- **Instagram:** [@zzhy0](https://instagram.com/zzhy0)
+- **LinkedIn:** [Jaehyung Park](https://www.linkedin.com/in/jaehyung-park-4986b53a5/)
+
 ## License
 
 MIT
