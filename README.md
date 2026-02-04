@@ -41,7 +41,7 @@ To customize shortcuts, press `Option/Alt + K` or click the keyboard icon in the
 
 ## macOS Setup
 
-### Option 1: Docker (Recommended)
+### Option 1: Docker
 
 **Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) and [Ollama](https://ollama.com/download/mac)
 
@@ -60,7 +60,7 @@ docker compose up --build
 open http://localhost:3000
 ```
 
-### Option 2: Manual Setup
+### Option 2: Manual Setup (Recommended)
 
 **Prerequisites:** Python 3.11+, Node.js 18+, [Ollama](https://ollama.com/download/mac)
 
