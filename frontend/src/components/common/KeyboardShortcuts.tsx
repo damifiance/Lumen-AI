@@ -30,9 +30,26 @@ export function KeyboardShortcuts() {
       else if (e.ctrlKey) modifier = 'ctrl';
       else if (e.altKey) modifier = 'alt';
 
-      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      const label = `${modLabel(modifier)}+${key.toUpperCase()}`;
-      const binding: ShortcutBinding = { label, modifier, key };
+      // Use e.code to get the physical key (immune to Option+key transformations on macOS)
+      const code = e.code;
+      // Derive a readable key name from the code
+      let displayKey = code
+        .replace(/^Digit/, '')
+        .replace(/^Key/, '')
+        .replace(/^Slash$/, '/')
+        .replace(/^Backslash$/, '\\')
+        .replace(/^Minus$/, '-')
+        .replace(/^Equal$/, '=')
+        .replace(/^Comma$/, ',')
+        .replace(/^Period$/, '.')
+        .replace(/^Semicolon$/, ';')
+        .replace(/^Quote$/, "'")
+        .replace(/^Backquote$/, '`')
+        .replace(/^BracketLeft$/, '[')
+        .replace(/^BracketRight$/, ']');
+      const key = displayKey.length === 1 ? displayKey.toLowerCase() : displayKey;
+      const label = `${modLabel(modifier)}+${displayKey.toUpperCase()}`;
+      const binding: ShortcutBinding = { label, modifier, key, code };
 
       updateBinding(recording, binding);
       setRecording(null);

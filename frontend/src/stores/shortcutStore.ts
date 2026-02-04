@@ -3,12 +3,14 @@ import { create } from 'zustand';
 const isMac = navigator.platform.toUpperCase().includes('MAC');
 
 export interface ShortcutBinding {
-  /** Display label, e.g. "Cmd+1" or "Ctrl+1" */
+  /** Display label, e.g. "Option+1" or "Alt+1" */
   label: string;
   /** The modifier key(s) to check */
   modifier: 'meta' | 'ctrl' | 'alt';
-  /** The key to check (e.g. '1', 'w', '/', 'k') */
+  /** The key for display (e.g. '1', 'w', '/') */
   key: string;
+  /** The physical key code to match against (e.g. 'Digit1', 'KeyW', 'Slash') */
+  code: string;
 }
 
 export interface ShortcutDef {
@@ -19,10 +21,22 @@ export interface ShortcutDef {
 
 const STORAGE_KEY = 'lumen-keyboard-shortcuts';
 
+/** Map a simple key to its KeyboardEvent.code */
+function keyToCode(key: string): string {
+  if (/^[0-9]$/.test(key)) return `Digit${key}`;
+  if (/^[a-zA-Z]$/.test(key)) return `Key${key.toUpperCase()}`;
+  const specials: Record<string, string> = {
+    '/': 'Slash', '\\': 'Backslash', '[': 'BracketLeft', ']': 'BracketRight',
+    '-': 'Minus', '=': 'Equal', ',': 'Comma', '.': 'Period',
+    ';': 'Semicolon', "'": 'Quote', '`': 'Backquote',
+  };
+  return specials[key] ?? key;
+}
+
 function defaultBinding(key: string, macMod: 'meta' | 'ctrl' | 'alt' = 'alt', winMod: 'ctrl' | 'alt' = 'alt'): ShortcutBinding {
   const mod = isMac ? macMod : winMod;
   const modLabel = mod === 'meta' ? (isMac ? 'Cmd' : 'Meta') : mod === 'ctrl' ? 'Ctrl' : (isMac ? 'Option' : 'Alt');
-  return { label: `${modLabel}+${key.toUpperCase()}`, modifier: mod, key };
+  return { label: `${modLabel}+${key.toUpperCase()}`, modifier: mod, key, code: keyToCode(key) };
 }
 
 function createDefaults(): ShortcutDef[] {
@@ -48,10 +62,13 @@ function loadShortcuts(): ShortcutDef[] {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return defaults;
     const overrides: Record<string, ShortcutBinding> = JSON.parse(saved);
-    return defaults.map((def) => ({
-      ...def,
-      binding: overrides[def.id] ?? def.binding,
-    }));
+    return defaults.map((def) => {
+      const override = overrides[def.id];
+      if (!override) return def;
+      // Migrate old bindings that lack a code field
+      if (!override.code) override.code = keyToCode(override.key);
+      return { ...def, binding: override };
+    });
   } catch {
     return defaults;
   }
@@ -80,7 +97,6 @@ export const useShortcutStore = create<ShortcutState>((set, get) => ({
       s.id === id ? { ...s, binding } : s
     );
     set({ shortcuts });
-    // Save overrides
     const overrides: Record<string, ShortcutBinding> = {};
     shortcuts.forEach((s) => { overrides[s.id] = s.binding; });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
@@ -100,7 +116,8 @@ export const useShortcutStore = create<ShortcutState>((set, get) => ({
       (binding.modifier === 'meta' && e.metaKey) ||
       (binding.modifier === 'ctrl' && e.ctrlKey) ||
       (binding.modifier === 'alt' && e.altKey);
-    return modMatch && e.key.toLowerCase() === binding.key.toLowerCase();
+    // Match against e.code (physical key) to handle macOS Option+key producing special characters
+    return modMatch && e.code === binding.code;
   },
 }));
 
