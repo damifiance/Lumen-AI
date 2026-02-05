@@ -14,7 +14,8 @@
   <nav class="nav">
     <div class="nav-left">
       <a href="#features">Features</a>
-      <a href="#setup">Setup</a>
+      <a href="#download">Download</a>
+      <a href="#setup">Build from Source</a>
       <a href="https://github.com/damifiance/Lumen-AI">Community</a>
     </div>
     <a href="#" class="nav-logo">
@@ -101,8 +102,8 @@
     </div>
   </section>
 
-  <!-- Download CTA -->
-  <section class="download-section">
+  <!-- Download & Install -->
+  <section class="download-section" id="download">
     <h2>Ready to read smarter?</h2>
     <p>Download Lumen AI for free. macOS, Windows, and Linux.</p>
     <div class="download-buttons">
@@ -113,49 +114,86 @@
       <a href="https://github.com/damifiance/Lumen-AI/releases/latest" class="btn btn-ghost">
         Windows / Linux
       </a>
-      <a href="https://github.com/damifiance/Lumen-AI" class="btn btn-ghost">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-        View on GitHub
-      </a>
+    </div>
+
+    <div class="install-steps">
+      <div class="install-step">
+        <span class="install-step-number">1</span>
+        <div class="install-step-content">
+          <h3>Download the app</h3>
+          <p>Grab the <code>.dmg</code> for macOS, <code>.exe</code> for Windows, or <code>.AppImage</code> for Linux from the button above.</p>
+        </div>
+      </div>
+      <div class="install-step">
+        <span class="install-step-number">2</span>
+        <div class="install-step-content">
+          <h3>Install it</h3>
+          <p>macOS: open the <code>.dmg</code> and drag Lumen AI to Applications. Windows: run the installer. Linux: make the AppImage executable and run it.</p>
+        </div>
+      </div>
+      <div class="install-step">
+        <span class="install-step-number">3</span>
+        <div class="install-step-content">
+          <h3>Install Ollama</h3>
+          <p>Download Ollama from <a href="https://ollama.com/download">ollama.com</a>, then pull a model:</p>
+          <pre><code>ollama pull llama3.1</code></pre>
+        </div>
+      </div>
+      <div class="install-step">
+        <span class="install-step-number">4</span>
+        <div class="install-step-content">
+          <h3>Open Lumen AI</h3>
+          <p>Launch the app, open a PDF, and start reading with AI. That's it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ollama-callout">
+      <strong>Ollama is required.</strong> Lumen AI uses Ollama for free, private, local AI. <a href="https://ollama.com/download">Install it first</a> &mdash; it takes 30 seconds.
     </div>
   </section>
 
-  <!-- Setup -->
+  <!-- Build from Source -->
   <section class="setup" id="setup">
-    <h2>Quick Start</h2>
-    <div class="setup-steps">
-      <div class="setup-step">
-        <h3>1. Install Prerequisites</h3>
-        <pre><code><span class="comment"># Install Ollama (free local AI)</span>
+    <details class="build-from-source">
+      <summary class="build-from-source-toggle">
+        <h2>Build from Source</h2>
+        <p class="build-subtitle">For developers who want to run from source or contribute</p>
+      </summary>
+      <div class="setup-steps">
+        <div class="setup-step">
+          <h3>1. Install Prerequisites</h3>
+          <pre><code><span class="comment"># Install Ollama (free local AI)</span>
 <a href="https://ollama.com/download" style="color:#f59e0b">https://ollama.com/download</a>
 
 <span class="comment"># Pull a model</span>
 ollama pull llama3.1</code></pre>
-      </div>
-      <div class="setup-step">
-        <h3>2. Clone &amp; Install</h3>
-        <pre><code>git clone https://github.com/damifiance/Lumen-AI.git
+        </div>
+        <div class="setup-step">
+          <h3>2. Clone &amp; Install</h3>
+          <pre><code>git clone https://github.com/damifiance/Lumen-AI.git
 cd Lumen-AI
 
 cd backend && pip install -e . && cd ..
 cd frontend && npm install --legacy-peer-deps && cd ..</code></pre>
-      </div>
-      <div class="setup-step">
-        <h3>3. Run</h3>
-        <pre><code><span class="comment"># macOS / Linux</span>
+        </div>
+        <div class="setup-step">
+          <h3>3. Run</h3>
+          <pre><code><span class="comment"># macOS / Linux</span>
 ./start-web.sh
 
 <span class="comment"># Windows</span>
 start-web.bat</code></pre>
-      </div>
-      <div class="setup-step">
-        <h3>4. Or build the desktop app</h3>
-        <pre><code>npm run build
+        </div>
+        <div class="setup-step">
+          <h3>4. Or build the desktop app</h3>
+          <pre><code>npm run build
 npm run package:mac   <span class="comment"># macOS</span>
 npm run package:win   <span class="comment"># Windows</span>
 npm run package:linux <span class="comment"># Linux</span></code></pre>
+        </div>
       </div>
-    </div>
+    </details>
   </section>
 
   <!-- Footer -->

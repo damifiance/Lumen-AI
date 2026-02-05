@@ -411,6 +411,163 @@ a:hover {
 }
 
 /* ================================================
+   INSTALL STEPS (inside download section)
+   ================================================ */
+.install-steps {
+  max-width: 560px;
+  margin: 48px auto 0;
+  text-align: left;
+}
+
+.install-step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.install-step-number {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.install-step-content h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.install-step-content p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 0;
+  line-height: 1.55;
+}
+
+.install-step-content a {
+  color: var(--amber-light);
+}
+
+.install-step-content a:hover {
+  color: var(--amber);
+}
+
+.install-step-content code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+  color: var(--amber-light);
+}
+
+.install-step-content pre {
+  background: var(--dark-deep);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  overflow-x: auto;
+}
+
+.install-step-content pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.85rem;
+  color: #e5e7eb;
+}
+
+/* Ollama callout */
+.ollama-callout {
+  max-width: 560px;
+  margin: 32px auto 0;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: left;
+  line-height: 1.55;
+}
+
+.ollama-callout strong {
+  color: var(--amber-light);
+}
+
+.ollama-callout a {
+  color: var(--amber-light);
+}
+
+.ollama-callout a:hover {
+  color: var(--white);
+}
+
+/* ================================================
+   BUILD FROM SOURCE (collapsible)
+   ================================================ */
+.build-from-source {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.build-from-source-toggle {
+  cursor: pointer;
+  list-style: none;
+  text-align: center;
+}
+
+.build-from-source-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.build-from-source-toggle::marker {
+  display: none;
+  content: '';
+}
+
+.build-from-source-toggle h2 {
+  margin-bottom: 8px;
+}
+
+.build-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.build-from-source-toggle:hover h2 {
+  color: var(--amber-dark);
+}
+
+.build-from-source-toggle::after {
+  content: 'Click to expand';
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+  transition: opacity 0.2s;
+}
+
+.build-from-source[open] > .build-from-source-toggle::after {
+  content: '';
+  display: none;
+}
+
+.build-from-source[open] .setup-steps {
+  margin-top: 32px;
+}
+
+/* ================================================
    SETUP
    ================================================ */
 .setup {
@@ -550,6 +707,20 @@ a:hover {
     width: 100%;
     max-width: 300px;
     justify-content: center;
+  }
+
+  .install-steps {
+    margin-top: 36px;
+  }
+
+  .install-step-number {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+  }
+
+  .ollama-callout {
+    margin-top: 24px;
   }
 
   .setup {
