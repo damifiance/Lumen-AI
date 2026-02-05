@@ -3,8 +3,16 @@ import { createRoot } from 'react-dom/client';
 import './styles/globals.css';
 import App from './App';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+async function init() {
+  if ((window as any).electron) {
+    const port = await (window as any).electron.getBackendPort();
+    (window as any).__BACKEND_PORT__ = port;
+  }
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+}
+
+init();

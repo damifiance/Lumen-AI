@@ -39,28 +39,42 @@ To customize shortcuts, press `Option/Alt + K` or click the keyboard icon in the
 
 ---
 
-## macOS Setup
+## Desktop App (No Terminal Needed)
 
-### Option 1: Docker
+Download the `.dmg` from the [Releases](#) page, open it, drag **Lumen AI** into Applications, and double-click to launch.
 
-**Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) and [Ollama](https://ollama.com/download/mac)
+> On first launch, macOS may block the unsigned app. Right-click → **Open** → click **Open** in the dialog.
+
+### Building the Desktop App Yourself
 
 ```bash
-# 1. Install a local AI model
-ollama pull llama3.1
+# 1. Install deps (first time)
+cd backend && pip install -e ".[dev]" && cd ..
+cd frontend && npm install && cd ..
+cd electron && npm install && cd ..
 
-# 2. Clone this repo
-git clone https://github.com/damifiance/Lumen-AI.git
-cd Lumen-AI
+# 2. Build backend + frontend
+npm run build
 
-# 3. Start the app
-docker compose up --build
-
-# 4. Open in your browser
-open http://localhost:3000
+# 3. Package as .dmg (macOS) / .exe (Windows) / .AppImage (Linux)
+npm run package:mac
+npm run package:win
+npm run package:linux
 ```
 
-### Option 2: Manual Setup (Recommended)
+The installer appears in `dist/installers/`. The resulting app is fully self-contained — no Python, Node, or terminal required for end users.
+
+### Desktop App Dev Mode
+
+Run backend, frontend, and Electron together with hot reload:
+
+```bash
+npm run dev
+```
+
+---
+
+## macOS Setup
 
 **Prerequisites:** Python 3.11+, Node.js 18+, [Ollama](https://ollama.com/download/mac)
 
@@ -81,9 +95,9 @@ cd frontend && npm install --legacy-peer-deps && cd ..
 
 The app opens automatically in your browser at `http://localhost:5173`.
 
-### Option 3: macOS App Shortcut
+### macOS App Shortcut
 
-After running Option 2 at least once, you can launch the app from Spotlight:
+After setup, you can launch the app from Spotlight:
 
 1. Press `Cmd + Space`, type **"Lumen AI"**
 2. It opens a Terminal and starts both servers
@@ -91,38 +105,6 @@ After running Option 2 at least once, you can launch the app from Spotlight:
 ---
 
 ## Windows Setup
-
-### Option 1: Docker (Recommended)
-
-**Step 1 — Install prerequisites:**
-
-1. Download and install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-2. Download and install [Ollama for Windows](https://ollama.com/download/windows)
-3. Download and install [Git for Windows](https://git-scm.com/download/win) (if you don't have it)
-
-**Step 2 — Install a local AI model:**
-
-Open **Command Prompt** or **PowerShell** and run:
-
-```
-ollama pull llama3.1
-```
-
-Wait for the download to finish (~4.9 GB).
-
-**Step 3 — Clone and start the app:**
-
-```
-git clone https://github.com/damifiance/Lumen-AI.git
-cd Lumen-AI
-docker compose up --build
-```
-
-**Step 4 — Open in your browser:**
-
-Go to `http://localhost:3000`
-
-### Option 2: Manual Setup (Windows)
 
 **Step 1 — Install prerequisites:**
 
@@ -219,6 +201,7 @@ AI-paper-reader/
 │   │   ├── services/   # Business logic (PDF, LLM, files)
 │   │   ├── models/     # Database models
 │   │   └── schemas/    # Request/response types
+│   ├── lumen-backend.spec  # PyInstaller build spec
 │   └── pyproject.toml
 ├── frontend/           # React app
 │   └── src/
@@ -226,9 +209,15 @@ AI-paper-reader/
 │       ├── stores/     # Zustand state management
 │       ├── api/        # API client
 │       └── types/      # TypeScript types
-├── docker-compose.yml
-├── start.sh            # One-click launcher (macOS/Linux)
-└── start.bat           # One-click launcher (Windows)
+├── electron/           # Electron desktop wrapper
+│   ├── main.js         # Main process (spawns backend, creates window)
+│   ├── preload.js      # IPC bridge to renderer
+│   └── electron-builder.json  # Installer build config
+├── scripts/            # Build scripts
+│   ├── build.js        # Full build orchestrator
+│   └── dev.js          # Dev mode launcher
+├── start.sh            # Web app launcher (macOS/Linux)
+└── start.bat           # Web app launcher (Windows)
 ```
 
 ## Contact

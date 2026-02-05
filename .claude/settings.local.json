@@ -17,7 +17,20 @@
       "mcp__ide__getDiagnostics",
       "Bash(git pull:*)",
       "Bash(git stash:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(ls:*)",
+      "Bash(sips:*)",
+      "Bash(TMPDIR_ICON=\"/var/folders/l6/_hd0vhxn7jj09sbl0m1rf9tw0000gn/T/tmp.PU7rTRsPz8\")",
+      "Bash(__NEW_LINE_fbdad024bcaf19e8__ python3 -c \"\nfrom PIL import Image\nimg = Image.open\\(''/Users/damifiance/Documents/Lumen-AI.jpg''\\)\nbg_color = img.getpixel\\(\\(0, 0\\)\\)\nsquare = Image.new\\(''RGB'', \\(1024, 1024\\), bg_color\\)\nx_offset = \\(1024 - img.width\\) // 2\ny_offset = \\(1024 - img.height\\) // 2\nsquare.paste\\(img, \\(x_offset, y_offset\\)\\)\nsquare.save\\(''$TMPDIR_ICON/icon_1024.png''\\)\nprint\\(f''Background color sampled: {bg_color}''\\)\nprint\\(''Done''\\)\n\")",
+      "Bash(python3:*)",
+      "Bash(pip3 show:*)",
+      "Bash(pyinstaller:*)",
+      "Bash(npx electron-builder:*)",
+      "Bash(git rebase:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(git rm:*)",
+      "Bash(GIT_EDITOR=true git rebase:*)"
     ]
   }
 }

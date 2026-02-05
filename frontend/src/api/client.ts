@@ -1,4 +1,6 @@
-const BASE_URL = '/api';
+const BASE_URL = (window as any).__BACKEND_PORT__
+  ? `http://localhost:${(window as any).__BACKEND_PORT__}/api`
+  : '/api';
 
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {

@@ -1,0 +1,19 @@
+{
+  "name": "lumen-ai",
+  "version": "0.1.0",
+  "description": "Lumen AI - AI-powered paper reading assistant",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win"
+  },
+  "dependencies": {
+    "find-free-port": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}
