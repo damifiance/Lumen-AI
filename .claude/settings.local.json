@@ -38,7 +38,13 @@
       "Bash(/Users/damifiance/workspace/AI-paper-reader/backend/dist/lumen-backend/lumen-backend:*)",
       "Bash(git mv:*)",
       "Bash(osascript:*)",
-      "Bash(file:*)"
+      "Bash(file:*)",
+      "Bash(gh api:*)",
+      "Bash(1 <<'EOF'\n{\"cname\":\"\",\"source\":{\"branch\":\"master\",\"path\":\"/docs\"},\"build_type\":\"legacy\"}\nEOF)",
+      "Bash(bash scripts/build-backend.sh:*)",
+      "Bash(bash scripts/build-frontend.sh:*)",
+      "Bash(gh release create:*)",
+      "Bash(gh release view:*)"
     ]
   }
 }
