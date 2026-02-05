@@ -1,9 +1,12 @@
-const BASE_URL = (window as any).__BACKEND_PORT__
-  ? `http://localhost:${(window as any).__BACKEND_PORT__}/api`
-  : '/api';
+function getBaseUrl(): string {
+  if ((window as any).__BACKEND_PORT__) {
+    return `http://localhost:${(window as any).__BACKEND_PORT__}/api`;
+  }
+  return '/api';
+}
 
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetch(`${getBaseUrl()}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
@@ -16,5 +19,5 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
 }
 
 export function apiStreamUrl(path: string): string {
-  return `${BASE_URL}${path}`;
+  return `${getBaseUrl()}${path}`;
 }

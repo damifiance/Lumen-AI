@@ -8,7 +8,7 @@ FRONTEND_DIR="$PROJECT_DIR/frontend"
 echo "==> Building frontend..."
 cd "$FRONTEND_DIR"
 
-npm install
+npm install --legacy-peer-deps
 npm run build
 
 echo "==> Frontend build complete: $FRONTEND_DIR/dist/"

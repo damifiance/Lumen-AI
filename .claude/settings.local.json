@@ -30,7 +30,15 @@
       "Bash(git reset:*)",
       "Bash(git checkout:*)",
       "Bash(git rm:*)",
-      "Bash(GIT_EDITOR=true git rebase:*)"
+      "Bash(GIT_EDITOR=true git rebase:*)",
+      "Bash(git push:*)",
+      "Bash(open:*)",
+      "Bash(xattr:*)",
+      "Bash(pip show:*)",
+      "Bash(/Users/damifiance/workspace/AI-paper-reader/backend/dist/lumen-backend/lumen-backend:*)",
+      "Bash(git mv:*)",
+      "Bash(osascript:*)",
+      "Bash(file:*)"
     ]
   }
 }

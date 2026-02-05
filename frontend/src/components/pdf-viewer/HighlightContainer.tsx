@@ -11,7 +11,7 @@ import { NotePopup } from './NotePopup';
 
 interface HighlightContainerProps {
   onDelete: (id: string) => void;
-  onAskAI: (text: string, question: string) => void;
+  onAskAI: (text: string, question: string, highlightId?: string) => void;
   onUpdateNote: (id: string, comment: string) => void;
 }
 
@@ -31,24 +31,33 @@ export function HighlightContainer({
   const [notePopupPosition, setNotePopupPosition] = useState({ x: 0, y: 0 });
   const highlightRef = useRef<HTMLDivElement>(null);
 
+  const [notePopupBelow, setNotePopupBelow] = useState(false);
+
   const handleOpenNotes = useCallback(() => {
     if (highlightRef.current) {
       const rect = highlightRef.current.getBoundingClientRect();
-      const popupWidth = 288; // w-72 = 18rem = 288px
+      const popupWidth = 320; // w-80 = 20rem = 320px
       const margin = 12;
 
-      let x = rect.right + margin;
-      let y = rect.top + rect.height / 2;
+      // Center horizontally on the highlight
+      let x = rect.left + rect.width / 2;
 
-      // If popup would overflow right edge, place it to the left
-      if (x + popupWidth > window.innerWidth) {
-        x = rect.left - popupWidth - margin;
+      // Clamp X so popup doesn't overflow left/right edges
+      const halfPopup = popupWidth / 2;
+      x = Math.max(halfPopup + margin, Math.min(x, window.innerWidth - halfPopup - margin));
+
+      // Place above highlight by default
+      let y = rect.top - margin;
+      let below = false;
+
+      // If too close to top, flip to below
+      if (rect.top < 200) {
+        y = rect.bottom + margin;
+        below = true;
       }
 
-      // Clamp x to stay on screen
-      x = Math.max(margin, Math.min(x, window.innerWidth - popupWidth - margin));
-
       setNotePopupPosition({ x, y });
+      setNotePopupBelow(below);
     }
     setNotePopupOpen(true);
   }, []);
@@ -64,6 +73,7 @@ export function HighlightContainer({
         note={isNote ? '' : comment}
         contentText={contentText}
         isNote={isNote}
+        highlightId={highlight.id}
         onDelete={() => onDelete(highlight.id)}
         onAskAI={onAskAI}
         onOpenNotes={isNote ? handleOpenNotes : undefined}
@@ -100,7 +110,9 @@ export function HighlightContainer({
               position: 'fixed',
               left: notePopupPosition.x,
               top: notePopupPosition.y,
-              transform: 'translateY(-50%)',
+              transform: notePopupBelow
+                ? 'translate(-50%, 0)'
+                : 'translate(-50%, -100%)',
               zIndex: 9999,
             }}
           >
@@ -114,6 +126,7 @@ export function HighlightContainer({
                 setNotePopupOpen(false);
               }}
               onClose={handleCloseNotes}
+              arrowPosition={notePopupBelow ? 'top' : 'bottom'}
             />
           </div>,
           document.body,

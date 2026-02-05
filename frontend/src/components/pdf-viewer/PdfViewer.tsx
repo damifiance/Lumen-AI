@@ -105,8 +105,8 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
   );
 
   const handleHighlightAskAI = useCallback(
-    (text: string, question: string) => {
-      askAboutSelection(paperPath, text, question);
+    (text: string, question: string, highlightId?: string) => {
+      askAboutSelection(paperPath, text, question, highlightId);
       setOpen(true);
     },
     [paperPath, askAboutSelection, setOpen]

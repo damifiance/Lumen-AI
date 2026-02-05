@@ -2,16 +2,21 @@
 # PyInstaller spec for Lumen AI backend
 
 import sys
+import os
 from pathlib import Path
+from PyInstaller.utils.hooks import collect_all, collect_submodules
 
 block_cipher = None
+
+# Collect ALL of litellm — it has too many dynamic imports/data files
+litellm_datas, litellm_binaries, litellm_hiddenimports = collect_all('litellm')
 
 a = Analysis(
     ['app/main.py'],
     pathex=[],
-    binaries=[],
-    datas=[],
-    hiddenimports=[
+    binaries=litellm_binaries,
+    datas=litellm_datas,
+    hiddenimports=litellm_hiddenimports + [
         # FastAPI / Uvicorn
         'uvicorn',
         'uvicorn.logging',
@@ -29,14 +34,6 @@ a = Analysis(
         'sqlalchemy.dialects.sqlite',
         'aiosqlite',
 
-        # LiteLLM and its dynamic deps
-        'litellm',
-        'litellm.llms',
-        'litellm.llms.ollama',
-        'litellm.llms.ollama.completion.handler',
-        'litellm.llms.openai',
-        'litellm.llms.anthropic',
-
         # Tiktoken
         'tiktoken',
         'tiktoken_ext',
@@ -48,7 +45,6 @@ a = Analysis(
         'sklearn.feature_extraction.text',
         'sklearn.utils._cython_blas',
         'sklearn.utils._typedefs',
-        'sklearn.neighbors._typedefs',
 
         # PyMuPDF
         'fitz',

@@ -24,6 +24,7 @@ interface NotePopupProps {
   onUpdateNote: (comment: string) => void;
   onDelete: () => void;
   onClose?: () => void;
+  arrowPosition?: 'top' | 'bottom';
 }
 
 export function NotePopup({
@@ -31,6 +32,7 @@ export function NotePopup({
   onUpdateNote,
   onDelete,
   onClose,
+  arrowPosition,
 }: NotePopupProps) {
   const [notes, setNotes] = useState<NoteEntry[]>(() => parseNotes(comment));
   const [newText, setNewText] = useState('');
@@ -113,9 +115,34 @@ export function NotePopup({
   return (
     <div
       ref={containerRef}
-      className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 w-72"
+      className="relative bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 w-80"
       onClick={(e) => e.stopPropagation()}
     >
+      {/* Arrow caret */}
+      {arrowPosition === 'bottom' && (
+        <div
+          className="absolute left-1/2 -translate-x-1/2 -bottom-2"
+          style={{
+            width: 0,
+            height: 0,
+            borderLeft: '8px solid transparent',
+            borderRight: '8px solid transparent',
+            borderTop: '8px solid rgba(255,255,255,0.95)',
+          }}
+        />
+      )}
+      {arrowPosition === 'top' && (
+        <div
+          className="absolute left-1/2 -translate-x-1/2 -top-2"
+          style={{
+            width: 0,
+            height: 0,
+            borderLeft: '8px solid transparent',
+            borderRight: '8px solid transparent',
+            borderBottom: '8px solid rgba(255,255,255,0.95)',
+          }}
+        />
+      )}
       {/* Header */}
       <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between">
         <span className="text-[12px] font-semibold text-gray-700">

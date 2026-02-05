@@ -1,4 +1,4 @@
-import { apiFetch } from './client';
+import { apiFetch, apiStreamUrl } from './client';
 import type { ModelInfo } from '../types/chat';
 
 export function getModels(): Promise<ModelInfo[]> {
@@ -22,7 +22,7 @@ export function streamAsk(
 ): AbortController {
   const controller = new AbortController();
 
-  fetch('/api/chat/ask', {
+  fetch(apiStreamUrl('/chat/ask'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -46,7 +46,7 @@ export function streamConversation(
 ): AbortController {
   const controller = new AbortController();
 
-  fetch('/api/chat/conversation', {
+  fetch(apiStreamUrl('/chat/conversation'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),

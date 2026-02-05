@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -5,7 +6,8 @@ import 'katex/dist/katex.min.css';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { ChatMessage as ChatMessageType } from '../../types/chat';
-import { User, Sun } from 'lucide-react';
+import { User, Sun, BookmarkPlus, Check } from 'lucide-react';
+import { useHighlightStore } from '../../stores/highlightStore';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -14,6 +16,16 @@ interface ChatMessageProps {
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const isEmpty = !message.content && !isUser;
+  const [saved, setSaved] = useState(false);
+  const addNoteToHighlight = useHighlightStore((s) => s.addNoteToHighlight);
+
+  const canSaveAsNote = !isUser && message.highlightId && message.content && !isEmpty;
+
+  const handleSaveAsNote = async () => {
+    if (!message.highlightId || !message.content) return;
+    await addNoteToHighlight(message.highlightId, message.content);
+    setSaved(true);
+  };
 
   return (
     <div className={`px-5 py-4 ${isUser ? 'bg-chat-user' : 'bg-chat-assistant'}`}>
@@ -76,6 +88,20 @@ export function ChatMessage({ message }: ChatMessageProps) {
               >
                 {message.content}
               </ReactMarkdown>
+            )}
+            {canSaveAsNote && (
+              <button
+                onClick={handleSaveAsNote}
+                disabled={saved}
+                className={`mt-2 flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg transition-colors ${
+                  saved
+                    ? 'text-green-600 bg-green-50 cursor-default'
+                    : 'text-amber-600 bg-amber-50 hover:bg-amber-100 cursor-pointer'
+                }`}
+              >
+                {saved ? <Check size={12} /> : <BookmarkPlus size={12} />}
+                {saved ? 'Saved to highlight' : 'Save as Note'}
+              </button>
             )}
           </div>
         </div>

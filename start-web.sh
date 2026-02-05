@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Lumen AI — One-click launcher
+# Lumen AI (Web) — Opens in browser, no Electron
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 cleanup() {

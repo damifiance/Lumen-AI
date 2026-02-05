@@ -47,22 +47,73 @@ Download the `.dmg` from the [Releases](#) page, open it, drag **Lumen AI** into
 
 ### Building the Desktop App Yourself
 
+**Prerequisites:** Python 3.11+, Node.js 18+, pip, npm
+
+Open Terminal (or Command Prompt on Windows) and run these commands **one at a time**:
+
 ```bash
-# 1. Install deps (first time)
-cd backend && pip install -e ".[dev]" && cd ..
-cd frontend && npm install && cd ..
-cd electron && npm install && cd ..
-
-# 2. Build backend + frontend
-npm run build
-
-# 3. Package as .dmg (macOS) / .exe (Windows) / .AppImage (Linux)
-npm run package:mac
-npm run package:win
-npm run package:linux
+git clone https://github.com/damifiance/Lumen-AI.git
+cd Lumen-AI
 ```
 
-The installer appears in `dist/installers/`. The resulting app is fully self-contained — no Python, Node, or terminal required for end users.
+**Step 1 — Install dependencies:**
+```bash
+cd backend && pip install -e ".[dev]" && cd ..
+```
+```bash
+cd frontend && npm install --legacy-peer-deps && cd ..
+```
+```bash
+cd electron && npm install && cd ..
+```
+
+**Step 2 — Build everything:**
+```bash
+npm run build
+```
+
+**Step 3 — Create the installer:**
+
+| Platform | Command |
+|----------|---------|
+| macOS | `npm run package:mac` |
+| Windows | `npm run package:win` |
+| Linux | `npm run package:linux` |
+
+> **Note:** Each platform's installer must be built on that platform (e.g., Windows builds require running on Windows). PyInstaller produces platform-specific binaries.
+
+**Step 4 — Install the app:**
+
+**macOS:**
+```bash
+open "dist/installers/Lumen AI-0.1.0-arm64.dmg"
+```
+Drag **Lumen AI** into the **Applications** folder. Then open it from Launchpad or `/Applications`.
+
+> If macOS says the app "can't be opened", run this in Terminal first:
+> ```bash
+> xattr -rd com.apple.quarantine "/Applications/Lumen AI.app"
+> ```
+> Then open it normally. You only need to do this once.
+
+**Windows:**
+The NSIS installer will be at `dist/installers/Lumen AI Setup *.exe`. Double-click to install.
+
+**Linux:**
+The AppImage will be at `dist/installers/Lumen AI-*.AppImage`. Make it executable and run:
+```bash
+chmod +x "dist/installers/Lumen AI-"*.AppImage
+./"dist/installers/Lumen AI-"*.AppImage
+```
+
+### Build Scripts
+
+Platform-specific build scripts are available in the `scripts/` folder:
+
+| Platform | Backend | Frontend |
+|----------|---------|----------|
+| macOS/Linux | `scripts/build-backend.sh` | `scripts/build-frontend.sh` |
+| Windows | `scripts/build-backend.bat` | `scripts/build-frontend.bat` |
 
 ### Desktop App Dev Mode
 
@@ -90,7 +141,7 @@ cd backend && pip install -e . && cd ..
 cd frontend && npm install --legacy-peer-deps && cd ..
 
 # 3. Run the app
-./start.sh
+./start-web.sh
 ```
 
 The app opens automatically in your browser at `http://localhost:5173`.
@@ -138,15 +189,15 @@ cd ..
 
 **Step 4 — Start the app:**
 
-Double-click `start.bat` in the project folder, or run:
+Double-click `start-web.bat` in the project folder, or run:
 
 ```
-start.bat
+start-web.bat
 ```
 
 The app opens automatically in your browser at `http://localhost:5173`.
 
-**Tip:** Create a shortcut to `start.bat` on your Desktop for quick access.
+**Tip:** Create a shortcut to `start-web.bat` on your Desktop for quick access.
 
 ---
 
@@ -216,8 +267,8 @@ AI-paper-reader/
 ├── scripts/            # Build scripts
 │   ├── build.js        # Full build orchestrator
 │   └── dev.js          # Dev mode launcher
-├── start.sh            # Web app launcher (macOS/Linux)
-└── start.bat           # Web app launcher (Windows)
+├── start-web.sh        # Web app launcher (macOS/Linux)
+└── start-web.bat       # Web app launcher (Windows)
 ```
 
 ## Contact

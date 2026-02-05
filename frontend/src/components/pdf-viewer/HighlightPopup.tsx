@@ -5,8 +5,9 @@ interface HighlightPopupProps {
   note: string;
   contentText: string;
   isNote: boolean;
+  highlightId?: string;
   onDelete: () => void;
-  onAskAI: (text: string, question: string) => void;
+  onAskAI: (text: string, question: string, highlightId?: string) => void;
   onOpenNotes?: () => void;
 }
 
@@ -14,6 +15,7 @@ export function HighlightPopup({
   note,
   contentText,
   isNote,
+  highlightId,
   onDelete,
   onAskAI,
   onOpenNotes,
@@ -28,7 +30,7 @@ export function HighlightPopup({
 
   const handleSend = () => {
     const q = question.trim() || 'Explain this passage.';
-    onAskAI(contentText, q);
+    onAskAI(contentText, q, highlightId);
     setAskMode(false);
     setQuestion('');
   };

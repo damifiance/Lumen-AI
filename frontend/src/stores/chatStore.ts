@@ -14,7 +14,7 @@ interface ChatState {
   toggleOpen: () => void;
   setOpen: (open: boolean) => void;
   sendMessage: (paperPath: string, content: string) => void;
-  askAboutSelection: (paperPath: string, selectedText: string, question: string) => void;
+  askAboutSelection: (paperPath: string, selectedText: string, question: string, highlightId?: string) => void;
   stopStreaming: () => void;
   clearMessages: () => void;
 }
@@ -96,11 +96,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ abortController: controller });
   },
 
-  askAboutSelection: (paperPath: string, selectedText: string, question: string) => {
+  askAboutSelection: (paperPath: string, selectedText: string, question: string, highlightId?: string) => {
     const { model } = get();
     const userContent = `${question}\n\n> ${selectedText}`;
-    const userMsg: ChatMessage = { id: nextId(), role: 'user', content: userContent };
-    const assistantMsg: ChatMessage = { id: nextId(), role: 'assistant', content: '' };
+    const userMsg: ChatMessage = { id: nextId(), role: 'user', content: userContent, highlightId, selectedText, paperPath };
+    const assistantMsg: ChatMessage = { id: nextId(), role: 'assistant', content: '', highlightId, selectedText, paperPath };
 
     set((s) => ({
       messages: [...s.messages, userMsg, assistantMsg],
