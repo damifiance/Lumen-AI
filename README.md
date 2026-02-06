@@ -41,9 +41,15 @@ To customize shortcuts, press `Option/Alt + K` or click the keyboard icon in the
 
 ## Desktop App (No Terminal Needed)
 
-Download the `.dmg` from the [Releases](#) page, open it, drag **Lumen AI** into Applications, and double-click to launch.
+Download the installer for your platform from the [Releases](https://github.com/damifiance/Lumen-AI/releases) page:
 
-> On first launch, macOS may block the unsigned app. Right-click → **Open** → click **Open** in the dialog.
+| Platform | Download | Notes |
+|----------|----------|-------|
+| **Windows** | `Lumen AI Setup *.exe` | Double-click to install. Choose install directory, desktop shortcut created automatically. |
+| **macOS** | `Lumen AI-*-arm64.dmg` | Open DMG, drag to Applications. |
+| **Linux** | `Lumen AI-*.AppImage` | Make executable with `chmod +x`, then run. |
+
+> **macOS note:** On first launch, macOS may block the unsigned app. Right-click → **Open** → click **Open** in the dialog.
 
 ### Building the Desktop App Yourself
 
