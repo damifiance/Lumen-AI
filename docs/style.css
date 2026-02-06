@@ -528,9 +528,9 @@ a:hover {
 }
 
 .guide-step-label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--white);
   line-height: 1.5;
 }
 
@@ -551,18 +551,19 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--amber);
   color: var(--white);
   font-weight: 700;
-  font-size: 0.75rem;
-  margin-right: 8px;
+  font-size: 0.85rem;
+  margin-right: 10px;
   vertical-align: middle;
 }
 
 .guide-step img {
+  max-width: 360px;
   width: 100%;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
