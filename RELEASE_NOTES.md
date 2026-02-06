@@ -1,12 +1,22 @@
-# Lumen AI v0.1.0
+# Lumen AI
+
+## Download
+
+| Platform | File to look for | Notes |
+|----------|-----------------|-------|
+| **Windows** | `.exe` installer | Double-click to install |
+| **macOS** | `.dmg` disk image | See macOS note below |
+| **Linux** | `.AppImage` | Make executable with `chmod +x`, then run |
+
+> **macOS first launch:** macOS will show *"Lumen AI Not Opened — Apple could not verify…"*. This is normal for apps distributed outside the App Store. To fix it:
+> 1. Click **Done** (not "Move to Trash")
+> 2. Open **System Settings → Privacy & Security**
+> 3. Scroll down — you'll see a message about Lumen AI being blocked. Click **Open Anyway**
+> 4. macOS will ask one more time — click **Open**
+>
+> You only need to do this once.
 
 ## What's New
-
-### Windows Installer
-- **NSIS installer** for Windows (x64) — double-click to install, no terminal needed
-- Custom installation directory support
-- Desktop shortcut created automatically
-- App launches after installation
 
 ### Desktop App (All Platforms)
 - **macOS** — DMG installer (Apple Silicon)
@@ -30,13 +40,13 @@
 ## Installation
 
 ### Windows
-Download `Lumen AI Setup 0.1.0.exe` from the assets below and run it.
+Download the `.exe` installer from the assets below and run it.
 
 ### macOS
-Download `Lumen AI-0.1.0-arm64.dmg`, open it, and drag Lumen AI into Applications.
+Download the `.dmg` file, open it, and drag Lumen AI into Applications.
 
 ### Linux
-Download `Lumen AI-0.1.0.AppImage`, make it executable (`chmod +x`), and run it.
+Download the `.AppImage` file, make it executable (`chmod +x`), and run it.
 
 ## Prerequisites
 - [Ollama](https://ollama.com) installed with at least one model (e.g., `ollama pull llama3.1`)
