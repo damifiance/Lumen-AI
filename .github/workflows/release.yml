@@ -125,10 +125,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Delete release if it exists
+          gh release delete "${{ github.ref_name }}" --yes 2>/dev/null || true
+          # Create the release with all artifacts
           gh release create "${{ github.ref_name }}" \
             --title "Lumen AI ${{ github.ref_name }}" \
             --notes-file RELEASE_NOTES.md \
-            --clobber \
             artifacts/macos-installer/* \
             artifacts/windows-installer/* \
             artifacts/linux-installer/*
