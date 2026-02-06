@@ -44,7 +44,12 @@
       "Bash(bash scripts/build-backend.sh:*)",
       "Bash(bash scripts/build-frontend.sh:*)",
       "Bash(gh release create:*)",
-      "Bash(gh release view:*)"
+      "Bash(gh release view:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nadd Windows installer support with CI/CD and release notes\n\n- Fix build.js to work cross-platform \\(uses .bat on Windows, .sh on Unix\\)\n- Add GitHub Actions workflow for Windows NSIS installer builds\n- Add multi-platform release workflow \\(macOS, Windows, Linux\\)\n- Add RELEASE_NOTES.md for v0.1.0\n- Update README with download table for all platforms\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(git config:*)"
     ]
   }
 }

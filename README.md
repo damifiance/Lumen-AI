@@ -96,11 +96,12 @@ open "dist/installers/Lumen AI-0.1.0-arm64.dmg"
 ```
 Drag **Lumen AI** into the **Applications** folder. Then open it from Launchpad or `/Applications`.
 
-> If macOS says the app "can't be opened", run this in Terminal first:
+> **macOS first launch:** macOS will show a security warning because the app isn't signed with an Apple certificate. **Right-click** the app → click **Open** → click **Open** in the dialog. You only need to do this once.
+>
+> If that doesn't work, run this in Terminal as a fallback:
 > ```bash
 > xattr -rd com.apple.quarantine "/Applications/Lumen AI.app"
 > ```
-> Then open it normally. You only need to do this once.
 
 **Windows:**
 The NSIS installer will be at `dist/installers/Lumen AI Setup *.exe`. Double-click to install.
