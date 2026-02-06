@@ -50,7 +50,12 @@
       "Bash(cat:*)",
       "Bash(find:*)",
       "Bash(git config:*)",
-      "Bash(codesign:*)"
+      "Bash(codesign:*)",
+      "Bash(git tag:*)",
+      "Bash(gh release edit:*)",
+      "Bash(gh release delete:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)"
     ]
   }
 }

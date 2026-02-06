@@ -11,6 +11,7 @@ import { getPaperMetadata } from './api/papers';
 import { Sun, ArrowLeft, Sparkles, Keyboard } from 'lucide-react';
 import { OnboardingModal } from './components/common/OnboardingModal';
 import { KeyboardShortcuts } from './components/common/KeyboardShortcuts';
+import { OllamaSetupCard } from './components/OllamaSetupCard';
 
 export default function App() {
   const { tabs, activeTabIndex, isLoading, setActivePaper, setLoading } =
@@ -95,32 +96,42 @@ export default function App() {
           ) : activePaperPath ? (
             <PdfViewer key={activePaperPath} paperPath={activePaperPath} />
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400 bg-white">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-accent/8 to-teal-400/8 flex items-center justify-center mb-5">
-                <Sun size={36} className="text-accent/30" />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
-                Welcome to Lumen AI
-              </h2>
-              <p className="text-sm text-gray-400 mb-6 max-w-sm text-center leading-relaxed">
-                Browse your files in the sidebar and select a PDF to start reading with AI assistance.
-              </p>
-              <div className="flex items-center gap-6 text-xs text-gray-400">
-                <div className="flex items-center gap-2">
-                  <ArrowLeft size={14} />
-                  <span>Browse files</span>
+            <div className="flex items-center justify-center h-full bg-white">
+              <div className="flex gap-12 max-w-6xl px-8">
+                {/* Welcome content */}
+                <div className="flex flex-col items-center text-gray-400 flex-shrink-0">
+                  <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-accent/8 to-teal-400/8 flex items-center justify-center mb-5">
+                    <Sun size={36} className="text-accent/30" />
+                  </div>
+                  <h2 className="text-lg font-semibold text-gray-700 mb-2">
+                    Welcome to Lumen AI
+                  </h2>
+                  <p className="text-sm text-gray-400 mb-6 max-w-sm text-center leading-relaxed">
+                    Browse your files in the sidebar and select a PDF to start reading with AI assistance.
+                  </p>
+                  <div className="flex flex-col items-start gap-3 text-xs text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <ArrowLeft size={14} />
+                      <span>Browse files</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Sparkles size={14} />
+                      <span>Ask AI about any passage</span>
+                    </div>
+                    <button
+                      onClick={openShortcuts}
+                      className="flex items-center gap-2 hover:text-gray-600 cursor-pointer"
+                    >
+                      <Keyboard size={14} />
+                      <span>Shortcuts</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Sparkles size={14} />
-                  <span>Ask AI about any passage</span>
+
+                {/* Ollama Setup Card */}
+                <div className="hidden lg:flex items-center">
+                  <OllamaSetupCard />
                 </div>
-                <button
-                  onClick={openShortcuts}
-                  className="flex items-center gap-2 hover:text-gray-600 cursor-pointer"
-                >
-                  <Keyboard size={14} />
-                  <span>Shortcuts</span>
-                </button>
               </div>
             </div>
           )}
