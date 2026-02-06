@@ -122,13 +122,12 @@ jobs:
           path: artifacts
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: Lumen AI ${{ github.ref_name }}
-          files: |
-            artifacts/macos-installer/*
-            artifacts/windows-installer/*
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "Lumen AI ${{ github.ref_name }}" \
+            --notes-file RELEASE_NOTES.md \
+            artifacts/macos-installer/* \
+            artifacts/windows-installer/* \
             artifacts/linux-installer/*
-          body_path: RELEASE_NOTES.md
-          draft: false
-          prerelease: false
