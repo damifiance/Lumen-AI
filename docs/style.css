@@ -486,6 +486,89 @@ a:hover {
   color: #e5e7eb;
 }
 
+/* ================================================
+   macOS INSTALLATION GUIDE (visual steps)
+   ================================================ */
+.macos-guide {
+  max-width: 640px;
+  margin: 48px auto 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 32px 28px;
+  text-align: left;
+}
+
+.macos-guide-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.macos-guide-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.guide-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guide-step-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
+}
+
+.guide-step-label code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+  color: var(--amber-light);
+}
+
+.guide-step-label strong {
+  color: var(--white);
+}
+
+.guide-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.guide-step img {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
 /* Ollama callout */
 .ollama-callout {
   max-width: 560px;
@@ -717,6 +800,14 @@ a:hover {
     width: 30px;
     height: 30px;
     font-size: 0.85rem;
+  }
+
+  .macos-guide {
+    padding: 24px 20px;
+  }
+
+  .macos-guide-title {
+    font-size: 1.05rem;
   }
 
   .ollama-callout {
