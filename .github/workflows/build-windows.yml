@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing release tag to attach the installer to (e.g. v0.1.0)'
+        required: false
+        default: 'v0.1.0'
 
 jobs:
   build-windows:
@@ -30,7 +35,11 @@ jobs:
         working-directory: backend
         run: pip install -e ".[dev]" pyinstaller
 
-      - name: Build backend
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install --legacy-peer-deps
+
+      - name: Build
         run: node scripts/build.js
         env:
           CI: true
@@ -44,7 +53,19 @@ jobs:
           name: windows-installer
           path: dist/installers/*.exe
 
-      - name: Create GitHub Release
+      - name: Upload to existing release (manual trigger)
+        if: github.event_name == 'workflow_dispatch' && inputs.release_tag != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          files: dist/installers/*.exe
+          append_body: true
+          body: |
+
+            ### Windows
+            - **Windows (x64):** `Lumen AI Setup 0.1.0.exe` — Double-click to install.
+
+      - name: Create GitHub Release (tag push)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:

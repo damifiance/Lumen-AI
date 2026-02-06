@@ -23,6 +23,10 @@ jobs:
         working-directory: backend
         run: pip install -e ".[dev]" pyinstaller
 
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install --legacy-peer-deps
+
       - name: Build
         run: node scripts/build.js
 
@@ -52,6 +56,10 @@ jobs:
         working-directory: backend
         run: pip install -e ".[dev]" pyinstaller
 
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install --legacy-peer-deps
+
       - name: Build
         run: node scripts/build.js
 
@@ -80,6 +88,10 @@ jobs:
       - name: Install backend dependencies
         working-directory: backend
         run: pip install -e ".[dev]" pyinstaller
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install --legacy-peer-deps
 
       - name: Build
         run: node scripts/build.js
