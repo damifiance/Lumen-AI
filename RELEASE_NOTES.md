@@ -11,7 +11,7 @@
 > **macOS first launch:** macOS will show *"Lumen AI Not Opened — Apple could not verify…"*. This is normal for apps distributed outside the App Store. To fix it:
 > 1. Click **Done** (not "Move to Trash")
 > 2. Open **System Settings → Privacy & Security**
-> 3. Scroll down — you'll see a message about Lumen AI being blocked. Click **Open Anyway**
+> 3. Scroll **all the way to the bottom**, past the privacy categories — in the **Security** section you'll see a message about Lumen AI being blocked. Click **Open Anyway**
 > 4. macOS will ask one more time — click **Open**
 >
 > You only need to do this once.
