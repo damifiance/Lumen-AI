@@ -58,8 +58,16 @@ export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
 
   const goUp = () => {
     if (!currentPath) return;
-    const parent = currentPath.split('/').slice(0, -1).join('/') || '/';
-    loadDirectory(parent);
+    const isWindows = /^[A-Za-z]:\\/.test(currentPath);
+    if (isWindows) {
+      const lastSep = currentPath.lastIndexOf('\\');
+      if (lastSep <= 2) return; // already at drive root e.g. C:\
+      loadDirectory(currentPath.slice(0, lastSep));
+    } else {
+      const lastSep = currentPath.lastIndexOf('/');
+      const parent = lastSep <= 0 ? '/' : currentPath.slice(0, lastSep);
+      loadDirectory(parent);
+    }
   };
 
   const goToRoots = () => {
@@ -79,9 +87,11 @@ export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
     }
   };
 
-  const folderName = currentPath?.split('/').pop() || '';
-  const parentPath = currentPath?.split('/').slice(0, -1).join('/') || '';
-  const parentName = parentPath?.split('/').pop() || '';
+  const pathSep = currentPath?.includes('\\') ? '\\' : '/';
+  const pathParts = currentPath?.split(pathSep) || [];
+  const folderName = pathParts[pathParts.length - 1] || '';
+  const parentParts = pathParts.slice(0, -1);
+  const parentName = parentParts[parentParts.length - 1] || '';
 
   return (
     <div className="flex flex-col h-full bg-sidebar-bg select-none">

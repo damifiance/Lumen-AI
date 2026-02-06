@@ -1,6 +1,6 @@
 {
   "name": "lumen-ai",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lumen AI - AI-powered paper reading assistant",
   "main": "main.js",
   "scripts": {

@@ -18,6 +18,12 @@
 
 ## What's New
 
+### v0.1.1 — Bug Fix
+- **Windows:** Fixed file browser back button not working (paths using `\` were not handled correctly)
+- **Website:** Added macOS and Windows install guides
+
+### v0.1.0 — Initial Release
+
 ### Desktop App (All Platforms)
 - **macOS** — DMG installer (Apple Silicon)
 - **Windows** — NSIS installer (x64)
