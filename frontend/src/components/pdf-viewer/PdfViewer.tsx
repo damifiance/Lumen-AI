@@ -89,19 +89,28 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
   );
 
   const handleAskAI = useCallback(
-    (question: string) => {
+    async (question: string) => {
       const selection = selectionRef.current;
       if (!selection) return;
 
       const ghost = selection.makeGhostHighlight();
       const text = ghost.content.text || '';
 
-      askAboutSelection(paperPath, text, question);
+      // Create a highlight so the AI answer can be saved as a note later
+      const highlight = await addHighlight({
+        paper_path: paperPath,
+        content_text: text,
+        position_json: JSON.stringify(ghost.position),
+        color: 'note',
+        comment: '',
+      });
+
+      askAboutSelection(paperPath, text, question, highlight.id);
       setOpen(true);
       utilsRef.current?.removeGhostHighlight();
       selectionRef.current = null;
     },
-    [paperPath, askAboutSelection, setOpen]
+    [paperPath, addHighlight, askAboutSelection, setOpen]
   );
 
   const handleHighlightAskAI = useCallback(

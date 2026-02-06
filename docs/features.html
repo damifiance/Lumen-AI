@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Features — Lumen AI</title>
+  <meta name="description" content="Explore every feature of Lumen AI — the local AI-powered academic paper reader with highlighting, notes, multi-model AI chat, and more." />
+  <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ================================================
+       FEATURES PAGE — additional styles
+       ================================================ */
+    .features-hero {
+      position: relative;
+      background: var(--dark);
+      margin: 0 24px;
+      border-radius: 0 0 32px 32px;
+      overflow: hidden;
+      text-align: center;
+      padding: 80px 40px 90px;
+    }
+
+    .features-hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.06) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .features-hero h1 {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .features-hero h1 .accent {
+      color: var(--amber-light);
+    }
+
+    .features-hero p {
+      position: relative;
+      z-index: 1;
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.5);
+      max-width: 500px;
+      margin: 20px auto 0;
+    }
+
+    /* Feature category sections */
+    .feature-category {
+      padding: 72px 40px 0;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .feature-category:last-of-type {
+      padding-bottom: 80px;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .category-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--amber-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .category-header h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
+    }
+
+    .category-header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .feature-item {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 24px 28px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      transition: all 0.3s;
+    }
+
+    .feature-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+    }
+
+    .feature-item h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+
+    .feature-item p {
+      font-size: 0.85rem;
+      color: var(--text-body);
+      line-height: 1.55;
+    }
+
+    .feature-item .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .tag-core {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--amber-dark);
+    }
+
+    .tag-ai {
+      background: rgba(20, 184, 166, 0.1);
+      color: #0d9488;
+    }
+
+    .tag-shortcut {
+      background: rgba(99, 102, 241, 0.1);
+      color: #6366f1;
+    }
+
+    /* Divider */
+    .category-divider {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .category-divider hr {
+      border: none;
+      border-top: 1px solid var(--border-light);
+    }
+
+    /* CTA at bottom */
+    .features-cta {
+      text-align: center;
+      padding: 60px 40px 80px;
+    }
+
+    .features-cta h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .features-cta p {
+      color: var(--text-body);
+      font-size: 1rem;
+      margin-bottom: 28px;
+    }
+
+    .features-cta .btn {
+      display: inline-flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .features-hero {
+        margin: 0 12px;
+        padding: 60px 20px 70px;
+      }
+
+      .feature-category {
+        padding: 48px 20px 0;
+      }
+
+      .feature-list {
+        grid-template-columns: 1fr;
+      }
+
+      .category-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .feature-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="index.html#download">Download</a>
+      <a href="https://github.com/damifiance/Lumen-AI">GitHub</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <img
+        src="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png"
+        alt="Lumen AI"
+      />
+      Lumen AI
+    </a>
+    <div class="nav-right">
+      <a href="https://github.com/damifiance/Lumen-AI" class="btn-nav btn-nav-outline">GitHub</a>
+      <a href="index.html#download" class="btn-nav btn-nav-amber">Download</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="features-hero">
+    <h1>Every feature, <span class="accent">at a glance</span></h1>
+    <p>Everything Lumen AI can do to make your research workflow faster and smarter.</p>
+  </section>
+
+  <!-- =============================================
+       PDF Reading
+       ============================================= -->
+  <section class="feature-category">
+    <div class="category-header">
+      <div class="category-icon">&#128196;</div>
+      <div>
+        <h2>PDF Reading</h2>
+        <p>A modern reader built for academic papers</p>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <h3>Clean PDF Viewer</h3>
+        <p>Read papers in a distraction-free interface powered by PDF.js. Pages scale to fit your window width automatically.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Multi-Tab Support</h3>
+        <p>Open up to 9 papers simultaneously. Switch between them instantly with keyboard shortcuts (Option/Alt + 1-9).</p>
+      </div>
+      <div class="feature-item">
+        <h3>Close &amp; Manage Tabs</h3>
+        <p>Close individual tabs with Option/Alt + W. Click any tab header to switch. Paper titles and page counts shown at a glance.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Folder Browser</h3>
+        <p>Navigate your filesystem, pin your papers folder, and jump to Desktop, Documents, or Downloads with one click.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="category-divider"><hr /></div>
+
+  <!-- =============================================
+       Highlighting
+       ============================================= -->
+  <section class="feature-category">
+    <div class="category-header">
+      <div class="category-icon">&#127912;</div>
+      <div>
+        <h2>Highlighting</h2>
+        <p>Mark up papers in multiple colors, saved automatically</p>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <h3>5 Highlight Colors</h3>
+        <p>Choose from Yellow, Green, Blue, Pink, and Purple. Select text and pick a color from the floating toolbar.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Auto-Saved</h3>
+        <p>Every highlight is instantly persisted to a local SQLite database. Your work is never lost.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Recolor &amp; Delete</h3>
+        <p>Change highlight colors after creation. Remove any highlight with one click from the hover popup.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Ghost Preview</h3>
+        <p>See a preview of the highlight before committing. Hover over existing highlights to see a popup with actions.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="category-divider"><hr /></div>
+
+  <!-- =============================================
+       Notes
+       ============================================= -->
+  <section class="feature-category">
+    <div class="category-header">
+      <div class="category-icon">&#128221;</div>
+      <div>
+        <h2>Notes &amp; Annotations</h2>
+        <p>Attach notes to any passage, organized in threads</p>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <h3>Threaded Notes</h3>
+        <p>Create multiple notes on the same text selection. Each note is timestamped and shown in a threaded view.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Edit &amp; Delete</h3>
+        <p>Edit any individual note inline, or delete specific notes from a thread. Full control over your annotations.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Dashed Underline Display</h3>
+        <p>Notes appear as dashed underlines in the PDF, distinct from color highlights, so you can spot them at a glance.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Save AI Answers as Notes</h3>
+        <p>When AI explains a passage, save that answer directly as a note attached to the highlighted text.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="category-divider"><hr /></div>
+
+  <!-- =============================================
+       AI Chat
+       ============================================= -->
+  <section class="feature-category">
+    <div class="category-header">
+      <div class="category-icon">&#10024;</div>
+      <div>
+        <h2>AI Chat</h2>
+        <p>Ask questions about any passage or the entire paper</p>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <span class="tag tag-ai">Select &amp; Ask</span>
+        <h3>Selection-Based Questions</h3>
+        <p>Select any text, type a question, and get an instant AI explanation about that specific passage.</p>
+      </div>
+      <div class="feature-item">
+        <span class="tag tag-ai">Full Paper</span>
+        <h3>Full-Paper Chat</h3>
+        <p>Open the chat panel (Option/Alt + /) and discuss the entire paper. Multi-turn conversations with full context.</p>
+      </div>
+      <div class="feature-item">
+        <span class="tag tag-ai">Streaming</span>
+        <h3>Real-Time Streaming</h3>
+        <p>Responses stream token-by-token with a live animation. Stop generation mid-stream if you have enough.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Multi-Model Support</h3>
+        <p>Switch between Ollama (local, free), OpenAI GPT-4o, and Anthropic Claude from a dropdown. Your preferred model is remembered.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Markdown &amp; LaTeX</h3>
+        <p>AI responses render full Markdown with KaTeX math formulas and syntax-highlighted code blocks.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Clear &amp; Control</h3>
+        <p>Clear chat history with one button. Stop streaming anytime. Chat panel shows which paper is being discussed.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="category-divider"><hr /></div>
+
+  <!-- =============================================
+       Keyboard Shortcuts
+       ============================================= -->
+  <section class="feature-category">
+    <div class="category-header">
+      <div class="category-icon">&#9000;</div>
+      <div>
+        <h2>Keyboard Shortcuts</h2>
+        <p>Fully customizable shortcuts for power users</p>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <span class="tag tag-shortcut">Customizable</span>
+        <h3>Remap Any Shortcut</h3>
+        <p>Press Option/Alt + K to open the shortcut editor. Click any shortcut and record a new key combination.</p>
+      </div>
+      <div class="feature-item">
+        <h3>12+ Default Shortcuts</h3>
+        <p>Switch tabs (1-9), close tabs (W), toggle chat (/), open shortcut editor (K), send messages (Enter), and more.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Cross-Platform Keys</h3>
+        <p>Automatically handles Option on macOS and Alt on Windows/Linux. Physical key detection works across keyboard layouts.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Reset to Defaults</h3>
+        <p>Customizations saved to localStorage. One-click reset to restore all default shortcuts.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="category-divider"><hr /></div>
+
+  <!-- =============================================
+       Privacy & Data
+       ============================================= -->
+  <section class="feature-category">
+    <div class="category-header">
+      <div class="category-icon">&#128274;</div>
+      <div>
+        <h2>Privacy &amp; Data</h2>
+        <p>Your papers and notes never leave your machine</p>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <span class="tag tag-core">Local First</span>
+        <h3>Runs 100% Locally</h3>
+        <p>With Ollama, everything runs on your machine. No cloud, no subscriptions, no data leaving your computer.</p>
+      </div>
+      <div class="feature-item">
+        <h3>SQLite Database</h3>
+        <p>Highlights, notes, and paper metadata stored in a local SQLite database. Fast, reliable, and portable.</p>
+      </div>
+      <div class="feature-item">
+        <h3>No Account Required</h3>
+        <p>No sign-up, no login, no tracking. Install and start reading immediately.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Optional Cloud AI</h3>
+        <p>Add OpenAI or Anthropic API keys only if you want cloud models. Completely optional — Ollama works out of the box.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="category-divider"><hr /></div>
+
+  <!-- =============================================
+       UX & Polish
+       ============================================= -->
+  <section class="feature-category">
+    <div class="category-header">
+      <div class="category-icon">&#128171;</div>
+      <div>
+        <h2>UX &amp; Polish</h2>
+        <p>Small details that make a big difference</p>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <h3>Guided Onboarding</h3>
+        <p>5-step welcome walkthrough on first launch. Skip it or re-open anytime from the sidebar help button.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Pin Your Folder</h3>
+        <p>Pin your papers folder so it opens automatically every time you launch the app. One less click.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Floating Action Menu</h3>
+        <p>Select text and a floating toolbar appears with highlight colors, note, and Ask AI buttons. No right-clicking needed.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Loading States</h3>
+        <p>Smooth loading spinners for PDFs, streaming animations for AI responses, and visual feedback throughout.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="category-divider"><hr /></div>
+
+  <!-- =============================================
+       Cross-Platform
+       ============================================= -->
+  <section class="feature-category" style="padding-bottom: 0;">
+    <div class="category-header">
+      <div class="category-icon">&#128187;</div>
+      <div>
+        <h2>Cross-Platform</h2>
+        <p>Desktop apps for macOS, Windows, and Linux</p>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <h3>macOS (Apple Silicon)</h3>
+        <p>Native .dmg installer for Apple Silicon Macs. Drag to Applications and launch.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Windows</h3>
+        <p>NSIS installer with custom install directory, desktop shortcut, and auto-launch after install.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Linux</h3>
+        <p>AppImage — no installation needed. Make executable and run on any Linux distribution.</p>
+      </div>
+      <div class="feature-item">
+        <h3>Web Version</h3>
+        <p>Run from source in any browser at localhost:5173. Same full experience without the desktop wrapper.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="features-cta">
+    <h2>Ready to try it?</h2>
+    <p>Download Lumen AI for free. macOS, Windows, and Linux.</p>
+    <a href="index.html#download" class="btn btn-amber">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Now
+    </a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="https://github.com/damifiance/Lumen-AI">GitHub</a>
+      <a href="https://github.com/damifiance/Lumen-AI/releases">Releases</a>
+      <a href="mailto:jh0420park@gmail.com">Contact</a>
+    </div>
+    <p class="copyright">
+      <span class="sun-dot"></span>
+      Lumen AI &mdash; by JaeHyung (Benjamin) Park
+    </p>
+  </footer>
+
+</body>
+</html>
