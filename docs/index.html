@@ -15,7 +15,7 @@
     <div class="nav-left">
       <a href="features.html">Features</a>
       <a href="#download">Download</a>
-      <a href="#setup">Build from Source</a>
+      <a href="install-windows.html">Install Guides</a>
       <a href="https://github.com/damifiance/Lumen-AI">Community</a>
     </div>
     <a href="#" class="nav-logo">
@@ -159,42 +159,20 @@
       </div>
     </div>
 
-    <!-- macOS Installation Guide -->
-    <div class="macos-guide">
-      <h3 class="macos-guide-title">macOS Installation Guide</h3>
-      <p class="macos-guide-subtitle">macOS blocks apps not from the App Store.<br>Here's how to open Lumen AI.</p>
-      <p class="macos-guide-once">You only need to do this once.</p>
-
-      <div class="guide-steps">
-        <div class="guide-step">
-          <div class="guide-step-label"><span class="guide-step-num">1</span> Download the <code>.dmg</code> file from the release page</div>
-          <img src="images/step-1-assets.png" alt="GitHub release assets showing .dmg, .AppImage, and .exe files" />
-        </div>
-
-        <div class="guide-step">
-          <div class="guide-step-label"><span class="guide-step-num">2</span> Open the <code>.dmg</code> and drag Lumen AI into Applications</div>
-          <img src="images/step-2-dmg.png" alt="DMG window with Lumen AI icon and Applications folder" />
-        </div>
-
-        <div class="guide-step">
-          <div class="guide-step-label"><span class="guide-step-num">3</span> Open Lumen AI &mdash; macOS will block it. Click <strong>Done</strong></div>
-          <img src="images/step-3-blocked.png" alt="macOS dialog: Lumen AI Not Opened" />
-        </div>
-
-        <div class="guide-step">
-          <div class="guide-step-label"><span class="guide-step-num">4</span> Open <strong>System Settings &rarr; Privacy &amp; Security</strong>, scroll to the bottom, and click <strong>Open Anyway</strong></div>
-          <img src="images/step-4-open-anyway.png" alt="Privacy and Security settings showing Open Anyway button" />
-        </div>
-
-        <div class="guide-step">
-          <div class="guide-step-label"><span class="guide-step-num">5</span> Click <strong>Open Anyway</strong> in the final dialog</div>
-          <img src="images/step-5-confirm.png" alt="macOS final confirmation dialog with Open Anyway button" />
-        </div>
-      </div>
+    <!-- Installation Guide Buttons -->
+    <div class="guide-buttons">
+      <a href="install-windows.html" class="guide-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+        Windows Installation Guide
+      </a>
+      <a href="install-macos.html" class="guide-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        macOS Installation Guide
+      </a>
     </div>
 
     <div class="ollama-callout">
-      <strong>Ollama is required.</strong> Lumen AI uses Ollama for free, private, local AI. <a href="https://ollama.com/download">Install it first</a> &mdash; it takes 30 seconds.
+      <strong>Ollama is required.</strong> Lumen AI uses Ollama for free, private, local AI. <a href="https://ollama.com/download">Install it first</a> &mdash; it takes 30 seconds. Works the same on Mac (Terminal) and Windows (PowerShell).
     </div>
   </section>
 

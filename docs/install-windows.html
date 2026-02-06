@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windows Installation Guide — Lumen AI</title>
+  <meta name="description" content="Step-by-step guide to install Lumen AI on Windows. Bypass SmartScreen and get started in minutes." />
+  <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .install-hero {
+      position: relative;
+      background: var(--dark);
+      margin: 0 24px;
+      border-radius: 0 0 32px 32px;
+      overflow: hidden;
+      text-align: center;
+      padding: 80px 40px 90px;
+    }
+
+    .install-hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.06) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .install-hero h1 {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .install-hero h1 .accent {
+      color: var(--amber-light);
+    }
+
+    .install-hero-subtitle {
+      position: relative;
+      z-index: 1;
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.5);
+      max-width: 500px;
+      margin: 20px auto 0;
+    }
+
+    .install-hero-once {
+      position: relative;
+      z-index: 1;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--amber);
+      margin-top: 12px;
+    }
+
+    .install-guide {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 60px 40px 0;
+    }
+
+    .install-guide .guide-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .install-guide .guide-step {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .install-guide .guide-step-label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+
+    .install-guide .guide-step-label code {
+      background: rgba(0, 0, 0, 0.06);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 0.85rem;
+      color: var(--amber-dark);
+    }
+
+    .install-guide .guide-step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--amber);
+      color: var(--white);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    .install-guide .guide-step img {
+      max-width: 420px;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .install-cta {
+      text-align: center;
+      padding: 60px 40px 80px;
+    }
+
+    .install-cta h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .install-cta p {
+      color: var(--text-body);
+      font-size: 1rem;
+      margin-bottom: 28px;
+    }
+
+    .install-cta .btn {
+      display: inline-flex;
+    }
+
+    @media (max-width: 768px) {
+      .install-hero {
+        margin: 0 12px;
+        padding: 60px 20px 70px;
+      }
+
+      .install-guide {
+        padding: 40px 20px 0;
+      }
+
+      .install-guide .guide-step img {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="index.html#download">Download</a>
+      <a href="install-macos.html">macOS Guide</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <img
+        src="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png"
+        alt="Lumen AI"
+      />
+      Lumen AI
+    </a>
+    <div class="nav-right">
+      <a href="https://github.com/damifiance/Lumen-AI" class="btn-nav btn-nav-outline">GitHub</a>
+      <a href="index.html#download" class="btn-nav btn-nav-amber">Download</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="install-hero">
+    <h1>Windows <span class="accent">Installation Guide</span></h1>
+    <p class="install-hero-subtitle">Windows SmartScreen may block the installer.<br>Here's how to run Lumen AI.</p>
+    <p class="install-hero-once">You only need to do this once.</p>
+  </section>
+
+  <!-- Guide Steps -->
+  <section class="install-guide">
+    <div class="guide-steps">
+      <div class="guide-step">
+        <div class="guide-step-label"><span class="guide-step-num">1</span> Download the <code>.exe</code> file from the release page</div>
+        <img src="images/step-1-assets.png" alt="GitHub release assets showing .dmg, .AppImage, and .exe files" />
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-label"><span class="guide-step-num">2</span> Run the installer &mdash; Windows SmartScreen will block it. Click <strong>More info</strong></div>
+        <img src="images/win-step-1-smartscreen.png" alt="Windows SmartScreen dialog with More info link" />
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-label"><span class="guide-step-num">3</span> Click <strong>Run anyway</strong></div>
+        <img src="images/win-step-2-run-anyway.png" alt="Windows SmartScreen Run anyway button" />
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-label"><span class="guide-step-num">4</span> Choose installation options and click <strong>Next</strong></div>
+        <img src="images/win-step-3-options.png" alt="Installer: Choose Installation Options" />
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-label"><span class="guide-step-num">5</span> Choose install location and click <strong>Install</strong></div>
+        <img src="images/win-step-4-location.png" alt="Installer: Choose Install Location" />
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-label"><span class="guide-step-num">6</span> Wait for installation to complete</div>
+        <img src="images/win-step-5-installing.png" alt="Installer: Installing progress bar" />
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-label"><span class="guide-step-num">7</span> Click <strong>Finish</strong> to launch Lumen AI</div>
+        <img src="images/win-step-6-finish.png" alt="Installer: Completing Setup / Finish" />
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="install-cta">
+    <h2>Ready to read smarter?</h2>
+    <p>Head back to the download page to grab Lumen AI and set up Ollama.</p>
+    <a href="index.html#download" class="btn btn-amber">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Back to Download
+    </a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="https://github.com/damifiance/Lumen-AI">GitHub</a>
+      <a href="https://github.com/damifiance/Lumen-AI/releases">Releases</a>
+      <a href="mailto:jh0420park@gmail.com">Contact</a>
+    </div>
+    <p class="copyright">
+      <span class="sun-dot"></span>
+      Lumen AI &mdash; by JaeHyung (Benjamin) Park
+    </p>
+  </footer>
+
+</body>
+</html>

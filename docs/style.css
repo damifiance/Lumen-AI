@@ -487,95 +487,46 @@ a:hover {
 }
 
 /* ================================================
-   macOS INSTALLATION GUIDE (visual steps)
+   INSTALLATION GUIDE BUTTONS (in download section)
    ================================================ */
-.macos-guide {
-  max-width: 640px;
-  margin: 48px auto 0;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 32px 28px;
-  text-align: left;
-}
-
-.macos-guide-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.macos-guide-subtitle {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.5);
-  text-align: center;
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-.macos-guide-once {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--amber);
-  text-align: center;
-  margin-bottom: 28px;
-}
-
-.guide-steps {
+.guide-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 40px;
 }
 
-.guide-step {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.guide-step-label {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--white);
-  line-height: 1.5;
-}
-
-.guide-step-label code {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
-  font-size: 0.85rem;
-  color: var(--amber-light);
-}
-
-.guide-step-label strong {
-  color: var(--white);
-}
-
-.guide-step-num {
+.guide-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--amber);
+  gap: 10px;
+  padding: 16px 28px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: var(--white);
-  font-weight: 700;
-  font-size: 0.85rem;
-  margin-right: 10px;
-  vertical-align: middle;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s;
 }
 
-.guide-step img {
-  max-width: 360px;
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+.guide-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--amber);
+  color: var(--amber-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.guide-button svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.guide-button:hover svg {
+  opacity: 1;
 }
 
 /* Ollama callout */
@@ -811,12 +762,15 @@ a:hover {
     font-size: 0.85rem;
   }
 
-  .macos-guide {
-    padding: 24px 20px;
+  .guide-buttons {
+    flex-direction: column;
+    align-items: center;
   }
 
-  .macos-guide-title {
-    font-size: 1.05rem;
+  .guide-button {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
   }
 
   .ollama-callout {
