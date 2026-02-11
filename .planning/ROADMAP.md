@@ -27,12 +27,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Highlights with any notes (AI-generated or user-written) show a dotted underline visual marker
   4. User can zoom in and out on PDF and see the current zoom level
   5. Zoom controls work correctly with existing highlights and popups
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md -- Highlight color preservation on AI ask + dotted underline note markers
+- [ ] 01-02-PLAN.md -- Popup positioning fixes + universal notes access
+- [ ] 01-03-PLAN.md -- PDF zoom in/out controls with level display
 
 ### Phase 2: Interactive Enhancements
 **Goal**: Users can reposition popups anywhere on screen to unblock paper content they need to read.
@@ -55,7 +55,7 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core UX Fixes | 0/TBD | Not started | - |
+| 1. Core UX Fixes | 0/3 | Not started | - |
 | 2. Interactive Enhancements | 0/TBD | Not started | - |
 
 ---
