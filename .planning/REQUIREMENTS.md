@@ -51,15 +51,15 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | POP-01 | Phase 1 | Pending |
-| POP-02 | Phase 1 | Pending |
-| POP-03 | Phase 1 | Pending |
+| POP-02 | Phase 2 | Pending |
+| POP-03 | Phase 2 | Pending |
 | POP-04 | Phase 1 | Pending |
 | HLT-01 | Phase 1 | Pending |
 | HLT-02 | Phase 1 | Pending |
 | HLT-03 | Phase 1 | Pending |
-| PDF-01 | Phase 2 | Pending |
-| PDF-02 | Phase 2 | Pending |
-| PDF-03 | Phase 2 | Pending |
+| PDF-01 | Phase 1 | Pending |
+| PDF-02 | Phase 1 | Pending |
+| PDF-03 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 10 total
@@ -68,4 +68,4 @@
 
 ---
 *Requirements defined: 2026-02-12*
-*Last updated: 2026-02-12 after initial definition*
+*Last updated: 2026-02-12 after roadmap creation*
