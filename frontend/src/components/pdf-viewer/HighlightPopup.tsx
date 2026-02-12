@@ -2,9 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Trash2, Sparkles, ArrowUp, X, MessageSquare } from 'lucide-react';
 
 interface HighlightPopupProps {
-  note: string;
   contentText: string;
-  isNote: boolean;
+  hasNotes: boolean;
   highlightId?: string;
   onDelete: () => void;
   onAskAI: (text: string, question: string, highlightId?: string) => void;
@@ -12,9 +11,8 @@ interface HighlightPopupProps {
 }
 
 export function HighlightPopup({
-  note,
   contentText,
-  isNote,
+  hasNotes,
   highlightId,
   onDelete,
   onAskAI,
@@ -48,8 +46,6 @@ export function HighlightPopup({
 
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 p-3 max-w-xs">
-      {note && <p className="text-sm text-gray-700 mb-2">{note}</p>}
-
       {askMode ? (
         <div className="mb-2">
           <div className="flex items-center justify-between mb-1.5">
@@ -101,13 +97,13 @@ export function HighlightPopup({
         </button>
       )}
 
-      {isNote && onOpenNotes && (
+      {onOpenNotes && (
         <button
           onClick={onOpenNotes}
           className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg px-3 py-1.5 mb-2 cursor-pointer transition-colors"
         >
           <MessageSquare size={12} />
-          Open notes
+          {hasNotes ? 'Open notes' : 'Add note'}
         </button>
       )}
 
@@ -116,7 +112,7 @@ export function HighlightPopup({
         className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-600 cursor-pointer transition-colors"
       >
         <Trash2 size={12} />
-        {isNote ? 'Remove note' : 'Remove highlight'}
+        Remove highlight
       </button>
     </div>
   );

@@ -17,6 +17,7 @@ import { useHighlightStore } from '../../stores/highlightStore';
 import { useChatStore } from '../../stores/chatStore';
 import { SelectionTip } from './SelectionTip';
 import { HighlightContainer } from './HighlightContainer';
+import { ZoomControls } from './ZoomControls';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { createNoteEntry, serializeNotes } from '../../utils/noteHelpers';
 
@@ -172,6 +173,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
               onAskAI={handleHighlightAskAI}
               onUpdateNote={handleUpdateNote}
             />
+            <ZoomControls />
           </PdfHighlighter>
         )}
       </PdfLoader>

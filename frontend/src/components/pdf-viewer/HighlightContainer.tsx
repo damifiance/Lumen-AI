@@ -72,9 +72,8 @@ export function HighlightContainer({
     position: highlight.position,
     content: (
       <HighlightPopup
-        note={comment}
         contentText={contentText}
-        isNote={false}
+        hasNotes={hasNotes}
         highlightId={highlight.id}
         onDelete={() => onDelete(highlight.id)}
         onAskAI={onAskAI}
