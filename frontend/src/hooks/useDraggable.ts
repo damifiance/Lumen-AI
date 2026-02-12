@@ -7,7 +7,7 @@ interface UseDraggableOptions {
 }
 
 interface UseDraggableReturn {
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   offset: { x: number; y: number };
   resetPosition: () => void;
   isDragging: boolean;
