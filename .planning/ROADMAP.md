@@ -12,7 +12,7 @@ This roadmap fixes critical UX breaks in the PDF annotation system and adds esse
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Core UX Fixes** - Fix broken popup positioning, color preservation, add zoom and AI markers
+- [x] **Phase 1: Core UX Fixes** - Fix broken popup positioning, color preservation, add zoom and AI markers
 - [ ] **Phase 2: Interactive Enhancements** - Make popups draggable for flexible positioning
 
 ## Phase Details
@@ -30,9 +30,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Highlight color preservation on AI ask + dotted underline note markers
-- [ ] 01-02-PLAN.md -- Popup positioning fixes + universal notes access
-- [ ] 01-03-PLAN.md -- PDF zoom in/out controls with level display
+- [x] 01-01-PLAN.md -- Highlight color preservation on AI ask + dotted underline note markers
+- [x] 01-02-PLAN.md -- Popup positioning fixes + universal notes access
+- [x] 01-03-PLAN.md -- PDF zoom in/out controls with level display
 
 ### Phase 2: Interactive Enhancements
 **Goal**: Users can reposition popups anywhere on screen to unblock paper content they need to read.
@@ -55,9 +55,9 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core UX Fixes | 0/3 | Not started | - |
+| 1. Core UX Fixes | 3/3 | ✓ Complete | 2026-02-12 |
 | 2. Interactive Enhancements | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12*
+*Last updated: 2026-02-12 (Phase 1 complete)*
