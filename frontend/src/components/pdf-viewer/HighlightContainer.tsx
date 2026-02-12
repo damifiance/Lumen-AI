@@ -23,9 +23,11 @@ export function HighlightContainer({
   const { highlight, isScrolledTo } = useHighlightContainerContext();
 
   const highlightColor = (highlight as any).color || '#FFFF00';
-  const isNote = highlightColor === 'note';
   const contentText = highlight.content?.text || '';
   const comment = (highlight as any).comment || '';
+
+  const hasNotes = comment.trim().length > 0 && comment !== '[]';
+  const bgColor = highlightColor === 'note' ? '#FDE68A' : highlightColor;
 
   const [notePopupOpen, setNotePopupOpen] = useState(false);
   const [notePopupPosition, setNotePopupPosition] = useState({ x: 0, y: 0 });
@@ -70,13 +72,13 @@ export function HighlightContainer({
     position: highlight.position,
     content: (
       <HighlightPopup
-        note={isNote ? '' : comment}
+        note={comment}
         contentText={contentText}
-        isNote={isNote}
+        isNote={false}
         highlightId={highlight.id}
         onDelete={() => onDelete(highlight.id)}
         onAskAI={onAskAI}
-        onOpenNotes={isNote ? handleOpenNotes : undefined}
+        onOpenNotes={handleOpenNotes}
       />
     ),
   };
@@ -88,17 +90,13 @@ export function HighlightContainer({
           <TextHighlight
             highlight={highlight}
             isScrolledTo={isScrolledTo}
-            style={
-              isNote
-                ? {
-                    background: '#FDE68A',
-                    opacity: 0.4,
-                  }
-                : {
-                    background: highlightColor,
-                    opacity: 0.4,
-                  }
-            }
+            style={{
+              background: bgColor,
+              opacity: 0.4,
+              ...(hasNotes && {
+                borderBottom: '2px dotted rgba(0, 0, 0, 0.35)',
+              })
+            }}
           />
         </div>
       </MonitoredHighlightContainer>
