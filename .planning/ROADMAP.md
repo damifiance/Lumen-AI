@@ -43,10 +43,10 @@ Plans:
   2. User can drag selection tip popup by its header to any position on screen
   3. Popup position resets when reopened (starts fresh at default position)
   4. Dragging popups doesn't interfere with text selection or copying text from popup content
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md -- Draggable popups via custom useDraggable hook (NotePopup + SelectionTip)
 
 ## Progress
 
@@ -56,8 +56,8 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core UX Fixes | 3/3 | ✓ Complete | 2026-02-12 |
-| 2. Interactive Enhancements | 0/TBD | Not started | - |
+| 2. Interactive Enhancements | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12 (Phase 1 complete)*
+*Last updated: 2026-02-12 (Phase 2 planned)*
