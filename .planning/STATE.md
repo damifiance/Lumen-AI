@@ -33,6 +33,7 @@ Progress: [██████░░░░] 66%
 
 | Phase 01 P01 | 97s | 2 tasks | 4 files |
 | Phase 01 P03 | 67 | 2 tasks | 4 files |
+| Phase 01 P02 | 113 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -49,6 +50,9 @@ Recent decisions affecting current work:
 - [Phase 01-01]: All highlights can open notes panel regardless of color (removed isNote-based restrictions)
 - [Phase 01-03]: 25% zoom step increments for usability (not 10% or 50%)
 - [Phase 01-03]: Percentage display doubles as reset button to page-width
+- [Phase 01-02]: Remove isNote prop entirely - notes access no longer depends on highlight color
+- [Phase 01-02]: Add hasNotes prop for UI feedback - button shows 'Open notes' or 'Add note' accordingly
+- [Phase 01-02]: Remove inline note rendering from HighlightPopup - notes only shown in NotePopup
 
 ### Pending Todos
 
@@ -61,7 +65,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 01-03-PLAN.md
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
 
 ---
