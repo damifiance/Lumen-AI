@@ -25,6 +25,7 @@ interface NotePopupProps {
   onDelete: () => void;
   onClose?: () => void;
   arrowPosition?: 'top' | 'bottom';
+  showArrow?: boolean;
 }
 
 export function NotePopup({
@@ -33,6 +34,7 @@ export function NotePopup({
   onDelete,
   onClose,
   arrowPosition,
+  showArrow = true,
 }: NotePopupProps) {
   const [notes, setNotes] = useState<NoteEntry[]>(() => parseNotes(comment));
   const [newText, setNewText] = useState('');
@@ -119,7 +121,7 @@ export function NotePopup({
       onClick={(e) => e.stopPropagation()}
     >
       {/* Arrow caret */}
-      {arrowPosition === 'bottom' && (
+      {showArrow && arrowPosition === 'bottom' && (
         <div
           className="absolute left-1/2 -translate-x-1/2 -bottom-2"
           style={{
@@ -131,7 +133,7 @@ export function NotePopup({
           }}
         />
       )}
-      {arrowPosition === 'top' && (
+      {showArrow && arrowPosition === 'top' && (
         <div
           className="absolute left-1/2 -translate-x-1/2 -top-2"
           style={{
@@ -144,7 +146,7 @@ export function NotePopup({
         />
       )}
       {/* Header */}
-      <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between">
+      <div className="drag-handle px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between select-none cursor-grab active:cursor-grabbing">
         <span className="text-[12px] font-semibold text-gray-700">
           Notes ({notes.length})
         </span>

@@ -8,6 +8,7 @@ import {
 } from 'react-pdf-highlighter-extended';
 import { HighlightPopup } from './HighlightPopup';
 import { NotePopup } from './NotePopup';
+import { useDraggable } from '../../hooks/useDraggable';
 
 interface HighlightContainerProps {
   onDelete: (id: string) => void;
@@ -35,7 +36,12 @@ export function HighlightContainer({
 
   const [notePopupBelow, setNotePopupBelow] = useState(false);
 
+  const { containerRef: dragRef, offset: dragOffset, resetPosition } = useDraggable({
+    handleSelector: '.drag-handle',
+  });
+
   const handleOpenNotes = useCallback(() => {
+    resetPosition();
     if (highlightRef.current) {
       const rect = highlightRef.current.getBoundingClientRect();
       const popupWidth = 320; // w-80 = 20rem = 320px
@@ -62,7 +68,7 @@ export function HighlightContainer({
       setNotePopupBelow(below);
     }
     setNotePopupOpen(true);
-  }, []);
+  }, [resetPosition]);
 
   const handleCloseNotes = useCallback(() => {
     setNotePopupOpen(false);
@@ -103,13 +109,14 @@ export function HighlightContainer({
       {notePopupOpen &&
         createPortal(
           <div
+            ref={dragRef}
             style={{
               position: 'fixed',
               left: notePopupPosition.x,
               top: notePopupPosition.y,
               transform: notePopupBelow
-                ? 'translate(-50%, 0)'
-                : 'translate(-50%, -100%)',
+                ? `translate(calc(-50% + ${dragOffset.x}px), ${dragOffset.y}px)`
+                : `translate(calc(-50% + ${dragOffset.x}px), calc(-100% + ${dragOffset.y}px))`,
               zIndex: 9999,
             }}
           >
@@ -124,6 +131,7 @@ export function HighlightContainer({
               }}
               onClose={handleCloseNotes}
               arrowPosition={notePopupBelow ? 'top' : 'bottom'}
+              showArrow={dragOffset.x === 0 && dragOffset.y === 0}
             />
           </div>,
           document.body,
