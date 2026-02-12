@@ -60,11 +60,7 @@ export const useHighlightStore = create<HighlightState>((set, get) => ({
     const entry = createNoteEntry(text);
     const updated = serializeNotes([...existing, entry]);
 
-    // If this was a plain color highlight (not a note), convert it to a note highlight
-    const updateData: { comment: string; color?: string } = { comment: updated };
-    if (highlight.color !== 'note') {
-      updateData.color = 'note';
-    }
+    const updateData: { comment: string } = { comment: updated };
 
     const result = await highlightApi.updateHighlight(highlightId, updateData);
     set({

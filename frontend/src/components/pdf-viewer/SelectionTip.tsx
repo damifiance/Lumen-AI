@@ -11,13 +11,14 @@ const COLORS = [
 
 interface SelectionTipProps {
   onHighlight: (color: string) => void;
-  onAskAI: (question: string) => void;
+  onAskAI: (question: string, selectedColor?: string) => void;
   onNote: (note: string) => void;
 }
 
 export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps) {
   const [mode, setMode] = useState<'default' | 'askAI' | 'note'>('default');
   const [inputText, setInputText] = useState('');
+  const [selectedColor, setSelectedColor] = useState(COLORS[0].color);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps
   const handleSend = () => {
     if (mode === 'askAI') {
       const q = inputText.trim() || 'Explain this passage.';
-      onAskAI(q);
+      onAskAI(q, selectedColor);
     } else if (mode === 'note') {
       const c = inputText.trim();
       if (!c) return;
@@ -115,8 +116,13 @@ export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps
       {COLORS.map(({ color, label }) => (
         <button
           key={color}
-          onClick={() => onHighlight(color)}
-          className="w-6 h-6 rounded-full hover:scale-125 transition-transform cursor-pointer ring-2 ring-white shadow-sm"
+          onClick={() => {
+            setSelectedColor(color);
+            onHighlight(color);
+          }}
+          className={`w-6 h-6 rounded-full hover:scale-125 transition-transform cursor-pointer shadow-sm ${
+            selectedColor === color ? 'ring-2 ring-gray-400' : 'ring-2 ring-white'
+          }`}
           style={{ backgroundColor: color }}
           title={`Highlight ${label}`}
         />

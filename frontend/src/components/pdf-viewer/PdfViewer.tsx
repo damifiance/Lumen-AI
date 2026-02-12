@@ -89,7 +89,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
   );
 
   const handleAskAI = useCallback(
-    async (question: string) => {
+    async (question: string, selectedColor?: string) => {
       const selection = selectionRef.current;
       if (!selection) return;
 
@@ -101,7 +101,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
         paper_path: paperPath,
         content_text: text,
         position_json: JSON.stringify(ghost.position),
-        color: 'note',
+        color: selectedColor || '#FDE68A',
         comment: '',
       });
 
