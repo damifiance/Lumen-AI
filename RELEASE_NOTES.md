@@ -18,6 +18,23 @@
 
 ## What's New
 
+### v0.2.1 — System Tray, Auto-Update & New Logo
+
+**System Tray**
+- App lives in the menu bar with Open, Check for Updates, and Quit
+- Closing the window hides to tray instead of quitting
+- Works on macOS, Windows, and Linux
+
+**Auto-Update Checker**
+- Check for updates from the tray menu or the About modal
+- Compares against the latest GitHub release
+- Silent update check on launch (production only)
+
+**New Branding**
+- New Lumen.ai geometric "L" logo throughout the app
+- Updated app icon for all platforms (macOS, Windows, Linux)
+- AI assistant renamed to "Lumen" in chat
+
 ### v0.2.0 — Interactive Enhancements
 
 **Draggable Popups**
