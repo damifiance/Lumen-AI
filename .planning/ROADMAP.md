@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Supabase Foundation & Email Auth** - Backend setup, session persistence, email/password flows
 - [ ] **Phase 5: OAuth Integration** - Google and GitHub login with Electron deep linking
 - [ ] **Phase 6: Profile System** - Username claiming, avatar upload, profile editing
-- [ ] **Phase 7: Security Polish** - Email verification, password reset, account deletion
+- [x] **Phase 7: Security Polish** - Email verification, password reset, account deletion
 
 ## Phase Details
 
@@ -95,7 +95,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | 4. Supabase Foundation & Email Auth | 2/2 | ✓ Complete | 2026-02-14 |
 | 5. OAuth Integration | 2/2 | ✓ Complete | 2026-02-14 |
 | 6. Profile System | 2/2 | ✓ Complete | 2026-02-14 |
-| 7. Security Polish | 0/2 | Not started | - |
+| 7. Security Polish | 2/2 | ✓ Complete | 2026-02-14 |
 
 ---
 *Roadmap created: 2026-02-14*
