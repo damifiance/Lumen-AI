@@ -39,7 +39,7 @@ function translateAuthError(error: unknown): string {
   return 'Network error. Please check your connection.';
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   session: null,
   isLoading: false,

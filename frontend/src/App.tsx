@@ -6,6 +6,7 @@ import { TabBar } from './components/layout/TabBar';
 import { usePaperStore } from './stores/paperStore';
 import { useHighlightStore } from './stores/highlightStore';
 import { useChatStore } from './stores/chatStore';
+import { useAuthStore } from './stores/authStore';
 import { useShortcutStore, isShortcutModifier } from './stores/shortcutStore';
 import { getPaperMetadata } from './api/papers';
 import { ArrowLeft, Sparkles, Keyboard } from 'lucide-react';
@@ -14,12 +15,16 @@ import { OnboardingModal } from './components/common/OnboardingModal';
 import { KeyboardShortcuts } from './components/common/KeyboardShortcuts';
 import { AboutModal } from './components/common/AboutModal';
 import { OllamaSetupCard } from './components/OllamaSetupCard';
+import { AuthButton } from './components/auth/AuthButton';
+import { LoginModal } from './components/auth/LoginModal';
+import { SignupModal } from './components/auth/SignupModal';
 
 export default function App() {
   const { tabs, activeTabIndex, isLoading, setActivePaper, setLoading } =
     usePaperStore();
   const { loadHighlights, clearHighlights } = useHighlightStore();
   const { clearMessages, toggleOpen: toggleChat } = useChatStore();
+  const { initialize } = useAuthStore();
   const { openShortcuts } = useShortcutStore();
   const matchesEvent = useShortcutStore((s) => s.matchesEvent);
 
@@ -27,6 +32,11 @@ export default function App() {
     activeTabIndex >= 0 && activeTabIndex < tabs.length
       ? tabs[activeTabIndex].path
       : null;
+
+  // Initialize auth on mount (loads persisted session)
+  useEffect(() => {
+    initialize();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reload highlights when switching tabs
   useEffect(() => {
@@ -86,7 +96,17 @@ export default function App() {
 
       {/* Main — Tab Bar + PDF Viewer */}
       <div className="flex-1 min-w-0 flex flex-col">
-        <TabBar />
+        {/* Header bar with tabs and auth button */}
+        {(tabs.length > 0 || import.meta.env.VITE_SUPABASE_URL) && (
+          <div className="flex items-center justify-between bg-gray-100 border-b border-gray-200">
+            <div className="flex-1 min-w-0">
+              <TabBar />
+            </div>
+            <div className="shrink-0 pr-3">
+              <AuthButton />
+            </div>
+          </div>
+        )}
         <div className="flex-1 min-h-0">
           {isLoading ? (
             <div className="flex items-center justify-center h-full bg-white">
@@ -147,6 +167,8 @@ export default function App() {
       <OnboardingModal />
       <KeyboardShortcuts />
       <AboutModal />
+      <LoginModal />
+      <SignupModal />
     </div>
   );
 }
