@@ -52,7 +52,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
     const handleMouseDown = (e: MouseEvent) => {
       // Only pan on left-click on non-interactive elements
       const target = e.target as HTMLElement;
-      if (target.closest('button, a, textarea, input, .Highlight__part, [role="button"]')) return;
+      if (target.closest('button, a, textarea, input, .Highlight__part, [role="button"], .textLayer, .MouseSelection')) return;
       // Only if there's actually content to scroll
       scrollEl = getScrollEl();
       if (!scrollEl) return;
