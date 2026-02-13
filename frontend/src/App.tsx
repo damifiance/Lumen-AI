@@ -8,9 +8,11 @@ import { useHighlightStore } from './stores/highlightStore';
 import { useChatStore } from './stores/chatStore';
 import { useShortcutStore, isShortcutModifier } from './stores/shortcutStore';
 import { getPaperMetadata } from './api/papers';
-import { Sun, ArrowLeft, Sparkles, Keyboard } from 'lucide-react';
+import { ArrowLeft, Sparkles, Keyboard } from 'lucide-react';
+import lumenLogo from './assets/lumen-logo.png';
 import { OnboardingModal } from './components/common/OnboardingModal';
 import { KeyboardShortcuts } from './components/common/KeyboardShortcuts';
+import { AboutModal } from './components/common/AboutModal';
 import { OllamaSetupCard } from './components/OllamaSetupCard';
 
 export default function App() {
@@ -101,7 +103,7 @@ export default function App() {
                 {/* Welcome content */}
                 <div className="flex flex-col items-center text-gray-400 flex-shrink-0">
                   <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-accent/8 to-teal-400/8 flex items-center justify-center mb-5">
-                    <Sun size={36} className="text-accent/30" />
+                    <img src={lumenLogo} alt="Lumen AI" className="w-10 h-10 opacity-30" />
                   </div>
                   <h2 className="text-lg font-semibold text-gray-700 mb-2">
                     Welcome to Lumen AI
@@ -144,6 +146,7 @@ export default function App() {
       {/* Modals */}
       <OnboardingModal />
       <KeyboardShortcuts />
+      <AboutModal />
     </div>
   );
 }

@@ -6,7 +6,8 @@ import 'katex/dist/katex.min.css';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { ChatMessage as ChatMessageType } from '../../types/chat';
-import { User, Sun, BookmarkPlus, Check } from 'lucide-react';
+import { User, BookmarkPlus, Check } from 'lucide-react';
+import lumenLogo from '../../assets/lumen-logo.png';
 import { useHighlightStore } from '../../stores/highlightStore';
 
 interface ChatMessageProps {
@@ -37,13 +38,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
               : 'bg-gradient-to-br from-teal/10 to-accent/10 text-teal'
           }`}
         >
-          {isUser ? <User size={14} /> : <Sun size={14} />}
+          {isUser ? <User size={14} /> : <img src={lumenLogo} alt="AI" className="w-3.5 h-3.5" />}
         </div>
         <div className="flex-1 min-w-0">
           <span className={`text-[11px] font-semibold uppercase tracking-wider ${
             isUser ? 'text-accent/60' : 'text-teal/60'
           }`}>
-            {isUser ? 'You' : 'AI'}
+            {isUser ? 'You' : 'Lumen'}
           </span>
           <div className="mt-1 text-[13px] leading-relaxed text-gray-700 prose prose-sm max-w-none">
             {isUser ? (
