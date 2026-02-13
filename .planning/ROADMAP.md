@@ -62,10 +62,11 @@ Plans:
   3. User can edit bio, institution, and research interests
   4. Profile changes save to Supabase and persist across sessions
   5. User sees their @username in chat interface (not "You")
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] TBD
+- [ ] 06-01-PLAN.md — Profile foundation: DB migration, profileStore, username availability hook, image resize utility
+- [ ] 06-02-PLAN.md — Profile UI: UsernameClaimModal, ProfileEditModal, AvatarCropUpload, chat integration
 
 ### Phase 7: Security Polish
 **Goal**: Production-ready auth with email verification, password recovery, and account deletion
