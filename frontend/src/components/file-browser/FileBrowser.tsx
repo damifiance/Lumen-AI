@@ -138,6 +138,11 @@ export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
 
       <div className="mx-4 border-t border-white/5" />
 
+      {/* Auth */}
+      <div className="px-3 py-1.5">
+        <AuthButton />
+      </div>
+
       {!currentPath ? (
         /* No folder selected — show starting points */
         <div className="flex-1 overflow-y-auto dark-scrollbar px-3 pt-3">
@@ -158,10 +163,6 @@ export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
           <p className="text-[10px] text-sidebar-text/25 px-2 leading-relaxed">
             Navigate into any folder, then pin it to skip this screen next time.
           </p>
-          <div className="flex-1" />
-          <div className="px-1 pb-2">
-            <AuthButton />
-          </div>
         </div>
       ) : (
         /* Inside a folder */
@@ -254,9 +255,8 @@ export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
             )}
           </div>
 
-          {/* Bottom: auth + change folder */}
-          <div className="px-3 py-2 border-t border-white/5 space-y-1">
-            <AuthButton />
+          {/* Bottom: change folder */}
+          <div className="px-3 py-2 border-t border-white/5">
             <button
               onClick={goToRoots}
               className="w-full px-3 py-1.5 text-[11px] text-sidebar-text/30 hover:text-sidebar-text/50 hover:bg-sidebar-hover rounded-lg cursor-pointer text-center"
