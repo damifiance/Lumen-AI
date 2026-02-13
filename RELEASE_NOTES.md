@@ -8,9 +8,9 @@
 | **macOS** | `.dmg` disk image | See macOS note below |
 | **Linux** | `.AppImage` | Make executable with `chmod +x`, then run |
 
-> **macOS first launch:** macOS will show *"Lumen AI Not Opened — Apple could not verify…"*. This is normal for apps distributed outside the App Store. To fix it:
+> **macOS first launch:** macOS will show *"Lumen AI Not Opened — Apple could not verify..."*. This is normal for apps distributed outside the App Store. To fix it:
 > 1. Click **Done** (not "Move to Trash")
-> 2. Open **System Settings → Privacy & Security**
+> 2. Open **System Settings > Privacy & Security**
 > 3. Scroll **all the way to the bottom**, past the privacy categories — in the **Security** section you'll see a message about Lumen AI being blocked. Click **Open Anyway**
 > 4. macOS will ask one more time — click **Open**
 >
@@ -18,41 +18,48 @@
 
 ## What's New
 
+### v0.2.0 — Interactive Enhancements
+
+**Draggable Popups**
+- Notes popup — drag by the header to reposition
+- Ask AI popup — drag to move it while reading nearby context
+- Selection toolbar — drag via the divider handle to reposition
+
+**PDF Zoom Controls**
+- Zoom buttons (+/-) in the top-right corner
+- Trackpad pinch-to-zoom with natural gestures
+- Ctrl+scroll zoom for mouse users
+- Click the percentage to reset to page-width
+- Drag-to-pan — click and drag whitespace when zoomed in
+- Horizontal scrollbar when zoomed past page width
+
+**Highlight Improvements**
+- Highlights preserve their original color when using "Ask AI"
+- Highlights with notes show a dotted underline indicator
+- Smooth fade transition during zoom (no jitter)
+
+**Performance**
+- PDF caching with HTTP headers for faster reloads
+
+**Bug Fixes**
+- Fixed zoom buttons unable to zoom past page-width
+- Fixed popups disappearing when dragged too far
+- Fixed notes popup appearing in wrong position
+- Fixed click events being blocked by drag handlers
+
 ### v0.1.1 — Bug Fix
-- **Windows:** Fixed file browser back button not working (paths using `\` were not handled correctly)
-- **Website:** Added macOS and Windows install guides
+- **Windows:** Fixed file browser back button not working
 
 ### v0.1.0 — Initial Release
-
-### Desktop App (All Platforms)
-- **macOS** — DMG installer (Apple Silicon)
-- **Windows** — NSIS installer (x64)
-- **Linux** — AppImage
-
-### Core Features
-- PDF viewer with clean, modern interface
-- Multi-tab support — open multiple papers at once
-- Text highlighting in multiple colors, saved automatically
-- Notes — attach notes to any text selection
-- Select & Ask AI — select text, ask a question, get an AI answer
-- AI Chat — ask questions about the entire paper
-- Pin folders for quick access on launch
-- Local AI models via Ollama (free, private, no API keys)
-- Cloud model support (OpenAI, Anthropic)
-- LaTeX math rendering with KaTeX
-- Customizable keyboard shortcuts
+- PDF viewer with multi-tab support
+- Text highlighting in multiple colors
+- Notes on any text selection
+- Select & Ask AI
+- AI Chat about entire papers
+- Pin folders for quick access
+- Local AI via Ollama, cloud via OpenAI/Anthropic
+- LaTeX math rendering
 - Cross-platform (macOS, Windows, Linux)
-
-## Installation
-
-### Windows
-Download the `.exe` installer from the assets below and run it.
-
-### macOS
-Download the `.dmg` file, open it, and drag Lumen AI into Applications.
-
-### Linux
-Download the `.AppImage` file, make it executable (`chmod +x`), and run it.
 
 ## Prerequisites
 - [Ollama](https://ollama.com) installed with at least one model (e.g., `ollama pull llama3.1`)
