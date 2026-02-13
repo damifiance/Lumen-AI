@@ -5,6 +5,7 @@ import {
   type PdfHighlighterUtils,
   type Highlight,
   type PdfSelection,
+  type PdfScaleValue,
 } from 'react-pdf-highlighter-extended';
 import 'react-pdf-highlighter-extended/dist/esm/style/PdfHighlighter.css';
 import 'react-pdf-highlighter-extended/dist/esm/style/TextHighlight.css';
@@ -225,7 +226,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
                 onNote={handleNote}
               />
             }
-            pdfScaleValue={pdfScaleValue}
+            pdfScaleValue={pdfScaleValue as PdfScaleValue}
             style={{ height: '100%' }}
           >
             <HighlightContainer

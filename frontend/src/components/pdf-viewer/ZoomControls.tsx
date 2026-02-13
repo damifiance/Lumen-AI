@@ -14,7 +14,7 @@ const STEP = 0.25;
 
 export function ZoomControls({ utilsRef, containerRef, onScaleValueChange }: ZoomControlsProps) {
   const [scale, setScale] = useState(1.0);
-  const fadeTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Sync displayed scale from viewer (retry until viewer is available)
   useEffect(() => {
