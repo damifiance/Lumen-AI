@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-14)
 
 **Core value:** Researchers can read, annotate, and discuss papers with AI — locally and privately by default, with optional cloud features behind authentication
-**Current focus:** Phase 6 - Profile System
+**Current focus:** Phase 7 - Security Polish
 
 ## Current Position
 
-Phase: 6 of 7 (Profile System)
+Phase: 7 of 7 (Security Polish)
 Plan: 2 of 2 in current phase
 Status: Complete
-Last activity: 2026-02-14 — Completed Phase 6 Plan 02 (Profile UI Components)
+Last activity: 2026-02-13 — Completed Phase 7 Plan 02 (Account Deletion)
 
-Progress: [██████░░░░] ~60%
+Progress: [████████░░] ~80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 5.0 minutes
-- Total execution time: 0.58 hours
+- Total plans completed: 8
+- Average duration: 4.3 minutes
+- Total execution time: 0.63 hours
 
 **By Phase:**
 
@@ -30,16 +30,17 @@ Progress: [██████░░░░] ~60%
 | Phase 04 | 2 | 1444s (24.1m) | 722s |
 | Phase 05 | 2 | 179s (3.0m) | 90s |
 | Phase 06 | 2 | 178s (3.0m) | 89s |
+| Phase 07 | 2 | 161s (2.7m) | 81s |
 
 **Recent Plans:**
 
 | Plan | Duration | Tasks | Files | Date |
 |------|----------|-------|-------|------|
+| Phase 07 P02 | 161s (2.7m) | 2 tasks | 6 files | 2026-02-13 |
+| Phase 07 P01 | - | - | - | 2026-02-13 |
 | Phase 06 P02 | 15s (<1m) | 3 tasks | 9 files | 2026-02-14 |
 | Phase 06 P01 | 163s (2.7m) | 2 tasks | 4 files | 2026-02-14 |
 | Phase 05 P02 | <1m | 2 tasks | 2 files | 2026-02-14 |
-| Phase 05 P01 | 179s (3.0m) | 2 tasks | 6 files | 2026-02-14 |
-| Phase 04 P02 | 1260s (21m) | 3 tasks | 5 files | 2026-02-14 |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - Comma-separated input for research interests (start simple vs react-tag-autocomplete)
 - Auto-create profile for legacy users (PGRST116 handling for users created before migration)
 - Public avatars storage bucket (enable public profile viewing without auth)
+- Hard delete for GDPR compliance (shouldSoftDelete: false for permanent data removal)
+- Service_role key ONLY in Electron main process (never exposed to renderer for security)
+- Cascade deletion order: avatar -> profile -> auth (prevents orphaned data)
 
 ### Pending Todos
 
@@ -89,7 +93,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-14 (Phase 6 Plan 02 execution)
-Stopped at: Completed 06-02-PLAN.md — Profile UI Components complete (Phase 6 finished)
+Last session: 2026-02-13 (Phase 7 Plan 02 execution)
+Stopped at: Completed 07-02-PLAN.md — Account Deletion complete (Phase 7 finished)
 Resume file: None
-Next step: Phase 6 complete! All profile system components built and integrated. Ready to move to next phase or milestone as defined in roadmap.
+Next step: Phase 7 complete! Security polish finished (OAuth deep linking + account deletion). Ready to move to next phase or milestone as defined in roadmap.
