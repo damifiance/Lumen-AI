@@ -18,6 +18,8 @@ import { AboutModal } from './components/common/AboutModal';
 import { OllamaSetupCard } from './components/OllamaSetupCard';
 import { LoginModal } from './components/auth/LoginModal';
 import { SignupModal } from './components/auth/SignupModal';
+import { ForgotPasswordModal } from './components/auth/ForgotPasswordModal';
+import { ResetPasswordView } from './components/auth/ResetPasswordView';
 import { UsernameClaimModal } from './components/profile/UsernameClaimModal';
 import { ProfileEditModal } from './components/profile/ProfileEditModal';
 import { openUsernameClaimModal } from './components/profile/UsernameClaimModal';
@@ -189,8 +191,12 @@ export default function App() {
       <AboutModal />
       <LoginModal />
       <SignupModal />
+      <ForgotPasswordModal />
       <UsernameClaimModal />
       <ProfileEditModal />
+
+      {/* Reset Password View - overlays entire app when active */}
+      <ResetPasswordView />
     </div>
   );
 }

@@ -15,8 +15,9 @@ export function LoginModal() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showResendVerification, setShowResendVerification] = useState(false);
 
-  const { signIn, signInWithOAuth, isLoading } = useAuthStore();
+  const { signIn, signInWithOAuth, resendVerification, isLoading } = useAuthStore();
 
   // Register listener
   useEffect(() => {
@@ -41,14 +42,35 @@ export function LoginModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setShowResendVerification(false);
 
     const result = await signIn(email, password);
     if (result.error) {
       setError(result.error);
+      // Check if error is email_not_confirmed
+      if (result.error.includes('confirm your account')) {
+        setShowResendVerification(true);
+      }
     } else {
       // Success - close modal
       handleClose();
     }
+  };
+
+  const handleResendVerification = async () => {
+    setError('');
+    const result = await resendVerification(email);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setError('Verification email sent! Please check your inbox.');
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    handleClose();
+    const { openForgotPasswordModal } = await import('./ForgotPasswordModal');
+    openForgotPasswordModal();
   };
 
   const handleSignupClick = async () => {
@@ -126,7 +148,16 @@ export function LoginModal() {
           {/* Error display */}
           {error && (
             <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 text-red-600 text-sm">
-              {error}
+              <div>{error}</div>
+              {showResendVerification && (
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  className="mt-2 text-accent hover:text-accent-hover font-medium cursor-pointer underline"
+                >
+                  Resend verification email
+                </button>
+              )}
             </div>
           )}
 
@@ -151,7 +182,7 @@ export function LoginModal() {
           </div>
 
           {/* Password field */}
-          <div className="mb-5">
+          <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
@@ -169,6 +200,17 @@ export function LoginModal() {
                 placeholder="At least 6 characters"
               />
             </div>
+          </div>
+
+          {/* Forgot password link */}
+          <div className="flex justify-end mb-5">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-xs text-gray-400 hover:text-accent cursor-pointer"
+            >
+              Forgot password?
+            </button>
           </div>
 
           {/* Submit button */}
