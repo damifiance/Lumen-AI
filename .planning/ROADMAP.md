@@ -46,10 +46,11 @@ Plans:
   3. OAuth deep linking works when app is not running (cold start)
   4. OAuth deep linking works when app is already running (warm handoff)
   5. OAuth tokens stored securely via Electron SafeStorage
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] TBD
+- [ ] 05-01-PLAN.md — Electron protocol handler + OAuth IPC + frontend OAuth store
+- [ ] 05-02-PLAN.md — OAuth UI buttons in modals + end-to-end verification
 
 ### Phase 6: Profile System
 **Goal**: Users have complete academic profiles with username, avatar, bio, institution, and research interests
@@ -90,7 +91,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 4. Supabase Foundation & Email Auth | 2/2 | ✓ Complete | 2026-02-14 |
-| 5. OAuth Integration | 0/TBD | Not started | - |
+| 5. OAuth Integration | 0/2 | Not started | - |
 | 6. Profile System | 0/TBD | Not started | - |
 | 7. Security Polish | 0/TBD | Not started | - |
 
