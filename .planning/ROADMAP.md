@@ -30,10 +30,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User can log out from any screen
   5. App works fully offline with Ollama (no auth required)
   6. Auth actions show loading states and friendly error messages
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] TBD
+- [ ] 04-01-PLAN.md — Electron secure storage IPC + Supabase client + auth store
+- [ ] 04-02-PLAN.md — Auth modals (login/signup) + App integration + verification
 
 ### Phase 5: OAuth Integration
 **Goal**: Users can log in with Google or GitHub accounts via PKCE OAuth flow in Electron
@@ -88,7 +89,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 4. Supabase Foundation & Email Auth | 0/TBD | Not started | - |
+| 4. Supabase Foundation & Email Auth | 0/2 | Planning complete | - |
 | 5. OAuth Integration | 0/TBD | Not started | - |
 | 6. Profile System | 0/TBD | Not started | - |
 | 7. Security Polish | 0/TBD | Not started | - |
