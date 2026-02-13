@@ -91,7 +91,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 4. Supabase Foundation & Email Auth | 2/2 | ✓ Complete | 2026-02-14 |
-| 5. OAuth Integration | 0/2 | Not started | - |
+| 5. OAuth Integration | 2/2 | ✓ Complete | 2026-02-14 |
 | 6. Profile System | 0/TBD | Not started | - |
 | 7. Security Polish | 0/TBD | Not started | - |
 
