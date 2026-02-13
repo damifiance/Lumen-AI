@@ -2,15 +2,17 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   FileText,
   Folder,
-  Sun,
   Pin,
   PinOff,
   ChevronLeft,
   Keyboard,
   HelpCircle,
+  Info,
 } from 'lucide-react';
+import lumenLogo from '../../assets/lumen-logo.png';
 import { useShortcutStore } from '../../stores/shortcutStore';
 import { openOnboarding } from '../common/OnboardingModal';
+import { openAbout } from '../common/AboutModal';
 import { getRoots, browseDirectory } from '../../api/files';
 import type { FileEntry, RootEntry } from '../../types/file';
 
@@ -100,7 +102,7 @@ export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-accent/20 flex items-center justify-center">
-              <Sun size={14} className="text-accent" />
+              <img src={lumenLogo} alt="Lumen AI" className="w-4 h-4" />
             </div>
             <div>
               <h1 className="text-[13px] font-semibold text-sidebar-text-bright leading-tight tracking-wide">Lumen AI</h1>
@@ -121,6 +123,13 @@ export function FileBrowser({ onFileSelect, activePath }: FileBrowserProps) {
               title="Keyboard shortcuts"
             >
               <Keyboard size={13} />
+            </button>
+            <button
+              onClick={openAbout}
+              className="p-1.5 text-sidebar-text/25 hover:text-sidebar-text/50 hover:bg-sidebar-hover rounded-lg cursor-pointer"
+              title="About & Updates"
+            >
+              <Info size={13} />
             </button>
           </div>
         </div>

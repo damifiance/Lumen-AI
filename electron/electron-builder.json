@@ -7,6 +7,10 @@
   "files": [
     "main.js",
     "preload.js",
+    "tray.js",
+    "updater.js",
+    "build/trayIcon.png",
+    "build/trayIcon@2x.png",
     "package.json"
   ],
   "extraResources": [

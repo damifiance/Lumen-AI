@@ -13,7 +13,8 @@ This roadmap fixes critical UX breaks in the PDF annotation system and adds esse
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core UX Fixes** - Fix broken popup positioning, color preservation, add zoom and AI markers
-- [ ] **Phase 2: Interactive Enhancements** - Make popups draggable for flexible positioning
+- [x] **Phase 2: Interactive Enhancements** - Make popups draggable for flexible positioning
+- [ ] **Phase 3: System Tray & Auto-Update** - System tray icon with menu and update checking
 
 ## Phase Details
 
@@ -47,6 +48,22 @@ Plans:
 
 Plans:
 - [ ] 02-01-PLAN.md -- Draggable popups via custom useDraggable hook (NotePopup + SelectionTip)
+
+### Phase 3: System Tray & Auto-Update
+**Goal**: Users can check for updates from the system tray and the app lives in the menu bar for quick access.
+**Depends on**: Phase 2
+**Requirements**: TRAY-01, UPD-01
+**Success Criteria** (what must be TRUE):
+  1. App shows an icon in the system tray (macOS menu bar / Windows system tray)
+  2. Tray menu has: Open Lumen AI, Check for Updates, Quit
+  3. Check for Updates compares current version with latest GitHub release
+  4. If update available, shows dialog with version info and download link
+  5. Closing the window hides to tray instead of quitting (quit only from tray menu)
+  6. Works on both macOS and Windows
+**Plans**: 1 plan
+
+Plans:
+- [ ] 03-01-PLAN.md -- System tray icon, menu, and GitHub release update checker
 
 ## Progress
 

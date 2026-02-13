@@ -4,10 +4,13 @@ const { spawn } = require('child_process');
 const http = require('http');
 const findFreePort = require('find-free-port');
 const fs = require('fs');
+const { createTray, destroyTray } = require('./tray');
+const { checkForUpdates } = require('./updater');
 
 let mainWindow = null;
 let backendProcess = null;
 let backendPort = null;
+let isQuitting = false;
 
 const isDev = process.env.ELECTRON_DEV === 'true';
 
@@ -108,6 +111,15 @@ function waitForBackend(port, maxAttempts = 60) {
   });
 }
 
+function showWindow() {
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.focus();
+  } else {
+    createWindow();
+  }
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -130,6 +142,14 @@ function createWindow() {
     mainWindow.loadFile(path.join(process.resourcesPath, 'frontend', 'dist', 'index.html'));
   }
 
+  // Close to tray instead of quitting
+  mainWindow.on('close', (e) => {
+    if (!isQuitting) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -142,6 +162,14 @@ app.whenReady().then(async () => {
 
     ipcMain.handle('get-backend-port', () => backendPort);
 
+    // In-app update check
+    ipcMain.handle('check-for-updates', async () => {
+      return checkForUpdates({ parentWindow: mainWindow });
+    });
+
+    // Get current app version
+    ipcMain.handle('get-app-version', () => app.getVersion());
+
     if (!isDev) {
       backendProcess = await startBackend(port);
       console.log(`Waiting for backend on port ${port}...`);
@@ -153,6 +181,26 @@ app.whenReady().then(async () => {
     }
 
     createWindow();
+
+    // Create system tray
+    createTray({
+      onShowWindow: showWindow,
+      onQuit: () => {
+        isQuitting = true;
+        app.quit();
+      },
+    });
+
+    // Silent update check on launch (don't bother user if up to date)
+    if (!isDev) {
+      setTimeout(() => {
+        checkForUpdates({ silent: true, parentWindow: mainWindow }).then((result) => {
+          if (result.updateAvailable) {
+            console.log(`Update available: v${result.latestVersion}`);
+          }
+        });
+      }, 5000);
+    }
   } catch (err) {
     console.error('Failed to start:', err);
     app.quit();
@@ -160,18 +208,16 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  // Don't quit — app lives in tray
 });
 
 app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow();
-  }
+  showWindow();
 });
 
 app.on('before-quit', () => {
+  isQuitting = true;
+  destroyTray();
   if (backendProcess) {
     console.log('Stopping backend...');
     backendProcess.kill('SIGTERM');
