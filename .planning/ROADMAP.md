@@ -12,7 +12,7 @@ This milestone adds authentication and user profiles to Lumen AI via Supabase, m
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 4: Supabase Foundation & Email Auth** - Backend setup, session persistence, email/password flows
+- [x] **Phase 4: Supabase Foundation & Email Auth** - Backend setup, session persistence, email/password flows
 - [ ] **Phase 5: OAuth Integration** - Google and GitHub login with Electron deep linking
 - [ ] **Phase 6: Profile System** - Username claiming, avatar upload, profile editing
 - [ ] **Phase 7: Security Polish** - Email verification, password reset, account deletion
@@ -89,7 +89,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 4. Supabase Foundation & Email Auth | 0/2 | Planning complete | - |
+| 4. Supabase Foundation & Email Auth | 2/2 | ✓ Complete | 2026-02-14 |
 | 5. OAuth Integration | 0/TBD | Not started | - |
 | 6. Profile System | 0/TBD | Not started | - |
 | 7. Security Polish | 0/TBD | Not started | - |
