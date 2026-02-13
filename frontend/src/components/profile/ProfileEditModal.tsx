@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProfileStore } from '../../stores/profileStore';
 import { AvatarCropUpload } from './AvatarCropUpload';
+import { AccountDeleteSection } from '../auth/AccountDeleteSection';
 
 // Module-level listener for programmatic opening
 type Listener = (open: boolean) => void;
@@ -241,6 +242,9 @@ export function ProfileEditModal() {
               'Save Changes'
             )}
           </button>
+
+          {/* Account Deletion Section */}
+          <AccountDeleteSection />
         </form>
       </div>
     </div>
