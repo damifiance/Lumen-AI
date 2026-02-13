@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import {
   PdfLoader,
   PdfHighlighter,
@@ -27,8 +27,12 @@ interface PdfViewerProps {
 
 export function PdfViewer({ paperPath }: PdfViewerProps) {
   const utilsRef = useRef<PdfHighlighterUtils | null>(null);
+  const setUtilsRef = useCallback((utils: PdfHighlighterUtils | null) => {
+    utilsRef.current = utils;
+  }, []);
   const selectionRef = useRef<PdfSelection | null>(null);
   const viewerContainerRef = useRef<HTMLDivElement>(null);
+  const [pdfScaleValue, setPdfScaleValue] = useState<string>('page-width');
 
   // Drag-to-pan: click on whitespace and drag to scroll when zoomed in
   useEffect(() => {
@@ -213,9 +217,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
             pdfDocument={pdfDocument}
             highlights={pdfHighlights}
             onSelection={handleSelection}
-            utilsRef={(utils) => {
-              utilsRef.current = utils;
-            }}
+            utilsRef={setUtilsRef}
             selectionTip={
               <SelectionTip
                 onHighlight={handleHighlight}
@@ -223,7 +225,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
                 onNote={handleNote}
               />
             }
-            pdfScaleValue="page-width"
+            pdfScaleValue={pdfScaleValue}
             style={{ height: '100%' }}
           >
             <HighlightContainer
@@ -234,7 +236,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
           </PdfHighlighter>
         )}
       </PdfLoader>
-      <ZoomControls utilsRef={utilsRef} containerRef={viewerContainerRef} />
+      <ZoomControls utilsRef={utilsRef} containerRef={viewerContainerRef} onScaleValueChange={setPdfScaleValue} />
     </div>
   );
 }
