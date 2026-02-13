@@ -1,71 +1,87 @@
-# Requirements: Lumen AI UX Improvements
+# Requirements: Lumen AI Auth & Profiles
 
-**Defined:** 2026-02-12
-**Core Value:** Users can see and interact with their notes and highlights without fighting the interface
+**Defined:** 2026-02-14
+**Core Value:** Researchers can read, annotate, and discuss papers with AI — locally and privately by default, with optional cloud features behind authentication
 
 ## v1 Requirements
 
-### Popup UX
+### Authentication
 
-- [ ] **POP-01**: Note popups appear near the associated highlight (not at top-left/under tab bar)
-- [ ] **POP-02**: Note popups are draggable to any position on screen
-- [ ] **POP-03**: Selection tip popup is draggable to any position on screen
-- [ ] **POP-04**: Popup position resets when reopened
+- [ ] **AUTH-01**: User can sign up with email and password
+- [ ] **AUTH-02**: User can log in with Google OAuth
+- [ ] **AUTH-03**: User can log in with GitHub OAuth
+- [ ] **AUTH-04**: User session persists across app restarts
+- [ ] **AUTH-05**: User can log out
 
-### Highlight Integrity
+### Profiles
 
-- [ ] **HLT-01**: Asking AI about an existing highlight preserves the original highlight color
-- [ ] **HLT-02**: Asking AI about a new text selection uses current palette color (not hardcoded yellow)
-- [ ] **HLT-03**: Highlights with any notes (AI-generated or user-written) display a dotted underline visual marker
+- [ ] **PROF-01**: New user must pick a unique @username on first login
+- [ ] **PROF-02**: User can upload and crop a profile image
+- [ ] **PROF-03**: User can edit bio
+- [ ] **PROF-04**: User can set institution
+- [ ] **PROF-05**: User can add research interests
 
-### PDF Controls
+### Security & Polish
 
-- [ ] **PDF-01**: User can zoom in on PDF
-- [ ] **PDF-02**: User can zoom out on PDF
-- [ ] **PDF-03**: Zoom level displayed to user
+- [ ] **SEC-01**: User receives email verification after signup
+- [ ] **SEC-02**: User can reset password via email link
+- [ ] **SEC-03**: User can delete their account and all associated data
+- [ ] **SEC-04**: All auth actions show loading states and user-friendly error messages
+- [ ] **SEC-05**: App works fully offline with Ollama (auth is optional)
 
 ## v2 Requirements
 
-### Selection & Color Management
+### Premium & Cloud AI
 
-- **SEL-01**: User can re-select text that is already highlighted
-- **CLR-01**: User can change highlight color without losing attached notes
+- **PREM-01**: Logged-in premium users can use cloud AI models (OpenAI, Anthropic) via backend-proxied API key
+- **PREM-02**: User can subscribe to premium tier
+- **PREM-03**: Usage tracking and rate limiting for cloud AI
 
-### Navigation & Filtering
+### Social & Sync
 
-- **FLT-01**: User can filter highlights by color
-- **KBD-01**: Keyboard shortcuts for zoom and highlight colors
+- **SYNC-01**: Cross-device paper sync
+- **SOCL-01**: Share highlights with other users
+- **SOCL-02**: Follow researchers
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Auto-reposition popup on scroll/zoom | High complexity, defer to v2+ |
-| Collaborative annotations | Conflicts with local-first architecture |
-| Rich text/markdown in notes | Most notes are short text |
-| Highlight export by color | Not core reader experience |
+| API key management UI (user's own keys) | Using backend-proxied key for premium; users don't manage their own |
+| Cloud AI gating | Deferred to premium/paid tiers milestone |
+| Payment integration (Stripe) | Future milestone |
+| Cross-device paper sync | Future milestone |
+| Social features | Future milestone |
+| Team/organization accounts | Future milestone |
 | Dark mode | Not requested |
+| Username change after claiming | Breaks future @mentions; contact support instead |
+| Multiple OAuth accounts per user | Identity merging complexity; one account per email |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| POP-01 | Phase 1 | Pending |
-| POP-02 | Phase 2 | Pending |
-| POP-03 | Phase 2 | Pending |
-| POP-04 | Phase 1 | Pending |
-| HLT-01 | Phase 1 | Pending |
-| HLT-02 | Phase 1 | Pending |
-| HLT-03 | Phase 1 | Pending |
-| PDF-01 | Phase 1 | Pending |
-| PDF-02 | Phase 1 | Pending |
-| PDF-03 | Phase 1 | Pending |
+| AUTH-01 | — | Pending |
+| AUTH-02 | — | Pending |
+| AUTH-03 | — | Pending |
+| AUTH-04 | — | Pending |
+| AUTH-05 | — | Pending |
+| PROF-01 | — | Pending |
+| PROF-02 | — | Pending |
+| PROF-03 | — | Pending |
+| PROF-04 | — | Pending |
+| PROF-05 | — | Pending |
+| SEC-01 | — | Pending |
+| SEC-02 | — | Pending |
+| SEC-03 | — | Pending |
+| SEC-04 | — | Pending |
+| SEC-05 | — | Pending |
 
 **Coverage:**
-- v1 requirements: 10 total
-- Mapped to phases: 10
-- Unmapped: 0 ✓
+- v1 requirements: 15 total
+- Mapped to phases: 0
+- Unmapped: 15 ⚠️
 
 ---
-*Requirements defined: 2026-02-12*
-*Last updated: 2026-02-12 after roadmap creation*
+*Requirements defined: 2026-02-14*
+*Last updated: 2026-02-14 after milestone v0.3.0-alpha definition*
