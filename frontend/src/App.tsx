@@ -15,7 +15,6 @@ import { OnboardingModal } from './components/common/OnboardingModal';
 import { KeyboardShortcuts } from './components/common/KeyboardShortcuts';
 import { AboutModal } from './components/common/AboutModal';
 import { OllamaSetupCard } from './components/OllamaSetupCard';
-import { AuthButton } from './components/auth/AuthButton';
 import { LoginModal } from './components/auth/LoginModal';
 import { SignupModal } from './components/auth/SignupModal';
 
@@ -97,13 +96,10 @@ export default function App() {
       {/* Main — Tab Bar + PDF Viewer */}
       <div className="flex-1 min-w-0 flex flex-col">
         {/* Header bar with tabs and auth button */}
-        {(tabs.length > 0 || import.meta.env.VITE_SUPABASE_URL) && (
-          <div className="flex items-center justify-between bg-gray-100 border-b border-gray-200">
+        {tabs.length > 0 && (
+          <div className="flex items-center bg-gray-100 border-b border-gray-200">
             <div className="flex-1 min-w-0">
               <TabBar />
-            </div>
-            <div className="shrink-0 pr-3">
-              <AuthButton />
             </div>
           </div>
         )}

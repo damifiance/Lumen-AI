@@ -15,9 +15,9 @@ export function AuthButton() {
     return (
       <button
         onClick={openLoginModal}
-        className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 cursor-pointer rounded-lg hover:bg-gray-50 transition-colors"
+        className="flex items-center gap-2 w-full px-3 py-2 text-[12px] text-sidebar-text/50 hover:text-sidebar-text-bright hover:bg-sidebar-hover rounded-lg cursor-pointer transition-colors"
       >
-        <LogIn size={16} />
+        <LogIn size={14} />
         Sign In
       </button>
     );
@@ -26,20 +26,20 @@ export function AuthButton() {
   // Logged in - show user email + Sign Out button
   const displayEmail = user.email || 'User';
   const truncatedEmail =
-    displayEmail.length > 24 ? displayEmail.slice(0, 24) + '...' : displayEmail;
+    displayEmail.length > 20 ? displayEmail.slice(0, 20) + '...' : displayEmail;
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50">
-      <div className="flex items-center gap-2 text-sm">
-        <User size={14} className="text-gray-400" />
-        <span className="text-gray-600">{truncatedEmail}</span>
+    <div className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-white/5">
+      <div className="flex items-center gap-2 min-w-0">
+        <User size={13} className="text-sidebar-text/40 shrink-0" />
+        <span className="text-[11px] text-sidebar-text/70 truncate">{truncatedEmail}</span>
       </div>
       <button
         onClick={signOut}
-        className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer rounded hover:bg-gray-100 transition-colors"
+        className="p-1 text-sidebar-text/30 hover:text-sidebar-text/60 cursor-pointer rounded hover:bg-white/10 transition-colors shrink-0"
         title="Sign Out"
       >
-        <LogOut size={14} />
+        <LogOut size={13} />
       </button>
     </div>
   );
