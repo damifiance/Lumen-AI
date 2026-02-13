@@ -1,8 +1,8 @@
 # Feature Research
 
-**Domain:** PDF Annotation UX (Popups, Highlights, Visual Markers)
-**Researched:** 2026-02-12
-**Confidence:** MEDIUM
+**Domain:** User authentication, academic profiles, and cloud AI gating in Electron + React app
+**Researched:** 2026-02-14
+**Confidence:** HIGH
 
 ## Feature Landscape
 
@@ -12,29 +12,35 @@ Features users assume exist. Missing these = product feels incomplete.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Smart popup positioning (viewport-aware) | Standard in all professional PDF tools; popups appearing in wrong location breaks core UX | MEDIUM | Must position relative to highlight, avoid viewport edges, flip above/below based on available space. Current issue: popups appear at top-left under tab bar |
-| Highlight color palette (4-8 colors) | Users organize by color-coding system; industry standard includes yellow, blue, green, red, purple | LOW | Common pattern: yellow=key points, blue=references, green=action items, red=urgent/critical, purple=theoretical |
-| Zoom in/out controls | Core PDF reader functionality; users cannot read without zoom | LOW | Standard: Ctrl +/- keyboard shortcuts, +/- buttons, zoom slider, fit-to-width/height modes |
-| Visual distinction between annotation types | Users need to differentiate highlights from notes/comments at a glance | MEDIUM | Common pattern: plain highlights=no icon, highlights with notes=speech bubble icon, standalone notes=sticky note icon |
-| Persistent highlight colors | Color must not change unless user explicitly changes it; AI actions should not alter annotation color | LOW | Current issue: asking AI overwrites highlight color to yellow |
-| Click-outside-to-close for popups | Standard modal/popup behavior; users expect Esc or clicking outside to dismiss | LOW | Currently implemented in NotePopup with click-outside detection |
-| Annotation filtering/search by color | Users employ color-coding systems to organize; must be able to filter/view by color | MEDIUM | Zotero implements this with color filter in annotations sidebar |
-| Highlight opacity control | Text must remain readable under highlights; standard opacity ~40% | LOW | Currently implemented at 40% opacity |
+| Email/password login | Standard auth method expected in all apps | LOW | Supabase provides out-of-box; includes email validation, password reset |
+| OAuth social login (Google, GitHub) | Reduces friction; expected in 2026 academic/tech tools | MEDIUM | Supabase supports; Electron requires PKCE flow with deep links due to OAuth redirect challenges |
+| Persistent session | Users expect to stay logged in across app restarts | MEDIUM | JWT stored in Electron safeStorage (encrypted keychain); localStorage for web. Supabase auto-refreshes tokens |
+| Logout | Core security requirement | LOW | Clear session + redirect; standard Supabase method |
+| Unique username | Social identity feature; expected in academic platforms (ResearchGate, Mendeley) | MEDIUM | Requires real-time uniqueness check; inline validation with server roundtrip |
+| Profile avatar upload | Visual identity is table stakes; academic CVs include photos | MEDIUM | Supabase Storage for hosting; needs crop/resize UI (react-avatar-editor pattern) |
+| Profile editing | Users expect to update bio, institution, interests | LOW | Standard CRUD on profiles table; form validation |
+| Password reset flow | Required when email/password offered | LOW | Supabase magic link pattern; 15-min expiry token via email |
+| Email verification | Prevents fake accounts; security best practice | LOW | Supabase built-in; blocks username claim until verified |
+| Account deletion | GDPR requirement; user autonomy expectation | MEDIUM | Must delete from profiles + auth.users; 30-day confirmation pattern recommended |
+| Feature gating (cloud AI requires auth) | Users understand freemium pattern; local free, cloud requires login | LOW | UI check + modal prompt "Login to use cloud AI"; Ollama ungated |
+| API key management UI | If app requires API keys, users need CRUD interface | MEDIUM | Store encrypted in Supabase (never localStorage); per-provider sections |
+| Loading states for auth actions | Users need feedback during network-dependent actions | LOW | Spinners, disabled buttons during login/signup/profile save |
+| Error handling (auth failures) | Clear feedback when credentials wrong, network fails, etc. | LOW | User-friendly messages; avoid exposing security details |
+| Offline behavior (Electron) | Electron apps work offline; graceful degradation expected | MEDIUM | Cache last-known auth state; sync on reconnect; Ollama works fully offline |
 
 ### Differentiators (Competitive Advantage)
 
-Features that set the product apart. Not expected, but valued.
+Features that set the product apart. Not required, but valuable.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| AI-annotated highlights with visual marker | Distinguishes AI-generated annotations from manual ones; adds value to AI-powered PDF reader | MEDIUM | Implement distinct icon overlay (e.g., sparkle/AI badge) or border style for AI-annotated highlights; current gap in Lumen AI |
-| Draggable/repositionable note popups | Allows users to move popups out of the way while reviewing; reduces visual clutter | MEDIUM | PDF Expert implements with "tap and hold bottom-right corner to move"; creates better UX for dense annotations |
-| Context-aware popup arrow positioning | Arrow points to associated highlight, adapts when popup flips above/below | LOW | Currently implemented with top/bottom arrow based on flip logic |
-| Multi-note threading per highlight | Single highlight can have conversation-style thread of notes | MEDIUM | Currently implemented with NoteEntry system; differentiates from simpler "one note per highlight" pattern |
-| Relative timestamps (just now, 3h ago) | Makes annotation timeline more human-friendly than absolute dates | LOW | Currently implemented; small UX polish that users appreciate |
-| Auto-reposition on scroll/zoom | Popups stay anchored to highlight during viewport changes | HIGH | Adobe Acrobat implements this; prevents disorientation during navigation |
-| Keyboard shortcuts for annotations | Power users expect shortcuts for highlight colors, zoom, navigation | MEDIUM | Standard: Ctrl+H=highlight, Ctrl+E=comment, Ctrl+=/- =zoom; improves accessibility |
-| Color-coded annotation export/summary | Export highlights grouped by color with headers | MEDIUM | Valuable for academic/research use; Zotero users frequently request this |
+| Academic profile fields (institution, research interests) | Positions Lumen as academic-first; Zotero/Mendeley have basic profiles, this goes deeper | LOW | Array of tags for research interests; autocomplete from common fields suggests 60% fewer typos, faster input |
+| Hybrid local + cloud UX | App is fully functional without account (local Ollama); login unlocks cloud AI — respects privacy, no forced signup | MEDIUM | Clear messaging: "Use Lumen offline with Ollama, or login for OpenAI/Anthropic." Reduces abandonment from mandatory auth |
+| Username as chat identity | Shows @username in chat instead of "You"; academic context benefits from identity | LOW | Small UX touch; reinforces profile investment |
+| Avatar in chat messages | Visual consistency; user sees their avatar vs AI's logo | LOW | Replaces generic user icon; feels personal |
+| Magic link (passwordless email) | Lower friction than password; Slack/Notion use this; good for infrequent academic users | MEDIUM | Supabase signInWithOtp; 10-15min expiry; requires email template customization for PKCE |
+| Research interests autocomplete | Suggests common fields (e.g., "Machine Learning", "Neuroscience"); reduces typos, increases consistency | MEDIUM | Study shows autocomplete increases tag consistency 3x, reduces time 40%; fetch from common ontology or past user inputs |
+| Login modal (not separate page) | Matches existing modal pattern (codebase uses module-level listener modals); faster flow | LOW | Overlay with Google/GitHub buttons + email form; follows Lumen's existing UI patterns |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
@@ -42,241 +48,237 @@ Features that seem good but create problems.
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Unlimited custom colors | Users want precise color matching | Creates organizational chaos; defeats purpose of color-coding system | Provide 6-8 carefully chosen colors that are visually distinct; allow customizing the palette but limit active colors |
-| Always-visible annotation icons | Seems helpful for finding annotations | Creates visual clutter; makes reading difficult when many annotations exist | Show icons on hover only; provide sidebar/summary view for navigation |
-| Real-time collaborative annotations | Popular in web annotation tools | High complexity; requires backend infrastructure; out of scope for local-first tool | Focus on single-user excellence; export/import for sharing |
-| Full markdown/rich text in notes | Power users want formatting | Increases complexity; most notes are short informal text | Support multi-line text, basic structure via line breaks; defer rich formatting |
-| Popup auto-open on highlight hover | Seems convenient | Intrusive during reading/scrolling; creates accidental popup spam | Require explicit click to open; show lightweight tooltip on hover instead |
-| Annotation templates/stamps | Professional tools offer this | Adds UI complexity; niche feature for specific workflows (architecture, legal) | Defer until core annotation UX is solid; most users don't need it |
+| Username change after claiming | "I made a typo" or "I want to rebrand" | Breaks @mentions, citations, future social features; opens squatting exploits | Allow during first 24 hours only; after that, contact support with verification |
+| Multiple OAuth accounts per user | "I have Google work and personal" | Creates identity merging complexity; Supabase doesn't support out-of-box | One account, one email; user picks primary provider; can change provider but same email |
+| Real-time profile sync across devices | "I want instant updates everywhere" | WebSocket overhead for profile data that rarely changes; not worth complexity for MVP | Poll on app focus (check for profile updates every 5min when active); sufficient for profile changes |
+| Store API keys in localStorage | "Easy to implement" | Major security risk; XSS exposes keys; GDPR violation | Encrypt in Supabase user_metadata or separate encrypted table; Electron uses safeStorage |
+| Auto-login after signup | "Smoother UX" | Email verification best practice requires verification before full access | Show "Check your email to verify" screen; verify → auto-login on return |
+| Unlimited file storage for avatars | "Users want flexibility" | Cost and abuse risk; academic avatars don't need 10MB | 2MB limit, square crop, resize to 512x512; sufficient for profile photos |
 
 ## Feature Dependencies
 
 ```
-Popup Positioning (viewport-aware)
-    └──requires──> Bounding box calculation
-    └──requires──> Viewport dimensions detection
-    └──enhances──> Draggable popups (if popup can be dragged, positioning becomes starting point)
+[OAuth Login (Google/GitHub)]
+    └──requires──> [PKCE flow with deep links in Electron]
 
-Visual Annotation Markers
-    └──requires──> Annotation type metadata (is_note, has_ai, etc.)
-    └──requires──> Icon rendering system
+[Username Claiming]
+    └──requires──> [Email Verification]
+    └──requires──> [Uniqueness Check API]
 
-Persistent Highlight Colors
-    └──requires──> Color metadata stored with highlight
-    └──conflicts──> AI overwrites (bug to fix, not feature)
+[Profile Editing]
+    └──requires──> [Auth Session]
+    └──requires──> [Avatar Upload to Supabase Storage]
 
-Annotation Filtering by Color
-    └──requires──> Persistent highlight colors
-    └──requires──> Annotation list/sidebar view
+[Cloud AI Gating]
+    └──requires──> [Auth Session Check]
+    └──requires──> [API Key Management]
 
-Draggable Popups
-    └──requires──> Popup positioning foundation
-    └──requires──> Drag event handlers
-    └──optional──> Save preferred position per annotation
+[API Key Management]
+    └──requires──> [Auth Session]
+    └──requires──> [Encrypted Storage in Supabase]
 
-Keyboard Shortcuts
-    └──requires──> Global keyboard event listener
-    └──conflicts──> Native browser shortcuts (must handle conflicts)
+[Account Deletion]
+    └──requires──> [Auth Session]
+    └──requires──> [Cascade delete profiles + auth.users + avatar files]
 
-Auto-reposition on Scroll/Zoom
-    └──requires──> Popup positioning foundation
-    └──requires──> Scroll/zoom event listeners
-    └──high-complexity──> Coordinate transformation on zoom
+[Offline Mode Support] ──enhances──> [Hybrid Local + Cloud UX]
+
+[Research Interests Autocomplete] ──enhances──> [Profile Editing]
 ```
 
 ### Dependency Notes
 
-- **Popup Positioning is foundation for all popup features:** Must be fixed first before adding draggable or auto-reposition
-- **Persistent colors blocks filtering:** Can't filter by color if colors change unexpectedly
-- **Visual markers require metadata architecture:** Need to decide on data model before implementing icons
-- **Keyboard shortcuts must coexist with browser:** Use Ctrl/Cmd modifiers to avoid conflicts
+- **OAuth requires PKCE in Electron:** Standard OAuth redirects fail in Electron; must use authorization code flow with PKCE + custom URL protocol (e.g., `lumen://auth/callback`). Supabase discussion #22270 confirms this pattern.
+- **Username claiming requires email verification:** Prevent username squatting; only verified emails can claim usernames. Username locked once claimed (except 24hr grace period).
+- **Cloud AI gating requires auth check:** Before showing OpenAI/Anthropic models, check `authStore.session`. If null, show login modal with message "Cloud AI requires an account. Sign up free."
+- **API keys require encrypted storage:** Never store in localStorage (XSS risk). Use Supabase user_metadata (encrypted at rest) or separate `api_keys` table with encryption. Electron can use safeStorage API as additional layer.
+- **Account deletion cascades:** Delete from `profiles`, `auth.users`, and Supabase Storage avatar files. GDPR requires full deletion within 30 days; recommend immediate with 24hr undo window.
+- **Offline support enhances UX:** Electron apps cache last auth state; if offline, show cached profile but disable cloud features. Ollama continues working. On reconnect, refresh session.
 
 ## MVP Definition
 
-### Launch With (v1) - Current Milestone
+### Launch With (v1)
 
-Minimum viable fixes for existing issues.
+Minimum viable product — what's needed to validate the concept.
 
-- [x] Viewport-aware popup positioning (above/below highlight, avoid edges) — Essential; broken UX currently
-- [x] Persistent highlight colors (fix AI overwrite bug) — Essential; users lose organizational system
-- [ ] Visual distinction: AI-annotated highlights — Essential; core value proposition of AI-powered reader
-- [ ] Zoom in/out controls — Essential; basic PDF reader functionality
-
-**Rationale:** These four features fix critical UX breaks and establish baseline PDF annotation functionality.
+- [x] **Email/password signup + login** — Core auth method; no OAuth dependencies
+- [x] **Session persistence** — Users stay logged in across restarts; essential for desktop app
+- [x] **Username claiming on first login** — Unique @handle; must happen before profile access
+- [x] **Basic profile editing (username, bio, avatar)** — Minimal fields to have identity
+- [x] **Avatar upload with crop** — Visual identity; 2MB limit, crop to square
+- [x] **Cloud AI gating** — Core value prop: Ollama free, OpenAI/Anthropic require login
+- [x] **Logout** — Security requirement
+- [x] **Password reset** — Required when email/password offered
+- [x] **Loading states + error messages** — UX baseline; users need feedback
 
 ### Add After Validation (v1.x)
 
 Features to add once core is working.
 
-- [ ] Draggable/repositionable popups — Trigger: users complain about popups blocking content
-- [ ] Annotation filtering/sidebar by color — Trigger: users create 10+ annotations per document
-- [ ] Keyboard shortcuts (highlight, zoom, navigation) — Trigger: power users request efficiency improvements
-- [ ] Color palette customization (pick 6-8 colors) — Trigger: users want different color meanings
-- [ ] Hover tooltips for annotations (non-intrusive) — Trigger: users can't find annotations without opening all popups
-- [ ] Auto-reposition popups on scroll/zoom — Trigger: users navigate while popup is open
-
-**Rationale:** These improve UX quality but aren't blockers for core functionality.
+- [ ] **OAuth (Google + GitHub)** — Add when Electron PKCE flow is stable; reduces friction but adds complexity
+- [ ] **Email verification flow** — Add after launch to prevent username squatting (can launch with honor system)
+- [ ] **Institution field** — Academic profile depth; useful but not blocking
+- [ ] **Research interests with autocomplete** — Enhances profile but not required for v1
+- [ ] **Magic link (passwordless email)** — Alternative auth; nice-to-have after core email/password proven
+- [ ] **API key management UI** — Can defer if beta users manually add via settings; build when needed
 
 ### Future Consideration (v2+)
 
 Features to defer until product-market fit is established.
 
-- [ ] Multi-color highlights (gradient, patterns) — Why defer: edge case; adds UI complexity
-- [ ] Annotation templates/stamps — Why defer: niche workflow; most users don't need
-- [ ] Export annotations grouped by color — Why defer: valuable but not core reader experience
-- [ ] Voice annotations (audio notes) — Why defer: high complexity; storage concerns for local-first
-- [ ] Handwriting/drawing annotations — Why defer: requires different input model; tablet-focused
-- [ ] Collaborative annotations (real-time) — Why defer: requires backend; conflicts with local-first architecture
-
-**Rationale:** These are "nice to have" but not essential for an AI-powered PDF reader's core value.
+- [ ] **Account deletion (GDPR)** — Required for production but can be manual support flow for beta
+- [ ] **Cross-device profile sync status UI** — Show "Last synced 2 hours ago"; informational only
+- [ ] **Profile privacy controls** — Public vs private profiles; needed when social features launch
+- [ ] **Avatar crop/rotate/filters** — Advanced editing; basic crop sufficient for MVP
+- [ ] **Username change grace period (24hr)** — Reduces support burden but adds logic; defer until pattern emerges
+- [ ] **"Continue with Apple"** — Third OAuth provider; wait to see if Google/GitHub cover 90%+
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Viewport-aware popup positioning | HIGH | MEDIUM | P1 |
-| Persistent highlight colors (fix bug) | HIGH | LOW | P1 |
-| Zoom in/out controls | HIGH | LOW | P1 |
-| AI-annotated highlight marker | HIGH | MEDIUM | P1 |
-| Draggable popups | MEDIUM | MEDIUM | P2 |
-| Annotation filtering by color | MEDIUM | MEDIUM | P2 |
-| Keyboard shortcuts | MEDIUM | MEDIUM | P2 |
-| Hover tooltips | MEDIUM | LOW | P2 |
-| Auto-reposition on scroll/zoom | MEDIUM | HIGH | P2 |
-| Color palette customization | LOW | MEDIUM | P3 |
-| Export by color | MEDIUM | MEDIUM | P3 |
-| Annotation templates | LOW | HIGH | P3 |
-| Collaborative annotations | LOW | HIGH | P3 |
+| Email/password auth | HIGH | LOW | P1 |
+| Session persistence | HIGH | MEDIUM | P1 |
+| Username claiming | HIGH | MEDIUM | P1 |
+| Profile editing (basic) | HIGH | LOW | P1 |
+| Avatar upload + crop | HIGH | MEDIUM | P1 |
+| Cloud AI gating | HIGH | LOW | P1 |
+| Password reset | MEDIUM | LOW | P1 |
+| Logout | HIGH | LOW | P1 |
+| Error handling | HIGH | LOW | P1 |
+| OAuth (Google/GitHub) | MEDIUM | HIGH | P2 |
+| Email verification | MEDIUM | LOW | P2 |
+| Magic link auth | LOW | MEDIUM | P2 |
+| Institution field | MEDIUM | LOW | P2 |
+| Research interests + autocomplete | MEDIUM | MEDIUM | P2 |
+| API key management UI | MEDIUM | MEDIUM | P2 |
+| Account deletion | LOW | MEDIUM | P3 |
+| Profile privacy controls | LOW | MEDIUM | P3 |
+| Username change grace | LOW | MEDIUM | P3 |
 
 **Priority key:**
-- P1: Must have for launch — fixes broken UX or establishes core value
-- P2: Should have, add when possible — improves quality, addresses user friction
-- P3: Nice to have, future consideration — niche or complex features
+- P1: Must have for launch (MVP)
+- P2: Should have, add when possible (v1.x)
+- P3: Nice to have, future consideration (v2+)
 
 ## Competitor Feature Analysis
 
-| Feature | Adobe Acrobat | PDF Expert | Hypothesis | Zotero | Lumen AI (Current) | Our Approach |
-|---------|---------------|------------|------------|--------|-------------------|--------------|
-| Popup positioning | Auto-repositions on scroll; viewport-aware | Tap-hold corner to drag | Sidebar-based (no popups) | Sidebar + inline | Broken (top-left) | **Fix to viewport-aware + add drag in v1.x** |
-| Highlight colors | Full palette + custom | 8 preset colors | Single color (yellow) | 8 preset colors | Multiple, but AI overwrites | **Fix persistence bug + 6-8 preset colors** |
-| Visual markers | Icon overlay for notes | Icon for notes | Sidebar flags | Color-coded sidebar | None (no AI distinction) | **Add AI badge/icon for AI annotations** |
-| Zoom controls | Slider + buttons + shortcuts + fit modes | Pinch + buttons + fit modes | Browser zoom only | +/- buttons + fit width | Missing | **Add +/- buttons + keyboard shortcuts** |
-| Annotation filtering | Filter by type, author, color | Search annotations | Public/private toggle | Filter by color in sidebar | None | **Add color filter in v1.x** |
-| Draggable popups | Auto-position only | Tap-hold to drag | N/A (sidebar) | N/A (sidebar) | Not draggable | **Add drag functionality in v1.x** |
-| Keyboard shortcuts | Extensive (20+ shortcuts) | Basic navigation | Web standard | Basic (arrows, zoom) | None | **Add core shortcuts (highlight, zoom, nav) in v1.x** |
+| Feature | Zotero | Mendeley | ResearchGate | Our Approach (Lumen AI) |
+|---------|--------|----------|--------------|-------------------------|
+| **Authentication** | Email/password only | Email/password + Google | Email/password + multiple OAuth | Email/password + Google + GitHub (Supabase); magic link as differentiator |
+| **Username** | No unique username (just display name) | No @handle (email-based identity) | Has unique profile URL (researchgate.net/profile/Name) | Unique @username like Instagram; shows in chat for identity |
+| **Profile fields** | Name, institution (basic) | Name, field of study, academic status (dropdown) | Name, institution, department, position, skills, research interests | Name, @username, bio, institution, research interests (tags with autocomplete) |
+| **Avatar** | Optional gravatar from email | Upload profile photo | Upload profile photo | Upload + crop to square; stored in Supabase Storage; shows in chat |
+| **Feature gating** | All features free | Free for basic, Pro for storage/collab | Freemium (reading free, publishing/stats require RG Score or payment) | Hybrid: Ollama free forever, cloud AI (OpenAI/Anthropic) requires account |
+| **Account deletion** | Manual support request | Settings > Delete account | Settings > Delete account | GDPR-compliant deletion; one-click in settings (future P3) |
+| **Session management** | Desktop app stays logged in | Desktop app stays logged in; web requires re-login | Web-based; cookie session | Electron: encrypted safeStorage; web: localStorage with auto-refresh |
 
-**Key Insights:**
-- **Sidebar vs Popup:** Hypothesis and Zotero use sidebar approach to avoid positioning issues; we're committed to popups so must nail positioning
-- **Draggable popups:** PDF Expert's tap-hold pattern is proven; Adobe skips it with auto-repositioning
-- **Color systems:** 6-8 colors is sweet spot; more creates chaos, fewer limits organization
-- **AI distinction:** No competitor has AI-annotated highlights; this is our differentiator
+## UX Flow Patterns
 
-## UX Patterns from Research
+### First-Time User Flow (No Account)
 
-### Popup Positioning Algorithm (Industry Standard)
+1. **App opens** → User sees onboarding: "Use Lumen with local AI (Ollama) or sign up for cloud AI"
+2. **User skips signup** → Full app access with Ollama models
+3. **User tries to select OpenAI** → Modal: "Cloud AI requires an account. Sign up free." [Google] [GitHub] [Email]
+4. **User chooses signup** → Email signup form or OAuth redirect
+5. **After signup** → Username claiming screen: "Choose your @username (3-30 characters, unique)"
+6. **Username claimed** → Profile setup: "Add a profile picture and bio (optional)"
+7. **Profile complete** → Redirected to app; cloud AI now available
 
-1. **Default placement:** Above highlight, centered horizontally
-2. **Viewport edge detection:**
-   - If top < 200px from viewport top, flip to below
-   - If left edge would overflow, shift right (min margin: 12px)
-   - If right edge would overflow, shift left (min margin: 12px)
-3. **Arrow indicator:** Points to highlight; flips with popup (top/bottom)
-4. **Scroll behavior:** Either dismiss popup or auto-reposition (we should pick one)
+### Returning User Flow (Has Account)
 
-**Source pattern:** PDF Expert, Adobe Acrobat behavior analysis
+1. **App opens** → Session auto-restored from encrypted storage
+2. **User sees their avatar + @username** in sidebar and chat
+3. **Cloud AI models available** immediately (no prompt)
+4. **Session expires after 7 days** → Modal: "Your session expired. Please log in again."
 
-### Visual Annotation Markers
+### OAuth in Electron Flow (PKCE)
 
-1. **Plain highlight:** No icon, just colored background at 40% opacity
-2. **Highlight + note:** Small speech bubble icon overlaid at highlight position
-3. **Standalone note:** Sticky note icon at insertion point
-4. **AI annotation (our differentiator):** Sparkle/AI badge icon or distinct border style
+1. **User clicks "Continue with Google"**
+2. **App opens system browser** (not embedded) with Supabase OAuth URL
+3. **User authorizes on Google** in their default browser
+4. **Google redirects to `lumen://auth/callback?code=...`**
+5. **Electron deep link handler** catches URL, extracts code
+6. **Frontend calls Supabase** `exchangeCodeForSession(code)` to get JWT
+7. **Session stored** in Electron safeStorage (encrypted keychain)
+8. **App redirects** to username claiming or main app
 
-**Toggle option:** "Hide annotation icons" preference for reading mode vs review mode
+### Username Uniqueness Check UX
 
-**Source pattern:** Adobe Acrobat icon system, user feedback about clutter
+1. **User types username** in input field
+2. **After 500ms debounce** → API call: `GET /api/profiles/check-username?username=...`
+3. **If available** → Green checkmark: "✓ @username is available"
+4. **If taken** → Red X: "✗ @username is taken. Try another."
+5. **Real-time feedback** → No submit-and-fail; users know before clicking "Claim Username"
 
-### Color-Coding Systems (User Patterns)
+### Avatar Upload + Crop UX
 
-From academic research user interviews:
-- **Yellow:** Key points, important quotes
-- **Blue:** References, citations, related work
-- **Green:** Action items, things to implement
-- **Red:** Critical issues, urgent fixes, disagreements
-- **Purple:** Theoretical concepts, definitions
-- **Orange:** Questions, unclear sections
-- **(AI-generated):** Maintain user's chosen color, add AI icon overlay
+1. **User clicks avatar placeholder** or "Change Avatar" button
+2. **File picker opens** → User selects image (PNG, JPG, GIF; max 2MB)
+3. **Crop modal appears** → react-avatar-editor with zoom slider and drag-to-reposition
+4. **User adjusts** → Preview shows circular crop
+5. **User clicks "Save"** → Uploads to Supabase Storage as 512x512 square
+6. **Avatar updates** → Shows in profile and chat immediately
 
-**Our implementation:** Preserve user's color choice even when AI adds annotations; add visual marker instead.
+### Cloud AI Gating UX
 
-### Keyboard Shortcuts (Standard Across Tools)
-
-**Navigation:**
-- `Ctrl/Cmd + =` or `+`: Zoom in
-- `Ctrl/Cmd + -`: Zoom out
-- `Ctrl/Cmd + 0`: Reset zoom to 100%
-- `Arrow keys`: Scroll
-- `Home`: Jump to start
-- `End`: Jump to end
-- `Page Up/Down`: Page navigation
-
-**Annotation:**
-- `Ctrl/Cmd + H`: Highlight selected text
-- `Ctrl/Cmd + E`: Add comment/note
-- `Delete`: Remove selected annotation
-- `Esc`: Close popup/cancel action
-
-**Color selection (if implementing):**
-- `1-8`: Quick select highlight color (if annotation mode active)
-
-**Source:** Adobe Acrobat, PDF Annotator, Foxit Reader
+1. **User not logged in** → Model selector shows only "Ollama (Local)" section
+2. **User clicks "Add Model"** → Only Ollama models shown; "Cloud AI" section grayed out with lock icon
+3. **User clicks locked section** → Modal: "Cloud AI requires a Lumen account. Sign up free to access OpenAI and Anthropic models." [Sign Up] [Log In]
+4. **After login** → Model selector refreshes; "OpenAI" and "Anthropic" sections now active
+5. **User selects GPT-4** → If no API key: "Add your OpenAI API key in Settings to use this model." [Go to Settings]
 
 ## Sources
 
-### Official Documentation
-- [PDF Expert: Add text annotations and pop-up notes](https://helpspot.readdle.com/pdfexpert6/index.php?pg=kb.page&id=1107) — MEDIUM confidence
-- [Adobe Acrobat: Annotations and Commenting](https://www.adobe.com/devnet-docs/acrobatetk/tools/PrefRef/Windows/Annots.html) — MEDIUM confidence
-- [PDF Annotator Manual: Keyboard Shortcuts](https://www.pdfannotator.com/en/help/keyboardshortcuts) — MEDIUM confidence
-- [Zotero PDF Reader Documentation](https://www.zotero.org/support/pdf_reader) — MEDIUM confidence
+### Authentication & Session Management
+- [Use Supabase Auth with React | Supabase Docs](https://supabase.com/docs/guides/auth/quickstarts/react)
+- [Authenticating user in Electron app via default browser | Supabase Discussion #22270](https://github.com/orgs/supabase/discussions/22270)
+- [Electron Sessions: Is the Default Session Persistent? Complete 2026 Guide](https://copyprogramming.com/howto/in-electron-is-the-default-session-persistent)
+- [safeStorage | Electron](https://www.electronjs.org/docs/latest/api/safe-storage)
+- [Build and Secure an Electron App - OpenID, OAuth, Node.js, and Express](https://auth0.com/blog/securing-electron-applications-with-openid-connect-and-oauth-2/)
 
-### UX Research & Best Practices
-- [Exploring the UX of web-annotations](https://tomcritchlow.com/2019/02/12/annotations/) — LOW confidence (blog, but thoughtful analysis)
-- [Interactive TOCs, Bookmarks, and Notes: UX Patterns Readers Actually Use](https://www.3dissue.com/interactive-tocs-bookmarks-and-notes-ux-patterns-readers-actually-use/) — MEDIUM confidence
-- [11 UI Design Best Practices for UX Designers (2026 Guide)](https://uxplaybook.org/articles/ui-fundamentals-best-practices-for-ux-designers) — LOW confidence (general UX, not PDF-specific)
+### OAuth & Social Login UX
+- [Login & Signup UX: The 2025 Guide to Best Practices (Examples & Tips) - Authgear](https://www.authgear.com/post/login-signup-ux-guide)
+- [Using OAuth 2.0 for Web Server Applications | Authorization | Google for Developers](https://developers.google.com/identity/protocols/oauth2/web-server)
+- [Best Practices | Authorization Resources | Google for Developers](https://developers.google.com/identity/protocols/oauth2/resources/best-practices)
 
-### Competitor Analysis
-- [Top 9 PDF Annotation Apps to Know in 2026](https://www.drawboard.com/blog/top-pdf-annotation-apps) — MEDIUM confidence
-- [Drawboard PDF features and tricks](https://www.drawboard.com/blog/12-drawboard-pdf-features-and-tricks-to-increase-productivity-that-you-might-not-know-about) — MEDIUM confidence
+### Passwordless Authentication
+- [Passwordless email logins | Supabase Docs](https://supabase.com/docs/guides/auth/auth-email-passwordless)
+- [Learn how magic links work, their benefits, and how to implement them | SuperTokens](https://supertokens.com/blog/magiclinks)
+- [The beginner's guide to magic links | Postmark](https://postmarkapp.com/blog/magic-links)
 
-### Technical Implementation
-- [Create text highlight annotations in multiple colors – PDF Studio](https://kbpdfstudio.qoppa.com/create-text-highlight-annotations-in-multiple-colors/) — MEDIUM confidence
-- [How to Change Highlight Color in PDF](https://pdf.easeus.com/pdf-knowledge-center/how-to-change-highlight-color-in-pdf.html) — LOW confidence (tutorial, but shows user expectations)
+### User Profiles & Metadata
+- [User Management | Supabase Docs](https://supabase.com/docs/guides/auth/managing-user-data)
+- [Best practices for adding "username" to profiles table at signup? | Supabase Discussion #3491](https://github.com/orgs/supabase/discussions/3491)
+- [Zotero vs. Mendeley vs. AI: Which Reference Manager Is Best for You?](https://www.sourcely.net/resources/zotero-vs-mendeley-vs-ai-which-reference-manager-is-best-for-you)
 
-### User Communities & Discussions
-- [Zotero Forums: Extract Annotations by Color](https://forums.zotero.org/discussion/110131/extract-annotations-by-color) — MEDIUM confidence (real user needs)
-- [Adobe Community: Remove unnecessary comment icon on highlight](https://community.adobe.com/questions-9/remove-unnecessary-comment-icon-on-highlight-1313583) — MEDIUM confidence (pain point validation)
+### Form Validation & UX Patterns
+- [The Ultimate UX Design of Form Validation](https://designmodo.com/ux-form-validation/)
+- [Inline form validations — UX design considerations and React examples | by Shan Plourde | Medium](https://medium.com/@shanplourde/inline-form-validations-ux-design-considerations-and-react-examples-c2f53f89bebc)
+
+### Avatar Upload & Cropping
+- [react-avatar-editor | GitHub](https://github.com/mosch/react-avatar-editor)
+- [Top React image cropping libraries - LogRocket Blog](https://blog.logrocket.com/top-react-image-cropping-libraries/)
+- [Userpic UI design: Tutorial for Avatar states, anatomy, usability](https://www.setproduct.com/blog/avatar-ui-design)
+
+### Feature Gating & Freemium Patterns
+- [App paywall optimization - Business of Apps](https://www.businessofapps.com/guide/app-paywall-optimization/)
+- [10 Types of Paywalls for Mobile Apps and Examples](https://adapty.io/blog/the-10-types-of-mobile-app-paywalls/)
+- [App Monetization Models That Work in 2026 | Honeygain SDK](https://sdk.honeygain.com/blog/app-monetization-models/)
+
+### Academic Tools & Research Interests
+- [The effects of suggested tags and autocomplete features on social tagging behaviors](https://www.researchgate.net/publication/346387302_The_effects_of_suggested_tags_and_autocomplete_features_on_social_tagging_behaviors)
+- [Customizable Tags in AI-Powered Research Tools](https://www.sourcely.net/resources/customizable-tags-in-ai-powered-research-tools)
+
+### GDPR & Account Deletion
+- [Art. 17 GDPR – Right to erasure ('right to be forgotten') - General Data Protection Regulation (GDPR)](https://gdpr-info.eu/art-17-gdpr/)
+- [GDPR compliance and account deletion | Getaround Tech](https://getaround.tech/gdpr-account-deletion/)
+
+### Offline-First Patterns
+- [Offline-First Apps: Key Use Cases and Benefits in 2026](https://www.octalsoftware.com/blog/offline-first-apps)
+- [A Design Guide for Building Offline First Apps](https://hasura.io/blog/design-guide-to-offline-first-apps)
+- [Why Offline First Apps Will Dominate In 2026 | by Labeeb Ali | Dec, 2025 | Medium](https://medium.com/@tekwrites/why-offline-first-apps-are-dominating-2026-c76e5083d686)
 
 ---
-
-**Confidence Assessment:**
-
-- **Table Stakes Features:** HIGH confidence — consistent across all professional PDF tools
-- **Visual Marker Patterns:** MEDIUM confidence — based on Adobe/PDF Expert patterns, but limited 2026-specific docs
-- **Popup Positioning Algorithm:** MEDIUM confidence — derived from multiple sources, not single authoritative spec
-- **AI Annotation Distinction:** LOW confidence — no direct competitor research; our innovation
-- **Keyboard Shortcuts:** HIGH confidence — standardized across industry for 20+ years
-
-**Research Gaps:**
-
-1. No authoritative spec for popup positioning algorithm (derived from behavior observation)
-2. Limited 2026-specific updates on PDF annotation UX evolution (most patterns are stable)
-3. No direct research on AI-annotated highlight UX patterns (greenfield for us)
-4. Unclear user preference: auto-reposition vs dismiss popups on scroll (need user testing)
-
-**Recommendation for Roadmap:**
-
-Phase 1 should focus on P1 features (popup positioning, persistent colors, zoom, AI markers) to establish solid foundation. Phase 2 can add P2 quality-of-life improvements (draggable, filtering, shortcuts) based on user feedback. P3 features should wait for validated product-market fit.
-
----
-*Feature research for: Lumen AI PDF Annotation UX Improvements*
-*Researched: 2026-02-12*
+*Feature research for: User authentication, academic profiles, and cloud AI gating in Lumen AI*
+*Researched: 2026-02-14*
