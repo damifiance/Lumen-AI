@@ -14,4 +14,5 @@ contextBridge.exposeInMainWorld('electron', {
   removeOAuthCallback: () => ipcRenderer.removeAllListeners('oauth-callback'),
   onAuthDeepLink: (callback) => ipcRenderer.on('auth-deep-link', (_event, data) => callback(data)),
   removeAuthDeepLink: () => ipcRenderer.removeAllListeners('auth-deep-link'),
+  deleteUserAccount: (userId) => ipcRenderer.invoke('delete-user-account', userId),
 });

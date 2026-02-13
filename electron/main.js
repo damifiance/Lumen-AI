@@ -7,6 +7,7 @@ const fs = require('fs');
 const { createTray, destroyTray } = require('./tray');
 const { checkForUpdates } = require('./updater');
 const secureStore = require('./secureStore');
+const { createClient } = require('@supabase/supabase-js');
 
 let mainWindow = null;
 let backendProcess = null;
@@ -16,6 +17,17 @@ let pendingOAuthUrl = null;
 let pendingAuthDeepLink = null;
 
 const isDev = process.env.ELECTRON_DEV === 'true';
+
+// Admin client for privileged operations (account deletion)
+// CRITICAL: service_role key must NEVER be exposed to renderer process
+let supabaseAdmin = null;
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (supabaseUrl && serviceRoleKey) {
+  supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  });
+}
 
 // Register custom protocol handler for OAuth deep linking
 if (process.defaultApp) {
@@ -278,6 +290,40 @@ app.whenReady().then(async () => {
     // OAuth IPC handler — opens OAuth URL in external browser
     ipcMain.handle('start-oauth', async (_event, url) => {
       shell.openExternal(url);
+    });
+
+    // Account deletion IPC handler — uses admin API to cascade delete user data
+    ipcMain.handle('delete-user-account', async (_event, userId) => {
+      if (!supabaseAdmin) {
+        return { success: false, error: 'Admin API not configured (missing SUPABASE_SERVICE_ROLE_KEY)' };
+      }
+      try {
+        // 1. Delete avatar from Storage (prevent orphaned files)
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', userId)
+          .single();
+
+        if (profile?.avatar_url) {
+          const avatarPath = profile.avatar_url.split('/').slice(-2).join('/');
+          await supabaseAdmin.storage.from('avatars').remove([avatarPath]);
+        }
+
+        // 2. Delete profile record
+        await supabaseAdmin.from('profiles').delete().eq('id', userId);
+
+        // 3. Delete auth.users record (hard delete)
+        const { error } = await supabaseAdmin.auth.admin.deleteUser(userId, {
+          shouldSoftDelete: false,
+        });
+
+        if (error) throw error;
+        return { success: true };
+      } catch (err) {
+        console.error('Account deletion error:', err);
+        return { success: false, error: err.message || 'Deletion failed' };
+      }
     });
 
     if (!isDev) {

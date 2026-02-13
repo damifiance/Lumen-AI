@@ -20,6 +20,7 @@ interface AuthState {
   resetPassword: (newPassword: string) => Promise<{ error?: string }>;
   verifyEmail: (tokenHash: string) => Promise<{ error?: string }>;
   resendVerification: (email: string) => Promise<{ error?: string }>;
+  deleteAccount: (password: string) => Promise<{ error?: string }>;
 }
 
 /**
@@ -350,6 +351,51 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       set({ isLoading: false });
+      return {};
+    } catch (err) {
+      const translated = translateAuthError(err);
+      set({ error: translated, isLoading: false });
+      return { error: translated };
+    }
+  },
+
+  /**
+   * Delete user account permanently.
+   * Requires password confirmation for security.
+   * Cascade deletes: avatar (Storage) -> profile (DB) -> auth record.
+   */
+  deleteAccount: async (password: string) => {
+    const { user } = get();
+    if (!user?.email) return { error: 'No user logged in' };
+
+    set({ isLoading: true, error: null });
+    try {
+      // Re-authenticate to confirm password
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password,
+      });
+      if (authError) {
+        set({ isLoading: false });
+        return { error: 'Incorrect password' };
+      }
+
+      // Call Electron main process to delete (requires service_role key)
+      if (window.electron?.deleteUserAccount) {
+        const result = await window.electron.deleteUserAccount(user.id);
+        if (!result.success) {
+          set({ isLoading: false });
+          return { error: result.error || 'Deletion failed' };
+        }
+      } else {
+        // Web fallback — can't delete without admin API
+        set({ isLoading: false });
+        return { error: 'Account deletion requires the desktop app' };
+      }
+
+      // Sign out locally
+      await supabase.auth.signOut();
+      set({ user: null, session: null, isLoading: false });
       return {};
     } catch (err) {
       const translated = translateAuthError(err);
