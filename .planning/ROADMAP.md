@@ -79,10 +79,11 @@ Plans:
   4. User can set new password after clicking reset link
   5. User can delete their account and all associated data
   6. Account deletion removes profile, avatar, and Supabase auth record
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] TBD
+- [ ] 07-01-PLAN.md — Email verification + password reset flows with deep link handling
+- [ ] 07-02-PLAN.md — Account deletion with cascade cleanup and profile UI integration
 
 ## Progress
 
@@ -94,7 +95,7 @@ Phases execute in numeric order: 4 → 5 → 6 → 7
 | 4. Supabase Foundation & Email Auth | 2/2 | ✓ Complete | 2026-02-14 |
 | 5. OAuth Integration | 2/2 | ✓ Complete | 2026-02-14 |
 | 6. Profile System | 2/2 | ✓ Complete | 2026-02-14 |
-| 7. Security Polish | 0/TBD | Not started | - |
+| 7. Security Polish | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-14*
