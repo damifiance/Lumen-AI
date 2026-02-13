@@ -3,7 +3,7 @@ import { Lock, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 
 export function ResetPasswordView() {
-  const { resetPasswordMode, resetPassword, requestPasswordReset } = useAuthStore();
+  const { resetPasswordMode, resetPassword } = useAuthStore();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');

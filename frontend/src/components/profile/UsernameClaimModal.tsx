@@ -18,7 +18,7 @@ export function UsernameClaimModal() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { user } = useAuthStore();
-  const { claimUsername, profile } = useProfileStore();
+  const { claimUsername } = useProfileStore();
   const { isChecking, isAvailable, error } = useUsernameAvailability(username);
 
   // Register listener
@@ -61,16 +61,13 @@ export function UsernameClaimModal() {
 
   // Show validation feedback
   let feedbackIcon = null;
-  let feedbackColor = '';
   if (username && username.length >= 3) {
     if (isChecking) {
       feedbackIcon = <Loader2 size={16} className="animate-spin text-gray-400" />;
     } else if (isAvailable === true) {
       feedbackIcon = <Check size={16} className="text-green-600" />;
-      feedbackColor = 'text-green-600';
     } else if (isAvailable === false) {
       feedbackIcon = <X size={16} className="text-red-600" />;
-      feedbackColor = 'text-red-600';
     }
   }
 
