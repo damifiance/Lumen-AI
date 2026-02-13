@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, MessageSquare, ArrowUp, X } from 'lucide-react';
+import { useDraggable } from '../../hooks/useDraggable';
 
 const COLORS = [
   { color: '#FDE68A', label: 'Yellow' },
@@ -11,14 +12,19 @@ const COLORS = [
 
 interface SelectionTipProps {
   onHighlight: (color: string) => void;
-  onAskAI: (question: string) => void;
+  onAskAI: (question: string, selectedColor?: string) => void;
   onNote: (note: string) => void;
 }
 
 export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps) {
   const [mode, setMode] = useState<'default' | 'askAI' | 'note'>('default');
   const [inputText, setInputText] = useState('');
+  const [selectedColor, setSelectedColor] = useState(COLORS[0].color);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const { containerRef, offset, resetPosition } = useDraggable({
+    handleSelector: '.drag-handle',
+  });
 
   useEffect(() => {
     if (mode !== 'default') {
@@ -29,12 +35,13 @@ export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps
   const resetMode = () => {
     setMode('default');
     setInputText('');
+    resetPosition();
   };
 
   const handleSend = () => {
     if (mode === 'askAI') {
       const q = inputText.trim() || 'Explain this passage.';
-      onAskAI(q);
+      onAskAI(q, selectedColor);
     } else if (mode === 'note') {
       const c = inputText.trim();
       if (!c) return;
@@ -56,8 +63,12 @@ export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps
   if (mode !== 'default') {
     const isAskAI = mode === 'askAI';
     return (
-      <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 p-3 w-72">
-        <div className="flex items-center justify-between mb-2">
+      <div
+        ref={containerRef}
+        className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 p-3 w-72"
+        style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
+      >
+        <div className="drag-handle flex items-center justify-between mb-2 select-none cursor-grab active:cursor-grabbing">
           <div className="flex items-center gap-1.5">
             {isAskAI ? (
               <Sparkles size={13} className="text-accent" />
@@ -111,26 +122,41 @@ export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps
   }
 
   return (
-    <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 px-2.5 py-2">
+    <div
+      ref={containerRef}
+      className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 px-2.5 py-2"
+      style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
+    >
       {COLORS.map(({ color, label }) => (
         <button
           key={color}
-          onClick={() => onHighlight(color)}
-          className="w-6 h-6 rounded-full hover:scale-125 transition-transform cursor-pointer ring-2 ring-white shadow-sm"
+          onClick={() => {
+            setSelectedColor(color);
+            onHighlight(color);
+          }}
+          className={`w-6 h-6 rounded-full hover:scale-125 transition-transform cursor-pointer shadow-sm ${
+            selectedColor === color ? 'ring-2 ring-gray-400' : 'ring-2 ring-white'
+          }`}
           style={{ backgroundColor: color }}
           title={`Highlight ${label}`}
         />
       ))}
-      <div className="w-px h-5 bg-gray-200 mx-1" />
+      <div className="drag-handle w-px h-5 bg-gray-300 mx-1 cursor-grab active:cursor-grabbing" title="Drag to move" />
       <button
-        onClick={() => setMode('note')}
+        onClick={() => {
+          resetPosition();
+          setMode('note');
+        }}
         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 cursor-pointer transition-colors"
       >
         <MessageSquare size={12} />
         Note
       </button>
       <button
-        onClick={() => setMode('askAI')}
+        onClick={() => {
+          resetPosition();
+          setMode('askAI');
+        }}
         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-accent to-purple-500 rounded-lg hover:shadow-lg hover:shadow-accent/25 cursor-pointer transition-shadow"
       >
         <Sparkles size={12} />
