@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Query
@@ -14,7 +15,12 @@ async def serve_pdf(path: str = Query(...)):
     pdf_path = Path(path)
     if not pdf_path.exists() or pdf_path.suffix.lower() != ".pdf":
         raise HTTPException(status_code=404, detail="PDF not found")
-    return FileResponse(str(pdf_path), media_type="application/pdf")
+    return FileResponse(
+        str(pdf_path),
+        media_type="application/pdf",
+        stat_result=os.stat(pdf_path),
+        headers={"Cache-Control": "private, max-age=3600"},
+    )
 
 
 @router.get("/text", response_model=PaperText)

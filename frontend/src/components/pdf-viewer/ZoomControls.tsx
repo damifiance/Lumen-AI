@@ -1,59 +1,122 @@
-import { useState, useEffect, useCallback } from 'react';
-import { usePdfHighlighterContext } from 'react-pdf-highlighter-extended';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ZoomIn, ZoomOut } from 'lucide-react';
+import type { PdfHighlighterUtils } from 'react-pdf-highlighter-extended';
 
-export function ZoomControls() {
-  const utils = usePdfHighlighterContext();
+interface ZoomControlsProps {
+  utilsRef: React.RefObject<PdfHighlighterUtils | null>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+}
+
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 3.0;
+const STEP = 0.25;
+
+export function ZoomControls({ utilsRef, containerRef }: ZoomControlsProps) {
   const [scale, setScale] = useState(1.0);
+  const scaleRef = useRef(scale);
+  scaleRef.current = scale;
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Sync scale on mount and when viewer changes
+  const syncScale = useCallback(() => {
+    const viewer = utilsRef.current?.getViewer();
+    if (viewer) {
+      setTimeout(() => setScale(viewer.currentScale), 50);
+    }
+  }, [utilsRef]);
+
   useEffect(() => {
-    const viewer = utils.getViewer();
-    if (viewer) {
-      setScale(viewer.currentScale);
-    }
-  }, [utils]);
+    const timer = setTimeout(syncScale, 500);
+    return () => clearTimeout(timer);
+  }, [syncScale]);
 
-  const updateScale = useCallback(() => {
-    const viewer = utils.getViewer();
-    if (viewer) {
-      // Small delay to ensure PDF.js has rendered at new scale
+  // Fade highlights out during zoom, fade back in after re-render
+  const fadeHighlights = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const parts = el.querySelectorAll('.Highlight__part') as NodeListOf<HTMLElement>;
+
+    // Instantly hide
+    parts.forEach((p) => {
+      p.style.transition = 'none';
+      p.style.opacity = '0';
+    });
+
+    // Clear any pending fade-in
+    if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
+
+    // Fade back in after PDF.js re-renders
+    fadeTimerRef.current = setTimeout(() => {
+      const freshParts = el.querySelectorAll('.Highlight__part') as NodeListOf<HTMLElement>;
+      freshParts.forEach((p) => {
+        p.style.transition = 'opacity 0.15s ease';
+        p.style.opacity = '';
+      });
+      // Clean up inline styles after transition
       setTimeout(() => {
-        setScale(viewer.currentScale);
-      }, 50);
-    }
-  }, [utils]);
+        freshParts.forEach((p) => {
+          p.style.transition = '';
+        });
+      }, 200);
+    }, 200);
+  }, [containerRef]);
+
+  const zoomTo = useCallback((newScale: number) => {
+    const viewer = utilsRef.current?.getViewer();
+    if (!viewer) return;
+    const clamped = Math.min(MAX_SCALE, Math.max(MIN_SCALE, newScale));
+    if (Math.abs(clamped - viewer.currentScale) < 0.01) return;
+    fadeHighlights();
+    viewer.currentScale = clamped;
+    setScale(clamped);
+  }, [utilsRef, fadeHighlights]);
 
   const zoomIn = useCallback(() => {
-    const viewer = utils.getViewer();
-    if (viewer && viewer.currentScale < 3.0) {
-      viewer.currentScale = Math.min(3.0, viewer.currentScale + 0.25);
-      updateScale();
-    }
-  }, [utils, updateScale]);
+    zoomTo(scaleRef.current + STEP);
+  }, [zoomTo]);
 
   const zoomOut = useCallback(() => {
-    const viewer = utils.getViewer();
-    if (viewer && viewer.currentScale > 0.5) {
-      viewer.currentScale = Math.max(0.5, viewer.currentScale - 0.25);
-      updateScale();
-    }
-  }, [utils, updateScale]);
+    zoomTo(scaleRef.current - STEP);
+  }, [zoomTo]);
 
   const resetZoom = useCallback(() => {
-    const viewer = utils.getViewer();
+    const viewer = utilsRef.current?.getViewer();
     if (viewer) {
+      fadeHighlights();
       viewer.currentScaleValue = 'page-width';
-      updateScale();
+      setTimeout(() => setScale(viewer.currentScale), 50);
     }
-  }, [utils, updateScale]);
+  }, [utilsRef, fadeHighlights]);
+
+  // Ctrl+scroll / trackpad pinch-to-zoom
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+
+      const viewer = utilsRef.current?.getViewer();
+      if (!viewer) return;
+
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, viewer.currentScale + delta));
+      if (Math.abs(newScale - viewer.currentScale) < 0.01) return;
+      fadeHighlights();
+      viewer.currentScale = newScale;
+      setScale(newScale);
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [utilsRef, containerRef, fadeHighlights]);
 
   return (
-    <div className="absolute bottom-4 right-4 z-50 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/60 px-2 py-1.5">
+    <div className="absolute top-4 right-4 z-50 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/60 px-2 py-1.5">
       <button
         onClick={zoomOut}
         className="p-1 text-gray-500 hover:text-gray-700 cursor-pointer rounded hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-default"
-        disabled={scale <= 0.5}
+        disabled={scale <= MIN_SCALE}
         title="Zoom out"
       >
         <ZoomOut size={16} />
@@ -68,7 +131,7 @@ export function ZoomControls() {
       <button
         onClick={zoomIn}
         className="p-1 text-gray-500 hover:text-gray-700 cursor-pointer rounded hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-default"
-        disabled={scale >= 3.0}
+        disabled={scale >= MAX_SCALE}
         title="Zoom in"
       >
         <ZoomIn size={16} />

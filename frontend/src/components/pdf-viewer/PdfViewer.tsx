@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import {
   PdfLoader,
   PdfHighlighter,
@@ -28,6 +28,64 @@ interface PdfViewerProps {
 export function PdfViewer({ paperPath }: PdfViewerProps) {
   const utilsRef = useRef<PdfHighlighterUtils | null>(null);
   const selectionRef = useRef<PdfSelection | null>(null);
+  const viewerContainerRef = useRef<HTMLDivElement>(null);
+
+  // Drag-to-pan: click on whitespace and drag to scroll when zoomed in
+  useEffect(() => {
+    const container = viewerContainerRef.current;
+    if (!container) return;
+
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
+    let scrollLeft = 0;
+    let scrollTop = 0;
+    let scrollEl: HTMLElement | null = null;
+
+    const getScrollEl = () => container.querySelector('.PdfHighlighter') as HTMLElement | null;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      // Only pan on left-click on non-interactive elements
+      const target = e.target as HTMLElement;
+      if (target.closest('button, a, textarea, input, .Highlight__part, [role="button"]')) return;
+      // Only if there's actually content to scroll
+      scrollEl = getScrollEl();
+      if (!scrollEl) return;
+      if (scrollEl.scrollWidth <= scrollEl.clientWidth && scrollEl.scrollHeight <= scrollEl.clientHeight) return;
+
+      isPanning = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      scrollLeft = scrollEl.scrollLeft;
+      scrollTop = scrollEl.scrollTop;
+      container.style.cursor = 'grabbing';
+      e.preventDefault();
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isPanning || !scrollEl) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      scrollEl.scrollLeft = scrollLeft - dx;
+      scrollEl.scrollTop = scrollTop - dy;
+    };
+
+    const handleMouseUp = () => {
+      if (!isPanning) return;
+      isPanning = false;
+      container.style.cursor = '';
+    };
+
+    container.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      container.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
   const { highlights, addHighlight, removeHighlight, updateHighlight } =
     useHighlightStore();
@@ -139,7 +197,7 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
   const pdfUrl = getPdfUrl(paperPath);
 
   return (
-    <div className="h-full w-full relative">
+    <div ref={viewerContainerRef} className="h-full w-full relative">
       <PdfLoader
         document={pdfUrl}
         workerSrc={pdfjsWorkerUrl}
@@ -173,10 +231,10 @@ export function PdfViewer({ paperPath }: PdfViewerProps) {
               onAskAI={handleHighlightAskAI}
               onUpdateNote={handleUpdateNote}
             />
-            <ZoomControls />
           </PdfHighlighter>
         )}
       </PdfLoader>
+      <ZoomControls utilsRef={utilsRef} containerRef={viewerContainerRef} />
     </div>
   );
 }

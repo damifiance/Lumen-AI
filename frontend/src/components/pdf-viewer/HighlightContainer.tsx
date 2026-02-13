@@ -7,8 +7,8 @@ import {
   type Tip,
 } from 'react-pdf-highlighter-extended';
 import { HighlightPopup } from './HighlightPopup';
+import { AskAIPopup } from './AskAIPopup';
 import { NotePopup } from './NotePopup';
-import { useDraggable } from '../../hooks/useDraggable';
 
 interface HighlightContainerProps {
   onDelete: (id: string) => void;
@@ -30,45 +30,40 @@ export function HighlightContainer({
   const hasNotes = comment.trim().length > 0 && comment !== '[]';
   const bgColor = highlightColor === 'note' ? '#FDE68A' : highlightColor;
 
+  // Portal-based popups
+  const [askAIOpen, setAskAIOpen] = useState(false);
+  const [askAIPos, setAskAIPos] = useState({ x: 0, y: 0 });
+
   const [notePopupOpen, setNotePopupOpen] = useState(false);
-  const [notePopupPosition, setNotePopupPosition] = useState({ x: 0, y: 0 });
-  const highlightRef = useRef<HTMLDivElement>(null);
+  const [notePopupPos, setNotePopupPos] = useState({ x: 0, y: 0 });
 
-  const [notePopupBelow, setNotePopupBelow] = useState(false);
+  // Ref on the tip wrapper to grab its position
+  const tipWrapperRef = useRef<HTMLDivElement>(null);
 
-  const { containerRef: dragRef, offset: dragOffset, resetPosition } = useDraggable({
-    handleSelector: '.drag-handle',
-  });
+  const getTipPosition = useCallback(() => {
+    if (tipWrapperRef.current) {
+      const rect = tipWrapperRef.current.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.bottom + 4 };
+    }
+    return { x: window.innerWidth / 2, y: 200 };
+  }, []);
+
+  const handleAskAI = useCallback(() => {
+    const pos = getTipPosition();
+    setAskAIPos(pos);
+    setAskAIOpen(true);
+  }, [getTipPosition]);
+
+  const handleAskAISend = useCallback((question: string) => {
+    onAskAI(contentText, question, highlight.id);
+    setAskAIOpen(false);
+  }, [onAskAI, contentText, highlight.id]);
 
   const handleOpenNotes = useCallback(() => {
-    resetPosition();
-    if (highlightRef.current) {
-      const rect = highlightRef.current.getBoundingClientRect();
-      const popupWidth = 320; // w-80 = 20rem = 320px
-      const margin = 12;
-
-      // Center horizontally on the highlight
-      let x = rect.left + rect.width / 2;
-
-      // Clamp X so popup doesn't overflow left/right edges
-      const halfPopup = popupWidth / 2;
-      x = Math.max(halfPopup + margin, Math.min(x, window.innerWidth - halfPopup - margin));
-
-      // Place above highlight by default
-      let y = rect.top - margin;
-      let below = false;
-
-      // If too close to top, flip to below
-      if (rect.top < 200) {
-        y = rect.bottom + margin;
-        below = true;
-      }
-
-      setNotePopupPosition({ x, y });
-      setNotePopupBelow(below);
-    }
+    const pos = getTipPosition();
+    setNotePopupPos(pos);
     setNotePopupOpen(true);
-  }, [resetPosition]);
+  }, [getTipPosition]);
 
   const handleCloseNotes = useCallback(() => {
     setNotePopupOpen(false);
@@ -77,46 +72,60 @@ export function HighlightContainer({
   const tip: Tip = {
     position: highlight.position,
     content: (
-      <HighlightPopup
-        contentText={contentText}
-        hasNotes={hasNotes}
-        highlightId={highlight.id}
-        onDelete={() => onDelete(highlight.id)}
-        onAskAI={onAskAI}
-        onOpenNotes={handleOpenNotes}
-      />
+      <div ref={tipWrapperRef}>
+        <HighlightPopup
+          hasNotes={hasNotes}
+          onDelete={() => onDelete(highlight.id)}
+          onAskAI={handleAskAI}
+          onOpenNotes={handleOpenNotes}
+        />
+      </div>
     ),
   };
 
   return (
     <>
       <MonitoredHighlightContainer highlightTip={tip}>
-        <div ref={highlightRef}>
-          <TextHighlight
-            highlight={highlight}
-            isScrolledTo={isScrolledTo}
-            style={{
-              background: bgColor,
-              opacity: 0.4,
-              ...(hasNotes && {
-                borderBottom: '2px dotted rgba(0, 0, 0, 0.35)',
-              })
-            }}
-          />
-        </div>
+        <TextHighlight
+          highlight={highlight}
+          isScrolledTo={isScrolledTo}
+          style={{
+            background: bgColor,
+            opacity: 0.4,
+            ...(hasNotes && {
+              borderBottom: '2px dotted rgba(0, 0, 0, 0.35)',
+            })
+          }}
+        />
       </MonitoredHighlightContainer>
+
+      {askAIOpen &&
+        createPortal(
+          <div
+            style={{
+              position: 'fixed',
+              left: askAIPos.x,
+              top: askAIPos.y,
+              transform: 'translate(-50%, 0)',
+              zIndex: 9999,
+            }}
+          >
+            <AskAIPopup
+              onSend={handleAskAISend}
+              onClose={() => setAskAIOpen(false)}
+            />
+          </div>,
+          document.body,
+        )}
 
       {notePopupOpen &&
         createPortal(
           <div
-            ref={dragRef}
             style={{
               position: 'fixed',
-              left: notePopupPosition.x,
-              top: notePopupPosition.y,
-              transform: notePopupBelow
-                ? `translate(calc(-50% + ${dragOffset.x}px), ${dragOffset.y}px)`
-                : `translate(calc(-50% + ${dragOffset.x}px), calc(-100% + ${dragOffset.y}px))`,
+              left: notePopupPos.x,
+              top: notePopupPos.y,
+              transform: 'translate(-50%, 0)',
               zIndex: 9999,
             }}
           >
@@ -130,8 +139,6 @@ export function HighlightContainer({
                 setNotePopupOpen(false);
               }}
               onClose={handleCloseNotes}
-              arrowPosition={notePopupBelow ? 'top' : 'bottom'}
-              showArrow={dragOffset.x === 0 && dragOffset.y === 0}
             />
           </div>,
           document.body,

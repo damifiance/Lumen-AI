@@ -124,7 +124,7 @@ export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps
   return (
     <div
       ref={containerRef}
-      className="drag-handle flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 px-2.5 py-2 select-none cursor-grab active:cursor-grabbing"
+      className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 px-2.5 py-2"
       style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
     >
       {COLORS.map(({ color, label }) => (
@@ -141,7 +141,7 @@ export function SelectionTip({ onHighlight, onAskAI, onNote }: SelectionTipProps
           title={`Highlight ${label}`}
         />
       ))}
-      <div className="w-px h-5 bg-gray-200 mx-1" />
+      <div className="drag-handle w-px h-5 bg-gray-300 mx-1 cursor-grab active:cursor-grabbing" title="Drag to move" />
       <button
         onClick={() => {
           resetPosition();

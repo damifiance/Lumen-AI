@@ -6,6 +6,7 @@ import {
   createNoteEntry,
   type NoteEntry,
 } from '../../utils/noteHelpers';
+import { useDraggable } from '../../hooks/useDraggable';
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -24,8 +25,6 @@ interface NotePopupProps {
   onUpdateNote: (comment: string) => void;
   onDelete: () => void;
   onClose?: () => void;
-  arrowPosition?: 'top' | 'bottom';
-  showArrow?: boolean;
 }
 
 export function NotePopup({
@@ -33,8 +32,6 @@ export function NotePopup({
   onUpdateNote,
   onDelete,
   onClose,
-  arrowPosition,
-  showArrow = true,
 }: NotePopupProps) {
   const [notes, setNotes] = useState<NoteEntry[]>(() => parseNotes(comment));
   const [newText, setNewText] = useState('');
@@ -42,30 +39,47 @@ export function NotePopup({
   const [editText, setEditText] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const editRef = useRef<HTMLTextAreaElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { containerRef, offset } = useDraggable({
+    handleSelector: '.drag-handle',
+  });
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  const handleClickOutside = useCallback(
-    (e: MouseEvent) => {
+  // Close on Escape
+  useEffect(() => {
+    if (!onClose) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !editingId) {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose, editingId]);
+
+  // Close on click outside
+  useEffect(() => {
+    if (!onClose) return;
+    const handleClickOutside = (e: MouseEvent) => {
       if (
-        onClose &&
         containerRef.current &&
         !containerRef.current.contains(e.target as Node)
       ) {
         onClose();
       }
-    },
-    [onClose],
-  );
-
-  useEffect(() => {
-    if (!onClose) return;
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [onClose, handleClickOutside]);
+    };
+    // Delay to avoid catching the click that opened this popup
+    const timer = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 100);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose, containerRef]);
 
   useEffect(() => {
     if (editingId) editRef.current?.focus();
@@ -118,33 +132,9 @@ export function NotePopup({
     <div
       ref={containerRef}
       className="relative bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/60 w-80"
+      style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Arrow caret */}
-      {showArrow && arrowPosition === 'bottom' && (
-        <div
-          className="absolute left-1/2 -translate-x-1/2 -bottom-2"
-          style={{
-            width: 0,
-            height: 0,
-            borderLeft: '8px solid transparent',
-            borderRight: '8px solid transparent',
-            borderTop: '8px solid rgba(255,255,255,0.95)',
-          }}
-        />
-      )}
-      {showArrow && arrowPosition === 'top' && (
-        <div
-          className="absolute left-1/2 -translate-x-1/2 -top-2"
-          style={{
-            width: 0,
-            height: 0,
-            borderLeft: '8px solid transparent',
-            borderRight: '8px solid transparent',
-            borderBottom: '8px solid rgba(255,255,255,0.95)',
-          }}
-        />
-      )}
       {/* Header */}
       <div className="drag-handle px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between select-none cursor-grab active:cursor-grabbing">
         <span className="text-[12px] font-semibold text-gray-700">
