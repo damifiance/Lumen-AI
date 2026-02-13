@@ -6,6 +6,7 @@ const findFreePort = require('find-free-port');
 const fs = require('fs');
 const { createTray, destroyTray } = require('./tray');
 const { checkForUpdates } = require('./updater');
+const secureStore = require('./secureStore');
 
 let mainWindow = null;
 let backendProcess = null;
@@ -169,6 +170,17 @@ app.whenReady().then(async () => {
 
     // Get current app version
     ipcMain.handle('get-app-version', () => app.getVersion());
+
+    // Secure storage IPC handlers
+    ipcMain.handle('secureStore:set', async (_event, key, value) => {
+      secureStore.set(key, value);
+    });
+    ipcMain.handle('secureStore:get', async (_event, key) => {
+      return secureStore.get(key);
+    });
+    ipcMain.handle('secureStore:remove', async (_event, key) => {
+      secureStore.remove(key);
+    });
 
     if (!isDev) {
       backendProcess = await startBackend(port);

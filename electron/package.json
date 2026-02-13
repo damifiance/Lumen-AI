@@ -10,6 +10,7 @@
     "dist:win": "electron-builder --win"
   },
   "dependencies": {
+    "electron-store": "^8.2.0",
     "find-free-port": "^2.0.0"
   },
   "devDependencies": {
