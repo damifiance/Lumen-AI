@@ -1,80 +1,98 @@
-# Roadmap: Lumen AI UX Improvements
+# Roadmap: Lumen AI — Auth & Profiles
 
 ## Overview
 
-This roadmap fixes critical UX breaks in the PDF annotation system and adds essential interactivity. Phase 1 resolves popup positioning bugs, preserves user highlight colors during AI interactions, adds visual markers for AI annotations, and implements zoom controls. Phase 2 enhances the experience by making popups draggable, allowing users to reposition annotations anywhere on screen to see underlying paper content.
+This milestone adds authentication and user profiles to Lumen AI via Supabase, maintaining the app's local-first architecture. Users can work fully offline with Ollama (no account required), with authentication unlocking cloud AI features and future premium functionality. The roadmap prioritizes foundational infrastructure, isolates OAuth complexity for thorough testing, then builds profile management and security polish.
 
 ## Phases
 
 **Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+- Integer phases (4, 5, 6, 7): Planned milestone work (continuing from last milestone's Phase 3)
+- Decimal phases (4.1, 4.2): Urgent insertions (marked with INSERTED)
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: Core UX Fixes** - Fix broken popup positioning, color preservation, add zoom and AI markers
-- [x] **Phase 2: Interactive Enhancements** - Make popups draggable for flexible positioning
-- [ ] **Phase 3: System Tray & Auto-Update** - System tray icon with menu and update checking
+- [ ] **Phase 4: Supabase Foundation & Email Auth** - Backend setup, session persistence, email/password flows
+- [ ] **Phase 5: OAuth Integration** - Google and GitHub login with Electron deep linking
+- [ ] **Phase 6: Profile System** - Username claiming, avatar upload, profile editing
+- [ ] **Phase 7: Security Polish** - Email verification, password reset, account deletion
 
 ## Phase Details
 
-### Phase 1: Core UX Fixes
-**Goal**: Users can see popups correctly positioned, preserve their color-coded organization when using AI, distinguish AI annotations, and zoom PDFs.
-**Depends on**: Nothing (first phase)
-**Requirements**: POP-01, POP-04, HLT-01, HLT-02, HLT-03, PDF-01, PDF-02, PDF-03
+### Phase 4: Supabase Foundation & Email Auth
+**Goal**: Users can create accounts and log in with email/password, with sessions persisting across app restarts
+**Depends on**: Nothing (first phase of this milestone)
+**Requirements**: AUTH-01, AUTH-04, AUTH-05, SEC-04, SEC-05
 **Success Criteria** (what must be TRUE):
-  1. Note popups appear near their associated highlights (not at top-left under tab bar)
-  2. User's highlight color persists when asking AI about that highlight
-  3. Highlights with any notes (AI-generated or user-written) show a dotted underline visual marker
-  4. User can zoom in and out on PDF and see the current zoom level
-  5. Zoom controls work correctly with existing highlights and popups
-**Plans**: 3 plans
+  1. User can sign up with email and password
+  2. User can log in with email and password
+  3. User session persists across app restarts (tokens stored securely)
+  4. User can log out from any screen
+  5. App works fully offline with Ollama (no auth required)
+  6. Auth actions show loading states and friendly error messages
+**Plans**: TBD
 
 Plans:
-- [x] 01-01-PLAN.md -- Highlight color preservation on AI ask + dotted underline note markers
-- [x] 01-02-PLAN.md -- Popup positioning fixes + universal notes access
-- [x] 01-03-PLAN.md -- PDF zoom in/out controls with level display
+- [ ] TBD
 
-### Phase 2: Interactive Enhancements
-**Goal**: Users can reposition popups anywhere on screen to unblock paper content they need to read.
-**Depends on**: Phase 1
-**Requirements**: POP-02, POP-03
+### Phase 5: OAuth Integration
+**Goal**: Users can log in with Google or GitHub accounts via PKCE OAuth flow in Electron
+**Depends on**: Phase 4
+**Requirements**: AUTH-02, AUTH-03
 **Success Criteria** (what must be TRUE):
-  1. User can drag note popups by their header to any position on screen
-  2. User can drag selection tip popup by its header to any position on screen
-  3. Popup position resets when reopened (starts fresh at default position)
-  4. Dragging popups doesn't interfere with text selection or copying text from popup content
-**Plans**: 1 plan
+  1. User can sign up/log in with Google OAuth
+  2. User can sign up/log in with GitHub OAuth
+  3. OAuth deep linking works when app is not running (cold start)
+  4. OAuth deep linking works when app is already running (warm handoff)
+  5. OAuth tokens stored securely via Electron SafeStorage
+**Plans**: TBD
 
 Plans:
-- [ ] 02-01-PLAN.md -- Draggable popups via custom useDraggable hook (NotePopup + SelectionTip)
+- [ ] TBD
 
-### Phase 3: System Tray & Auto-Update
-**Goal**: Users can check for updates from the system tray and the app lives in the menu bar for quick access.
-**Depends on**: Phase 2
-**Requirements**: TRAY-01, UPD-01
+### Phase 6: Profile System
+**Goal**: Users have complete academic profiles with username, avatar, bio, institution, and research interests
+**Depends on**: Phase 5
+**Requirements**: PROF-01, PROF-02, PROF-03, PROF-04, PROF-05
 **Success Criteria** (what must be TRUE):
-  1. App shows an icon in the system tray (macOS menu bar / Windows system tray)
-  2. Tray menu has: Open Lumen AI, Check for Updates, Quit
-  3. Check for Updates compares current version with latest GitHub release
-  4. If update available, shows dialog with version info and download link
-  5. Closing the window hides to tray instead of quitting (quit only from tray menu)
-  6. Works on both macOS and Windows
-**Plans**: 1 plan
+  1. New user must claim a unique @username on first login
+  2. User can upload, crop, and save a profile image
+  3. User can edit bio, institution, and research interests
+  4. Profile changes save to Supabase and persist across sessions
+  5. User sees their @username in chat interface (not "You")
+**Plans**: TBD
 
 Plans:
-- [ ] 03-01-PLAN.md -- System tray icon, menu, and GitHub release update checker
+- [ ] TBD
+
+### Phase 7: Security Polish
+**Goal**: Production-ready auth with email verification, password recovery, and account deletion
+**Depends on**: Phase 6
+**Requirements**: SEC-01, SEC-02, SEC-03
+**Success Criteria** (what must be TRUE):
+  1. User receives email verification link after signup
+  2. User cannot use account until email is verified
+  3. User can request password reset via email link
+  4. User can set new password after clicking reset link
+  5. User can delete their account and all associated data
+  6. Account deletion removes profile, avatar, and Supabase auth record
+**Plans**: TBD
+
+Plans:
+- [ ] TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2
+Phases execute in numeric order: 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core UX Fixes | 3/3 | ✓ Complete | 2026-02-12 |
-| 2. Interactive Enhancements | 0/1 | Not started | - |
+| 4. Supabase Foundation & Email Auth | 0/TBD | Not started | - |
+| 5. OAuth Integration | 0/TBD | Not started | - |
+| 6. Profile System | 0/TBD | Not started | - |
+| 7. Security Polish | 0/TBD | Not started | - |
 
 ---
-*Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12 (Phase 2 planned)*
+*Roadmap created: 2026-02-14*
+*Milestone: v0.3.0-alpha — Auth & Profiles*
