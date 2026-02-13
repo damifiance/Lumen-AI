@@ -9,4 +9,7 @@ contextBridge.exposeInMainWorld('electron', {
     set: (key, value) => ipcRenderer.invoke('secureStore:set', key, value),
     remove: (key) => ipcRenderer.invoke('secureStore:remove', key),
   },
+  startOAuth: (url) => ipcRenderer.invoke('start-oauth', url),
+  onOAuthCallback: (callback) => ipcRenderer.on('oauth-callback', (_event, data) => callback(data)),
+  removeOAuthCallback: () => ipcRenderer.removeAllListeners('oauth-callback'),
 });

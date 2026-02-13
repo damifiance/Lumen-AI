@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const http = require('http');
@@ -12,8 +12,70 @@ let mainWindow = null;
 let backendProcess = null;
 let backendPort = null;
 let isQuitting = false;
+let pendingOAuthUrl = null;
 
 const isDev = process.env.ELECTRON_DEV === 'true';
+
+// Register custom protocol handler for OAuth deep linking
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('lumenai', process.execPath, [path.resolve(process.argv[1])]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('lumenai');
+}
+
+// Single instance lock — prevents multiple app instances and handles Windows/Linux deep links
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine) => {
+    // Windows/Linux: second instance receives the deep link URL
+    const url = commandLine.find((arg) => arg.startsWith('lumenai://'));
+    if (url) handleOAuthCallback(url);
+
+    // Focus the existing window
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
+
+// macOS: handles deep links for both cold start and warm handoff
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  handleOAuthCallback(url);
+});
+
+/**
+ * Handles OAuth callback URLs from the browser redirect.
+ * Extracts auth code or error and forwards to renderer via IPC.
+ */
+function handleOAuthCallback(url) {
+  try {
+    const urlObj = new URL(url);
+    const code = urlObj.searchParams.get('code');
+    const error = urlObj.searchParams.get('error');
+    const errorDescription = urlObj.searchParams.get('error_description');
+
+    const payload = {
+      code: code || undefined,
+      error: error ? `${error}: ${errorDescription || 'Unknown error'}` : undefined,
+    };
+
+    // If window exists, send immediately
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send('oauth-callback', payload);
+    } else {
+      // Cold start: store for later
+      pendingOAuthUrl = payload;
+    }
+  } catch (err) {
+    console.error('Failed to parse OAuth callback URL:', err);
+  }
+}
 
 function getDataDir() {
   const dir = path.join(app.getPath('userData'), 'data');
@@ -143,6 +205,14 @@ function createWindow() {
     mainWindow.loadFile(path.join(process.resourcesPath, 'frontend', 'dist', 'index.html'));
   }
 
+  // Send pending OAuth callback after window loads (cold start scenario)
+  mainWindow.webContents.on('did-finish-load', () => {
+    if (pendingOAuthUrl) {
+      mainWindow.webContents.send('oauth-callback', pendingOAuthUrl);
+      pendingOAuthUrl = null;
+    }
+  });
+
   // Close to tray instead of quitting
   mainWindow.on('close', (e) => {
     if (!isQuitting) {
@@ -182,6 +252,11 @@ app.whenReady().then(async () => {
       secureStore.remove(key);
     });
 
+    // OAuth IPC handler — opens OAuth URL in external browser
+    ipcMain.handle('start-oauth', async (_event, url) => {
+      shell.openExternal(url);
+    });
+
     if (!isDev) {
       backendProcess = await startBackend(port);
       console.log(`Waiting for backend on port ${port}...`);
@@ -193,6 +268,12 @@ app.whenReady().then(async () => {
     }
 
     createWindow();
+
+    // Check for OAuth callback URL in argv (Windows/Linux cold start)
+    const argvUrl = process.argv.find((arg) => arg.startsWith('lumenai://'));
+    if (argvUrl) {
+      handleOAuthCallback(argvUrl);
+    }
 
     // Create system tray
     createTray({

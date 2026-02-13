@@ -1,6 +1,10 @@
 {
   "appId": "com.lumenai.app",
   "productName": "Lumen AI",
+  "protocols": {
+    "name": "Lumen AI OAuth",
+    "schemes": ["lumenai"]
+  },
   "directories": {
     "output": "../dist/installers"
   },
