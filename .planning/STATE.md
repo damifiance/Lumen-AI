@@ -5,34 +5,36 @@
 See: .planning/PROJECT.md (updated 2026-02-14)
 
 **Core value:** Researchers can read, annotate, and discuss papers with AI — locally and privately by default, with optional cloud features behind authentication
-**Current focus:** Phase 4 - Supabase Foundation & Email Auth
+**Current focus:** Phase 5 - OAuth Integration
 
 ## Current Position
 
-Phase: 4 of 7 (Supabase Foundation & Email Auth)
-Plan: 2 of 2 in current phase (Phase 4 complete)
-Status: Complete
-Last activity: 2026-02-14 — Completed Phase 4 Plan 02 (Email Auth UI)
+Phase: 5 of 7 (OAuth Integration)
+Plan: 1 of 2 in current phase
+Status: In Progress
+Last activity: 2026-02-14 — Completed Phase 5 Plan 01 (OAuth Deep Linking Infrastructure)
 
-Progress: [██░░░░░░░░] ~20%
+Progress: [███░░░░░░░] ~30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 13.5 minutes
-- Total execution time: 0.45 hours
+- Total plans completed: 3
+- Average duration: 10.8 minutes
+- Total execution time: 0.54 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | Phase 04 | 2 | 1444s (24.1m) | 722s |
+| Phase 05 | 1 | 179s (3.0m) | 179s |
 
 **Recent Plans:**
 
 | Plan | Duration | Tasks | Files | Date |
 |------|----------|-------|-------|------|
+| Phase 05 P01 | 179s (3.0m) | 2 tasks | 6 files | 2026-02-14 |
 | Phase 04 P02 | 1260s (21m) | 3 tasks | 5 files | 2026-02-14 |
 | Phase 04 P01 | 184s (3.1m) | 2 tasks | 10 files | 2026-02-13 |
 
@@ -54,6 +56,9 @@ Recent decisions affecting current work:
 - Modal listener pattern for auth modals (matching OnboardingModal pattern)
 - AuthButton placed in FileBrowser sidebar for persistent visibility across app states
 - Auth initialization non-blocking (app works immediately for offline users)
+- lumenai:// custom protocol for OAuth deep linking (enables browser-to-app redirect)
+- Single instance lock for Electron (prevents multiple instances, handles Windows/Linux deep links)
+- Cold start OAuth URL buffering (pendingOAuthUrl prevents callback loss before window ready)
 
 ### Pending Todos
 
@@ -72,7 +77,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-14 (Phase 4 Plan 02 execution)
-Stopped at: Completed 04-02-PLAN.md — Email auth UI complete, Phase 4 complete
+Last session: 2026-02-14 (Phase 5 Plan 01 execution)
+Stopped at: Completed 05-01-PLAN.md — OAuth deep linking infrastructure complete
 Resume file: None
-Next step: Phase 4 (Supabase Foundation & Email Auth) is complete. Ready to proceed to Phase 5 (OAuth Integration) when user is ready.
+Next step: Phase 5 (OAuth Integration) in progress. Plan 02 will add OAuth UI buttons.
