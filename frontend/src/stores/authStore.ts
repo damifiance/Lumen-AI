@@ -8,12 +8,18 @@ interface AuthState {
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
+  pendingVerification: string | null;
+  resetPasswordMode: boolean;
   initialize: () => Promise<void>;
   signUp: (email: string, password: string) => Promise<{ error?: string }>;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signInWithOAuth: (provider: 'google' | 'github') => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
+  requestPasswordReset: (email: string) => Promise<{ error?: string }>;
+  resetPassword: (newPassword: string) => Promise<{ error?: string }>;
+  verifyEmail: (tokenHash: string) => Promise<{ error?: string }>;
+  resendVerification: (email: string) => Promise<{ error?: string }>;
 }
 
 /**
@@ -33,6 +39,10 @@ function translateAuthError(error: unknown): string {
         return 'Password must be at least 6 characters';
       case 'over_email_send_rate_limit':
         return 'Too many attempts. Please wait a few minutes.';
+      case 'otp_expired':
+        return 'This link has expired. Please request a new one.';
+      case 'same_password':
+        return 'New password must be different from your current password.';
       default:
         return 'Unable to complete request. Please try again.';
     }
@@ -40,12 +50,14 @@ function translateAuthError(error: unknown): string {
   return 'Network error. Please check your connection.';
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   session: null,
   isLoading: false,
   isInitialized: false,
   error: null,
+  pendingVerification: null,
+  resetPasswordMode: false,
 
   /**
    * Initializes the auth store by loading persisted session and setting up auth listener.
@@ -101,6 +113,22 @@ export const useAuthStore = create<AuthState>((set) => ({
           }
         });
       }
+
+      // Listen for auth deep links from Electron main process (email verification and password reset)
+      if (window.electron?.onAuthDeepLink) {
+        window.electron.onAuthDeepLink(async ({ tokenHash, type }) => {
+          if (type === 'email') {
+            // Email verification
+            await get().verifyEmail(tokenHash);
+          } else if (type === 'recovery') {
+            // Password reset — exchange token for session, then show reset form
+            const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' });
+            if (!error) {
+              set({ resetPasswordMode: true });
+            }
+          }
+        });
+      }
     } catch (err) {
       console.error('Auth initialization error:', err);
       set({ isInitialized: true });
@@ -115,7 +143,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const isElectron = window.electron != null;
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: isElectron ? 'lumenai://auth/confirm' : window.location.origin + '/auth/confirm'
+        }
+      });
 
       if (error) {
         const translated = translateAuthError(error);
@@ -123,7 +158,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         return { error: translated };
       }
 
-      set({ isLoading: false });
+      set({ isLoading: false, pendingVerification: email });
       return {};
     } catch (err) {
       const translated = translateAuthError(err);
@@ -213,5 +248,113 @@ export const useAuthStore = create<AuthState>((set) => ({
    */
   clearError: () => {
     set({ error: null });
+  },
+
+  /**
+   * Request a password reset email.
+   * Returns an error object if the request fails.
+   */
+  requestPasswordReset: async (email: string) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const isElectron = window.electron != null;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: isElectron ? 'lumenai://auth/reset' : window.location.origin + '/auth/reset'
+      });
+
+      if (error) {
+        const translated = translateAuthError(error);
+        set({ error: translated, isLoading: false });
+        return { error: translated };
+      }
+
+      set({ isLoading: false });
+      return {};
+    } catch (err) {
+      const translated = translateAuthError(err);
+      set({ error: translated, isLoading: false });
+      return { error: translated };
+    }
+  },
+
+  /**
+   * Reset password after clicking the reset link.
+   * This only works when a valid session exists (created by reset link click).
+   */
+  resetPassword: async (newPassword: string) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+      if (error) {
+        const translated = translateAuthError(error);
+        set({ error: translated, isLoading: false });
+        return { error: translated };
+      }
+
+      set({ isLoading: false, resetPasswordMode: false });
+      return {};
+    } catch (err) {
+      const translated = translateAuthError(err);
+      set({ error: translated, isLoading: false });
+      return { error: translated };
+    }
+  },
+
+  /**
+   * Verify email address using token from verification email.
+   */
+  verifyEmail: async (tokenHash: string) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email' });
+
+      if (error) {
+        const translated = translateAuthError(error);
+        set({ error: translated, isLoading: false });
+        return { error: translated };
+      }
+
+      set({ isLoading: false, pendingVerification: null });
+      return {};
+    } catch (err) {
+      const translated = translateAuthError(err);
+      set({ error: translated, isLoading: false });
+      return { error: translated };
+    }
+  },
+
+  /**
+   * Resend verification email.
+   */
+  resendVerification: async (email: string) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const isElectron = window.electron != null;
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: isElectron ? 'lumenai://auth/confirm' : window.location.origin + '/auth/confirm'
+        }
+      });
+
+      if (error) {
+        const translated = translateAuthError(error);
+        set({ error: translated, isLoading: false });
+        return { error: translated };
+      }
+
+      set({ isLoading: false });
+      return {};
+    } catch (err) {
+      const translated = translateAuthError(err);
+      set({ error: translated, isLoading: false });
+      return { error: translated };
+    }
   },
 }));

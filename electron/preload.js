@@ -12,4 +12,6 @@ contextBridge.exposeInMainWorld('electron', {
   startOAuth: (url) => ipcRenderer.invoke('start-oauth', url),
   onOAuthCallback: (callback) => ipcRenderer.on('oauth-callback', (_event, data) => callback(data)),
   removeOAuthCallback: () => ipcRenderer.removeAllListeners('oauth-callback'),
+  onAuthDeepLink: (callback) => ipcRenderer.on('auth-deep-link', (_event, data) => callback(data)),
+  removeAuthDeepLink: () => ipcRenderer.removeAllListeners('auth-deep-link'),
 });

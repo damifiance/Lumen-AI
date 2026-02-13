@@ -13,6 +13,7 @@ let backendProcess = null;
 let backendPort = null;
 let isQuitting = false;
 let pendingOAuthUrl = null;
+let pendingAuthDeepLink = null;
 
 const isDev = process.env.ELECTRON_DEV === 'true';
 
@@ -33,7 +34,7 @@ if (!gotTheLock) {
   app.on('second-instance', (event, commandLine) => {
     // Windows/Linux: second instance receives the deep link URL
     const url = commandLine.find((arg) => arg.startsWith('lumenai://'));
-    if (url) handleOAuthCallback(url);
+    if (url) handleDeepLink(url);
 
     // Focus the existing window
     if (mainWindow) {
@@ -46,34 +47,52 @@ if (!gotTheLock) {
 // macOS: handles deep links for both cold start and warm handoff
 app.on('open-url', (event, url) => {
   event.preventDefault();
-  handleOAuthCallback(url);
+  handleDeepLink(url);
 });
 
 /**
- * Handles OAuth callback URLs from the browser redirect.
- * Extracts auth code or error and forwards to renderer via IPC.
+ * Handles deep link URLs from the browser redirect (OAuth, email verification, password reset).
+ * Extracts auth code/tokens and forwards to renderer via IPC.
  */
-function handleOAuthCallback(url) {
+function handleDeepLink(url) {
   try {
     const urlObj = new URL(url);
-    const code = urlObj.searchParams.get('code');
-    const error = urlObj.searchParams.get('error');
-    const errorDescription = urlObj.searchParams.get('error_description');
+    const pathname = urlObj.pathname; // '/auth/callback', '/auth/confirm', '/auth/reset'
 
-    const payload = {
-      code: code || undefined,
-      error: error ? `${error}: ${errorDescription || 'Unknown error'}` : undefined,
-    };
+    if (pathname === '/auth/callback') {
+      // OAuth callback flow
+      const code = urlObj.searchParams.get('code');
+      const error = urlObj.searchParams.get('error');
+      const errorDescription = urlObj.searchParams.get('error_description');
 
-    // If window exists, send immediately
-    if (mainWindow && mainWindow.webContents) {
-      mainWindow.webContents.send('oauth-callback', payload);
-    } else {
-      // Cold start: store for later
-      pendingOAuthUrl = payload;
+      const payload = {
+        code: code || undefined,
+        error: error ? `${error}: ${errorDescription || 'Unknown error'}` : undefined,
+      };
+
+      // If window exists, send immediately
+      if (mainWindow && mainWindow.webContents) {
+        mainWindow.webContents.send('oauth-callback', payload);
+      } else {
+        // Cold start: store for later
+        pendingOAuthUrl = payload;
+      }
+    } else if (pathname === '/auth/confirm' || pathname === '/auth/reset') {
+      // Email verification or password reset flow
+      const tokenHash = urlObj.searchParams.get('token_hash');
+      const type = urlObj.searchParams.get('type');
+      const payload = { tokenHash, type };
+
+      // If window exists, send immediately
+      if (mainWindow && mainWindow.webContents) {
+        mainWindow.webContents.send('auth-deep-link', payload);
+      } else {
+        // Cold start: store for later
+        pendingAuthDeepLink = payload;
+      }
     }
   } catch (err) {
-    console.error('Failed to parse OAuth callback URL:', err);
+    console.error('Failed to parse deep link URL:', err);
   }
 }
 
@@ -205,11 +224,15 @@ function createWindow() {
     mainWindow.loadFile(path.join(process.resourcesPath, 'frontend', 'dist', 'index.html'));
   }
 
-  // Send pending OAuth callback after window loads (cold start scenario)
+  // Send pending OAuth callback or auth deep link after window loads (cold start scenario)
   mainWindow.webContents.on('did-finish-load', () => {
     if (pendingOAuthUrl) {
       mainWindow.webContents.send('oauth-callback', pendingOAuthUrl);
       pendingOAuthUrl = null;
+    }
+    if (pendingAuthDeepLink) {
+      mainWindow.webContents.send('auth-deep-link', pendingAuthDeepLink);
+      pendingAuthDeepLink = null;
     }
   });
 
@@ -269,10 +292,10 @@ app.whenReady().then(async () => {
 
     createWindow();
 
-    // Check for OAuth callback URL in argv (Windows/Linux cold start)
+    // Check for deep link URL in argv (Windows/Linux cold start)
     const argvUrl = process.argv.find((arg) => arg.startsWith('lumenai://'));
     if (argvUrl) {
-      handleOAuthCallback(argvUrl);
+      handleDeepLink(argvUrl);
     }
 
     // Create system tray
