@@ -9,6 +9,7 @@ import type { ChatMessage as ChatMessageType } from '../../types/chat';
 import { User, BookmarkPlus, Check } from 'lucide-react';
 import lumenLogo from '../../assets/lumen-logo.png';
 import { useHighlightStore } from '../../stores/highlightStore';
+import { useProfileStore } from '../../stores/profileStore';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -19,8 +20,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const isEmpty = !message.content && !isUser;
   const [saved, setSaved] = useState(false);
   const addNoteToHighlight = useHighlightStore((s) => s.addNoteToHighlight);
+  const profile = useProfileStore((s) => s.profile);
 
   const canSaveAsNote = !isUser && message.highlightId && message.content && !isEmpty;
+
+  // Get display name and avatar for user messages
+  const displayName = isUser && profile?.username ? `@${profile.username}` : isUser ? 'You' : 'Lumen';
+  const avatarUrl = isUser ? profile?.avatar_url : null;
 
   const handleSaveAsNote = async () => {
     if (!message.highlightId || !message.content) return;
@@ -32,19 +38,27 @@ export function ChatMessage({ message }: ChatMessageProps) {
     <div className={`px-5 py-4 ${isUser ? 'bg-chat-user' : 'bg-chat-assistant'}`}>
       <div className="flex gap-3">
         <div
-          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 overflow-hidden ${
             isUser
               ? 'bg-accent/10 text-accent'
               : 'bg-gradient-to-br from-teal/10 to-accent/10 text-teal'
           }`}
         >
-          {isUser ? <User size={14} /> : <img src={lumenLogo} alt="AI" className="w-3.5 h-3.5" />}
+          {isUser ? (
+            avatarUrl ? (
+              <img src={avatarUrl} alt="User avatar" className="w-7 h-7 rounded-lg object-cover" />
+            ) : (
+              <User size={14} />
+            )
+          ) : (
+            <img src={lumenLogo} alt="AI" className="w-3.5 h-3.5" />
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <span className={`text-[11px] font-semibold uppercase tracking-wider ${
             isUser ? 'text-accent/60' : 'text-teal/60'
           }`}>
-            {isUser ? 'You' : 'Lumen'}
+            {displayName}
           </span>
           <div className="mt-1 text-[13px] leading-relaxed text-gray-700 prose prose-sm max-w-none">
             {isUser ? (

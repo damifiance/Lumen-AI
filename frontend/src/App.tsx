@@ -7,6 +7,7 @@ import { usePaperStore } from './stores/paperStore';
 import { useHighlightStore } from './stores/highlightStore';
 import { useChatStore } from './stores/chatStore';
 import { useAuthStore } from './stores/authStore';
+import { useProfileStore } from './stores/profileStore';
 import { useShortcutStore, isShortcutModifier } from './stores/shortcutStore';
 import { getPaperMetadata } from './api/papers';
 import { ArrowLeft, Sparkles, Keyboard } from 'lucide-react';
@@ -17,13 +18,17 @@ import { AboutModal } from './components/common/AboutModal';
 import { OllamaSetupCard } from './components/OllamaSetupCard';
 import { LoginModal } from './components/auth/LoginModal';
 import { SignupModal } from './components/auth/SignupModal';
+import { UsernameClaimModal } from './components/profile/UsernameClaimModal';
+import { ProfileEditModal } from './components/profile/ProfileEditModal';
+import { openUsernameClaimModal } from './components/profile/UsernameClaimModal';
 
 export default function App() {
   const { tabs, activeTabIndex, isLoading, setActivePaper, setLoading } =
     usePaperStore();
   const { loadHighlights, clearHighlights } = useHighlightStore();
   const { clearMessages, toggleOpen: toggleChat } = useChatStore();
-  const { initialize } = useAuthStore();
+  const { initialize, user } = useAuthStore();
+  const { fetchProfile, clearProfile, profile } = useProfileStore();
   const { openShortcuts } = useShortcutStore();
   const matchesEvent = useShortcutStore((s) => s.matchesEvent);
 
@@ -36,6 +41,25 @@ export default function App() {
   useEffect(() => {
     initialize();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch or clear profile when auth user changes
+  // IMPORTANT: Separate useEffect to avoid Supabase deadlock bug (never call API in onAuthStateChange)
+  useEffect(() => {
+    if (user) {
+      fetchProfile(user.id).catch((err) => {
+        console.error('Failed to fetch profile:', err);
+      });
+    } else {
+      clearProfile();
+    }
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-open username claim modal for new users
+  useEffect(() => {
+    if (profile && !profile.username_claimed) {
+      openUsernameClaimModal();
+    }
+  }, [profile]);
 
   // Reload highlights when switching tabs
   useEffect(() => {
@@ -165,6 +189,8 @@ export default function App() {
       <AboutModal />
       <LoginModal />
       <SignupModal />
+      <UsernameClaimModal />
+      <ProfileEditModal />
     </div>
   );
 }

@@ -1,9 +1,17 @@
-import { LogIn, LogOut, User } from 'lucide-react';
+import { LogIn, LogOut, User, Settings } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { useProfileStore } from '../../stores/profileStore';
 import { openLoginModal } from './LoginModal';
+import { openProfileEditModal } from '../profile/ProfileEditModal';
 
 export function AuthButton() {
   const { user, signOut } = useAuthStore();
+  const { profile, clearProfile } = useProfileStore();
+
+  const handleSignOut = async () => {
+    await signOut();
+    clearProfile();
+  };
 
   // Hide auth UI entirely if Supabase is not configured (offline-first requirement)
   if (!import.meta.env.VITE_SUPABASE_URL) {
@@ -23,23 +31,38 @@ export function AuthButton() {
     );
   }
 
-  // Logged in - show user email + Sign Out button
-  const displayEmail = user.email || 'User';
-  const truncatedEmail =
-    displayEmail.length > 20 ? displayEmail.slice(0, 20) + '...' : displayEmail;
+  // Logged in - show profile + actions
+  const displayText = profile?.username ? `@${profile.username}` : user.email || 'User';
+  const truncatedText =
+    displayText.length > 20 ? displayText.slice(0, 20) + '...' : displayText;
 
   return (
-    <div className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-white/5">
-      <div className="flex items-center gap-2 min-w-0">
-        <User size={13} className="text-sidebar-text/40 shrink-0" />
-        <span className="text-[11px] text-sidebar-text/70 truncate">{truncatedEmail}</span>
-      </div>
+    <div className="w-full space-y-1.5">
+      {/* Profile button */}
       <button
-        onClick={signOut}
-        className="p-1 text-sidebar-text/30 hover:text-sidebar-text/60 cursor-pointer rounded hover:bg-white/10 transition-colors shrink-0"
-        title="Sign Out"
+        onClick={openProfileEditModal}
+        className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer transition-colors"
       >
-        <LogOut size={13} />
+        <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-accent/10">
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="Avatar" className="w-6 h-6 object-cover" />
+          ) : (
+            <User size={12} className="text-accent/60" />
+          )}
+        </div>
+        <span className="text-[11px] text-sidebar-text/70 truncate flex-1 text-left">
+          {truncatedText}
+        </span>
+        <Settings size={12} className="text-sidebar-text/30 shrink-0" />
+      </button>
+
+      {/* Sign out button */}
+      <button
+        onClick={handleSignOut}
+        className="flex items-center gap-2 w-full px-3 py-2 text-[12px] text-sidebar-text/50 hover:text-sidebar-text-bright hover:bg-sidebar-hover rounded-lg cursor-pointer transition-colors"
+      >
+        <LogOut size={14} />
+        Sign Out
       </button>
     </div>
   );
