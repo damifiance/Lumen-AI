@@ -15,5 +15,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false, // Not needed for Electron
+    flowType: 'pkce', // Use PKCE flow for OAuth (more secure for native apps)
   },
 });

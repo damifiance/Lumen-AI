@@ -11,6 +11,7 @@ interface AuthState {
   initialize: () => Promise<void>;
   signUp: (email: string, password: string) => Promise<{ error?: string }>;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
+  signInWithOAuth: (provider: 'google' | 'github') => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
 }
@@ -81,6 +82,25 @@ export const useAuthStore = create<AuthState>((set) => ({
           user: session?.user ?? null,
         });
       });
+
+      // Listen for OAuth callbacks from Electron main process
+      if (window.electron?.onOAuthCallback) {
+        window.electron.onOAuthCallback(async ({ code, error: oauthError }) => {
+          if (oauthError) {
+            set({ error: `OAuth failed: ${oauthError}`, isLoading: false });
+            return;
+          }
+          if (code) {
+            try {
+              const { error } = await supabase.auth.exchangeCodeForSession(code);
+              if (error) throw error;
+              // Session update will be handled by onAuthStateChange
+            } catch (err) {
+              set({ error: translateAuthError(err), isLoading: false });
+            }
+          }
+        });
+      }
     } catch (err) {
       console.error('Auth initialization error:', err);
       set({ isInitialized: true });
@@ -134,6 +154,45 @@ export const useAuthStore = create<AuthState>((set) => ({
       const translated = translateAuthError(err);
       set({ error: translated, isLoading: false });
       return { error: translated };
+    }
+  },
+
+  /**
+   * Sign in with OAuth provider (Google or GitHub).
+   * In Electron mode, opens OAuth URL in external browser and handles deep link callback.
+   * In web mode, uses standard Supabase redirect behavior.
+   */
+  signInWithOAuth: async (provider) => {
+    set({ isLoading: true, error: null });
+    try {
+      const isElectron = window.electron != null;
+
+      if (isElectron) {
+        // Generate OAuth URL with Supabase (skipBrowserRedirect = true)
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: 'lumenai://auth/callback',
+            skipBrowserRedirect: true,
+          },
+        });
+        if (error) throw error;
+        // Open in external browser via Electron main process
+        await window.electron!.startOAuth(data.url);
+      } else {
+        // Web mode: use default Supabase redirect behavior
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback`,
+          },
+        });
+        if (error) throw error;
+      }
+      set({ isLoading: false });
+    } catch (err) {
+      const translated = translateAuthError(err);
+      set({ error: translated, isLoading: false });
     }
   },
 
