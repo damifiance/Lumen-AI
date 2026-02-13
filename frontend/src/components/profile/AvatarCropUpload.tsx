@@ -64,12 +64,20 @@ export function AvatarCropUpload({ currentAvatarUrl, onUploadComplete }: AvatarC
     const y = (naturalHeight - size) / 2;
 
     // Set default crop centered and 80% of smaller dimension
-    setCrop({
-      unit: 'px',
+    const defaultCrop = {
+      unit: 'px' as const,
       x,
       y,
       width: size,
       height: size,
+    };
+    setCrop(defaultCrop);
+    setCompletedCrop({
+      x: Math.round(x),
+      y: Math.round(y),
+      width: Math.round(size),
+      height: Math.round(size),
+      unit: 'px',
     });
   };
 
@@ -178,7 +186,7 @@ export function AvatarCropUpload({ currentAvatarUrl, onUploadComplete }: AvatarC
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="group relative w-24 h-24 rounded-full overflow-hidden cursor-pointer border-2 border-gray-200 hover:border-accent transition-colors"
+            className="group relative w-24 h-24 rounded-full overflow-hidden cursor-pointer border-2 border-gray-200 hover:border-accent transition-colors flex items-center justify-center bg-gray-50"
           >
             {currentAvatarUrl ? (
               <img
@@ -187,9 +195,7 @@ export function AvatarCropUpload({ currentAvatarUrl, onUploadComplete }: AvatarC
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                <User size={40} className="text-gray-400" />
-              </div>
+              <User size={36} className="text-gray-300" />
             )}
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

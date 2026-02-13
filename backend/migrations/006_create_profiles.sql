@@ -121,7 +121,7 @@ CREATE POLICY "Users can insert own profile"
 -- 6. Avatars storage bucket and RLS policies
 -- ============================================================
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('avatars', 'avatars', false)
+VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Allow users to upload to their own folder

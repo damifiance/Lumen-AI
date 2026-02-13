@@ -137,9 +137,6 @@ export function ProfileEditModal() {
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5">
           {/* Avatar Upload */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Avatar
-            </label>
             <AvatarCropUpload
               currentAvatarUrl={profile.avatar_url || undefined}
               onUploadComplete={handleAvatarUploadComplete}

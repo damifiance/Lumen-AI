@@ -45,6 +45,30 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         .eq('id', userId)
         .single();
 
+      if (error && error.code === 'PGRST116') {
+        // No profile row found (user created before migration) — create one
+        const { data: userData } = await supabase.auth.getUser();
+        const email = userData?.user?.email ?? '';
+        const baseName = email.split('@')[0] || 'user';
+        const sanitized = baseName.toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 26);
+        const username = sanitized.length < 3 ? 'user_' + sanitized : sanitized;
+
+        const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            username,
+            username_claimed: false,
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+
+        set({ profile: newProfile, isLoading: false });
+        return;
+      }
+
       if (error) throw error;
 
       set({ profile: data, isLoading: false });
