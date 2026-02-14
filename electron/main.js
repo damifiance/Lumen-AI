@@ -15,6 +15,7 @@ let backendPort = null;
 let isQuitting = false;
 let pendingOAuthUrl = null;
 let pendingAuthDeepLink = null;
+let pendingAuthSession = null;
 
 const isDev = process.env.ELECTRON_DEV === 'true';
 
@@ -88,6 +89,17 @@ function handleDeepLink(url) {
       } else {
         // Cold start: store for later
         pendingOAuthUrl = payload;
+      }
+    } else if (pathname === '/auth/session') {
+      // Web-based auth completed — session tokens passed via deep link
+      const accessToken = urlObj.searchParams.get('access_token');
+      const refreshToken = urlObj.searchParams.get('refresh_token');
+      const payload = { accessToken, refreshToken };
+
+      if (mainWindow && mainWindow.webContents) {
+        mainWindow.webContents.send('auth-session', payload);
+      } else {
+        pendingAuthSession = payload;
       }
     } else if (pathname === '/auth/confirm' || pathname === '/auth/reset') {
       // Email verification or password reset flow
@@ -245,6 +257,10 @@ function createWindow() {
     if (pendingAuthDeepLink) {
       mainWindow.webContents.send('auth-deep-link', pendingAuthDeepLink);
       pendingAuthDeepLink = null;
+    }
+    if (pendingAuthSession) {
+      mainWindow.webContents.send('auth-session', pendingAuthSession);
+      pendingAuthSession = null;
     }
   });
 

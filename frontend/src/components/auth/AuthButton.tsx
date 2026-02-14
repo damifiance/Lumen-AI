@@ -1,12 +1,21 @@
 import { LogIn, LogOut, User, Settings } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useProfileStore } from '../../stores/profileStore';
-import { openLoginModal } from './LoginModal';
 import { openProfileEditModal } from '../profile/ProfileEditModal';
+
+const AUTH_PAGE_URL = 'https://damifiance.github.io/Lumen-AI/auth.html?source=app';
 
 export function AuthButton() {
   const { user, signOut } = useAuthStore();
   const { profile, clearProfile } = useProfileStore();
+
+  const handleSignIn = () => {
+    if (window.electron?.startOAuth) {
+      window.electron.startOAuth(AUTH_PAGE_URL);
+    } else {
+      window.open(AUTH_PAGE_URL, '_blank');
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -22,7 +31,7 @@ export function AuthButton() {
     // Not logged in - show Sign In button
     return (
       <button
-        onClick={openLoginModal}
+        onClick={handleSignIn}
         className="flex items-center gap-2 w-full px-3 py-2 text-[12px] text-sidebar-text/50 hover:text-sidebar-text-bright hover:bg-sidebar-hover rounded-lg cursor-pointer transition-colors"
       >
         <LogIn size={14} />

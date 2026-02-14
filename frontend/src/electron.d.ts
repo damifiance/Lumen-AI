@@ -16,6 +16,8 @@ declare global {
       removeOAuthCallback: () => void;
       onAuthDeepLink: (callback: (data: { tokenHash: string; type: string }) => void) => void;
       removeAuthDeepLink: () => void;
+      onAuthSession: (callback: (data: { accessToken: string; refreshToken: string }) => void) => void;
+      removeAuthSession: () => void;
       deleteUserAccount: (userId: string) => Promise<{ success: boolean; error?: string }>;
     };
     __BACKEND_PORT__?: number;

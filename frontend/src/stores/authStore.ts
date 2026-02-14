@@ -8,18 +8,10 @@ interface AuthState {
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
-  pendingVerification: string | null;
-  resetPasswordMode: boolean;
   initialize: () => Promise<void>;
-  signUp: (email: string, password: string) => Promise<{ error?: string }>;
-  signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signInWithOAuth: (provider: 'google' | 'github') => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
-  requestPasswordReset: (email: string) => Promise<{ error?: string }>;
   resetPassword: (newPassword: string) => Promise<{ error?: string }>;
-  verifyEmail: (tokenHash: string) => Promise<{ error?: string }>;
-  resendVerification: (email: string) => Promise<{ error?: string }>;
   deleteAccount: (password: string) => Promise<{ error?: string }>;
 }
 
@@ -57,8 +49,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: false,
   isInitialized: false,
   error: null,
-  pendingVerification: null,
-  resetPasswordMode: false,
 
   /**
    * Initializes the auth store by loading persisted session and setting up auth listener.
@@ -96,9 +86,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       });
 
-      // Listen for OAuth callbacks from Electron main process
+      // Listen for session tokens from web-based auth (via deep link from GitHub Pages)
+      if (window.electron?.onAuthSession) {
+        window.electron.onAuthSession(async ({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) => {
+          try {
+            const { error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            if (error) {
+              set({ error: translateAuthError(error) });
+            }
+            // Session update will be handled by onAuthStateChange
+          } catch (err) {
+            set({ error: translateAuthError(err) });
+          }
+        });
+      }
+
+      // Listen for OAuth callbacks from Electron main process (legacy — kept for compatibility)
       if (window.electron?.onOAuthCallback) {
-        window.electron.onOAuthCallback(async ({ code, error: oauthError }) => {
+        window.electron.onOAuthCallback(async ({ code, error: oauthError }: { code?: string; error?: string }) => {
           if (oauthError) {
             set({ error: `OAuth failed: ${oauthError}`, isLoading: false });
             return;
@@ -107,7 +115,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             try {
               const { error } = await supabase.auth.exchangeCodeForSession(code);
               if (error) throw error;
-              // Session update will be handled by onAuthStateChange
             } catch (err) {
               set({ error: translateAuthError(err), isLoading: false });
             }
@@ -117,15 +124,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Listen for auth deep links from Electron main process (email verification and password reset)
       if (window.electron?.onAuthDeepLink) {
-        window.electron.onAuthDeepLink(async ({ tokenHash, type }) => {
+        window.electron.onAuthDeepLink(async ({ tokenHash, type }: { tokenHash: string; type: string }) => {
           if (type === 'email') {
-            // Email verification
-            await get().verifyEmail(tokenHash);
+            try {
+              const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email' });
+              if (error) {
+                set({ error: translateAuthError(error) });
+              }
+            } catch (err) {
+              set({ error: translateAuthError(err) });
+            }
           } else if (type === 'recovery') {
-            // Password reset — exchange token for session, then show reset form
             const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' });
-            if (!error) {
-              set({ resetPasswordMode: true });
+            if (error) {
+              set({ error: translateAuthError(error) });
             }
           }
         });
@@ -133,102 +145,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (err) {
       console.error('Auth initialization error:', err);
       set({ isInitialized: true });
-    }
-  },
-
-  /**
-   * Sign up a new user with email and password.
-   * Returns an error object if signup fails.
-   */
-  signUp: async (email: string, password: string) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      const isElectron = window.electron != null;
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: isElectron ? 'lumenai://auth/confirm' : window.location.origin + '/auth/confirm'
-        }
-      });
-
-      if (error) {
-        const translated = translateAuthError(error);
-        set({ error: translated, isLoading: false });
-        return { error: translated };
-      }
-
-      set({ isLoading: false, pendingVerification: email });
-      return {};
-    } catch (err) {
-      const translated = translateAuthError(err);
-      set({ error: translated, isLoading: false });
-      return { error: translated };
-    }
-  },
-
-  /**
-   * Sign in an existing user with email and password.
-   * Returns an error object if signin fails.
-   */
-  signIn: async (email: string, password: string) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        const translated = translateAuthError(error);
-        set({ error: translated, isLoading: false });
-        return { error: translated };
-      }
-
-      set({ isLoading: false });
-      return {};
-    } catch (err) {
-      const translated = translateAuthError(err);
-      set({ error: translated, isLoading: false });
-      return { error: translated };
-    }
-  },
-
-  /**
-   * Sign in with OAuth provider (Google or GitHub).
-   * In Electron mode, opens OAuth URL in external browser and handles deep link callback.
-   * In web mode, uses standard Supabase redirect behavior.
-   */
-  signInWithOAuth: async (provider) => {
-    set({ isLoading: true, error: null });
-    try {
-      const isElectron = window.electron != null;
-
-      if (isElectron) {
-        // Generate OAuth URL with Supabase (skipBrowserRedirect = true)
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo: 'lumenai://auth/callback',
-            skipBrowserRedirect: true,
-          },
-        });
-        if (error) throw error;
-        // Open in external browser via Electron main process
-        await window.electron!.startOAuth(data.url);
-      } else {
-        // Web mode: use default Supabase redirect behavior
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo: `${window.location.origin}/auth/callback`,
-          },
-        });
-        if (error) throw error;
-      }
-      set({ isLoading: false });
-    } catch (err) {
-      const translated = translateAuthError(err);
-      set({ error: translated, isLoading: false });
     }
   },
 
@@ -252,97 +168,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   /**
-   * Request a password reset email.
-   * Returns an error object if the request fails.
-   */
-  requestPasswordReset: async (email: string) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      const isElectron = window.electron != null;
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: isElectron ? 'lumenai://auth/reset' : window.location.origin + '/auth/reset'
-      });
-
-      if (error) {
-        const translated = translateAuthError(error);
-        set({ error: translated, isLoading: false });
-        return { error: translated };
-      }
-
-      set({ isLoading: false });
-      return {};
-    } catch (err) {
-      const translated = translateAuthError(err);
-      set({ error: translated, isLoading: false });
-      return { error: translated };
-    }
-  },
-
-  /**
-   * Reset password after clicking the reset link.
-   * This only works when a valid session exists (created by reset link click).
+   * Reset password (for in-app password change when user has a valid session).
    */
   resetPassword: async (newPassword: string) => {
     set({ isLoading: true, error: null });
 
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
-
-      if (error) {
-        const translated = translateAuthError(error);
-        set({ error: translated, isLoading: false });
-        return { error: translated };
-      }
-
-      set({ isLoading: false, resetPasswordMode: false });
-      return {};
-    } catch (err) {
-      const translated = translateAuthError(err);
-      set({ error: translated, isLoading: false });
-      return { error: translated };
-    }
-  },
-
-  /**
-   * Verify email address using token from verification email.
-   */
-  verifyEmail: async (tokenHash: string) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email' });
-
-      if (error) {
-        const translated = translateAuthError(error);
-        set({ error: translated, isLoading: false });
-        return { error: translated };
-      }
-
-      set({ isLoading: false, pendingVerification: null });
-      return {};
-    } catch (err) {
-      const translated = translateAuthError(err);
-      set({ error: translated, isLoading: false });
-      return { error: translated };
-    }
-  },
-
-  /**
-   * Resend verification email.
-   */
-  resendVerification: async (email: string) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      const isElectron = window.electron != null;
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email,
-        options: {
-          emailRedirectTo: isElectron ? 'lumenai://auth/confirm' : window.location.origin + '/auth/confirm'
-        }
-      });
 
       if (error) {
         const translated = translateAuthError(error);
