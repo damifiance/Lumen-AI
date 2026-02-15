@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profile — Lumen AI</title>
-  <meta name="description" content="Edit your Lumen AI profile — avatar, username, bio, and more." />
+  <meta name="description" content="Your Lumen AI profile — avatar, username, bio, and more." />
   <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -20,10 +20,7 @@
       <a href="index.html#download">Download</a>
     </div>
     <a href="index.html" class="nav-logo">
-      <img
-        src="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png"
-        alt="Lumen AI"
-      />
+      <img src="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" alt="Lumen AI" />
       Lumen AI
     </a>
     <div class="nav-right">
@@ -35,31 +32,73 @@
   <!-- Cover Banner -->
   <div class="profile-cover"></div>
 
-  <!-- Loading state (centered) -->
+  <!-- Loading -->
   <div id="profile-loading" style="text-align:center; padding:80px 0;">
     <p style="color:var(--text-muted);">Loading profile...</p>
   </div>
 
-  <!-- Profile Content (hidden until loaded) -->
-  <div class="profile-page" id="profile-content" style="display:none;">
+  <!-- ========== VIEW MODE ========== -->
+  <div class="profile-page" id="profile-view" style="display:none;">
     <div class="profile-container">
 
-      <!-- Header: avatar + name -->
-      <div class="profile-header">
-        <div class="profile-avatar-preview" id="avatar-preview">
-          <span class="avatar-placeholder" id="avatar-placeholder">U</span>
-          <label class="profile-avatar-upload-overlay">
-            <span>Edit</span>
-            <input type="file" id="avatar-input" accept="image/*" />
-          </label>
+      <!-- Header -->
+      <div class="pv-header">
+        <div class="pv-avatar" id="view-avatar">
+          <span class="avatar-placeholder" id="view-avatar-placeholder">U</span>
         </div>
-        <div class="profile-header-info">
-          <h2 id="profile-heading">Edit Profile</h2>
-          <p id="profile-email"></p>
+        <div class="pv-info">
+          <h1 class="pv-name" id="view-display-name"></h1>
+          <p class="pv-username" id="view-username"></p>
+          <p class="pv-bio" id="view-bio"></p>
         </div>
       </div>
 
-      <!-- Save feedback (between header and cards) -->
+      <!-- Details grid -->
+      <div class="pv-grid">
+        <div class="pv-section" id="view-institution-section" style="display:none;">
+          <h3 class="pv-section-title">Institution</h3>
+          <p class="pv-section-text" id="view-institution"></p>
+        </div>
+        <div class="pv-section" id="view-interests-section" style="display:none;">
+          <h3 class="pv-section-title">Research Interests</h3>
+          <div class="pv-tags" id="view-interests"></div>
+        </div>
+        <div class="pv-section">
+          <h3 class="pv-section-title">Email</h3>
+          <p class="pv-section-text" id="view-email"></p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="pv-actions">
+        <button class="pv-btn pv-btn-primary" onclick="switchToEdit()">Edit Profile</button>
+        <button class="pv-btn pv-btn-outline" onclick="openApp()">Open Lumen AI</button>
+        <button class="pv-btn pv-btn-ghost" onclick="handleSignOut()">Sign Out</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== EDIT MODE ========== -->
+  <div class="profile-page" id="profile-edit" style="display:none;">
+    <div class="profile-container">
+
+      <!-- Header with editable avatar -->
+      <div class="pv-header">
+        <div class="pe-avatar" id="edit-avatar">
+          <span class="avatar-placeholder" id="edit-avatar-placeholder">U</span>
+          <label class="pe-avatar-overlay">
+            <span>Change</span>
+            <input type="file" id="avatar-input" accept="image/*" />
+          </label>
+        </div>
+        <div class="pv-info">
+          <h1 class="pv-name" style="font-size:1.4rem;">Edit Profile</h1>
+          <p class="pv-username" id="edit-email"></p>
+        </div>
+      </div>
+
+      <!-- Feedback -->
       <div class="save-feedback" id="save-feedback" style="margin-bottom:12px;"></div>
 
       <!-- Form -->
@@ -68,7 +107,7 @@
         <!-- Card: Identity -->
         <div class="profile-card">
           <div class="profile-card-title">Identity</div>
-          <div class="profile-form">
+          <div class="profile-form-inner">
             <div class="profile-row">
               <div class="profile-field">
                 <label for="profile-username">Username</label>
@@ -92,7 +131,7 @@
         <!-- Card: Research -->
         <div class="profile-card">
           <div class="profile-card-title">Research</div>
-          <div class="profile-form">
+          <div class="profile-form-inner">
             <div class="profile-field">
               <label for="profile-institution">Institution</label>
               <input type="text" id="profile-institution" placeholder="University or organization" maxlength="200" />
@@ -105,44 +144,31 @@
           </div>
         </div>
 
-        <!-- Save -->
-        <div class="profile-save-row">
-          <button type="submit" class="auth-btn auth-btn-primary" id="save-btn">
+        <!-- Save row -->
+        <div class="pe-actions">
+          <button type="submit" class="pv-btn pv-btn-primary" id="save-btn">
             <span class="auth-btn-text">Save Changes</span>
             <span class="auth-btn-loading" style="display:none;">Saving...</span>
           </button>
-          <span class="save-feedback" id="save-feedback-inline"></span>
+          <button type="button" class="pv-btn pv-btn-outline" onclick="switchToView()">Cancel</button>
         </div>
 
       </form>
 
-      <!-- Card: Account -->
-      <div class="profile-card" style="margin-top:16px;">
-        <div class="profile-card-title">Account</div>
-        <div class="profile-footer-actions">
-          <button class="auth-btn auth-btn-primary" onclick="openApp()">Open Lumen AI</button>
-          <button class="auth-btn auth-btn-secondary" onclick="handleSignOut()">Sign Out</button>
-        </div>
-      </div>
-
-      <!-- Card: Danger Zone -->
-      <div class="profile-card danger-zone" style="margin-top:16px;">
+      <!-- Danger Zone -->
+      <div class="profile-card danger-zone" style="margin-top:24px;">
         <div class="profile-card-title">Danger Zone</div>
         <p class="danger-zone-desc">
           Permanently delete your account, profile, and all associated data. This action cannot be undone.
         </p>
-        <button class="danger-zone-btn" id="delete-account-btn" onclick="showDeleteConfirm()">
-          Delete Account
-        </button>
+        <button class="danger-zone-btn" id="delete-account-btn" onclick="showDeleteConfirm()">Delete Account</button>
         <div class="delete-confirm-overlay" id="delete-confirm">
           <p>To confirm, type <strong>delete my account</strong> below:</p>
           <input type="text" id="delete-confirm-input" placeholder="delete my account" autocomplete="off" />
           <div id="delete-feedback" class="save-feedback" style="margin-bottom:8px;"></div>
           <div class="delete-confirm-actions">
-            <button class="cancel-btn" onclick="hideDeleteConfirm()">Cancel</button>
-            <button class="danger-zone-btn" id="confirm-delete-btn" onclick="handleDeleteAccount()" disabled>
-              Permanently Delete
-            </button>
+            <button type="button" class="cancel-btn" onclick="hideDeleteConfirm()">Cancel</button>
+            <button type="button" class="danger-zone-btn" id="confirm-delete-btn" onclick="handleDeleteAccount()" disabled>Permanently Delete</button>
           </div>
         </div>
       </div>
@@ -167,6 +193,7 @@
     const APP_REDIRECT = 'lumenai://auth/session';
     let currentProfile = null;
     let currentUserId = null;
+    let currentEmail = null;
     let originalUsername = null;
     let usernameCheckTimeout = null;
     let researchInterests = [];
@@ -183,26 +210,20 @@
       }
 
       currentUserId = session.user.id;
-      document.getElementById('profile-email').textContent = session.user.email || '';
+      currentEmail = session.user.email || '';
 
       // Fetch or create profile
       let { data: profile, error } = await window.sb
-        .from('profiles')
-        .select('*')
-        .eq('id', currentUserId)
-        .single();
+        .from('profiles').select('*').eq('id', currentUserId).single();
 
       if (error && error.code === 'PGRST116') {
-        const email = session.user.email || '';
-        const baseName = email.split('@')[0] || 'user';
+        const baseName = currentEmail.split('@')[0] || 'user';
         const sanitized = baseName.toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 26);
         const username = sanitized.length < 3 ? 'user_' + sanitized : sanitized;
 
         const { data: newProfile, error: insertError } = await window.sb
-          .from('profiles')
-          .insert({ id: currentUserId, username, username_claimed: false })
-          .select()
-          .single();
+          .from('profiles').insert({ id: currentUserId, username, username_claimed: false })
+          .select().single();
 
         if (insertError) {
           document.getElementById('profile-loading').innerHTML =
@@ -220,87 +241,160 @@
       originalUsername = profile.username;
       researchInterests = profile.research_interests || [];
 
-      if (isSetup) {
-        document.getElementById('profile-heading').textContent = 'Set Up Your Profile';
-      }
-
-      // Populate form
-      document.getElementById('profile-username').value = profile.username || '';
-      document.getElementById('profile-display-name').value = profile.display_name || '';
-      document.getElementById('profile-bio').value = profile.bio || '';
-      document.getElementById('profile-institution').value = profile.institution || '';
-      renderInterests();
-      renderAvatar(profile.avatar_url, session.user.email);
-
-      // Show content
       document.getElementById('profile-loading').style.display = 'none';
-      document.getElementById('profile-content').style.display = 'flex';
+
+      // If setup mode, go straight to edit
+      if (isSetup) {
+        populateEditForm();
+        document.getElementById('profile-edit').style.display = 'flex';
+      } else {
+        populateView();
+        document.getElementById('profile-view').style.display = 'flex';
+      }
     })();
 
     // =============================================
-    // Avatar
+    // View Mode
     // =============================================
-    function renderAvatar(avatarUrl, email) {
-      const preview = document.getElementById('avatar-preview');
-      // Keep the upload overlay label
-      const overlay = preview.querySelector('.profile-avatar-upload-overlay');
-      if (avatarUrl) {
-        // Remove placeholder, add img before overlay
-        const existing = preview.querySelector('img');
-        const placeholder = preview.querySelector('.avatar-placeholder');
-        if (placeholder) placeholder.remove();
-        if (existing) existing.remove();
-        const img = document.createElement('img');
-        img.src = avatarUrl;
-        img.alt = 'Avatar';
-        preview.insertBefore(img, overlay);
+    function populateView() {
+      const p = currentProfile;
+      const name = p.display_name || p.username || 'User';
+
+      // Avatar
+      renderViewAvatar(p.avatar_url);
+
+      // Info
+      document.getElementById('view-display-name').textContent = name;
+      document.getElementById('view-username').textContent = '@' + (p.username || '');
+      document.getElementById('view-bio').textContent = p.bio || '';
+      document.getElementById('view-bio').style.display = p.bio ? '' : 'none';
+      document.getElementById('view-email').textContent = currentEmail;
+
+      // Institution
+      const instSection = document.getElementById('view-institution-section');
+      if (p.institution) {
+        document.getElementById('view-institution').textContent = p.institution;
+        instSection.style.display = '';
       } else {
-        const initial = (email || 'U')[0].toUpperCase();
-        const placeholder = preview.querySelector('.avatar-placeholder');
-        if (placeholder) placeholder.textContent = initial;
+        instSection.style.display = 'none';
+      }
+
+      // Interests
+      const intSection = document.getElementById('view-interests-section');
+      const interests = p.research_interests || [];
+      if (interests.length > 0) {
+        document.getElementById('view-interests').innerHTML = interests
+          .map(t => '<span class="pv-tag">' + escapeHtml(t) + '</span>').join('');
+        intSection.style.display = '';
+      } else {
+        intSection.style.display = 'none';
       }
     }
 
+    function renderViewAvatar(avatarUrl) {
+      const container = document.getElementById('view-avatar');
+      const placeholder = container.querySelector('.avatar-placeholder');
+      const existing = container.querySelector('img');
+      if (existing) existing.remove();
+
+      if (avatarUrl) {
+        if (placeholder) placeholder.style.display = 'none';
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = 'Avatar';
+        container.insertBefore(img, container.firstChild);
+      } else {
+        if (placeholder) {
+          placeholder.style.display = '';
+          placeholder.textContent = (currentEmail || 'U')[0].toUpperCase();
+        }
+      }
+    }
+
+    // =============================================
+    // Edit Mode
+    // =============================================
+    function populateEditForm() {
+      const p = currentProfile;
+      document.getElementById('edit-email').textContent = currentEmail;
+      document.getElementById('profile-username').value = p.username || '';
+      document.getElementById('profile-display-name').value = p.display_name || '';
+      document.getElementById('profile-bio').value = p.bio || '';
+      document.getElementById('profile-institution').value = p.institution || '';
+      researchInterests = [...(p.research_interests || [])];
+      renderInterests();
+      renderEditAvatar(p.avatar_url);
+    }
+
+    function renderEditAvatar(avatarUrl) {
+      const container = document.getElementById('edit-avatar');
+      const placeholder = container.querySelector('.avatar-placeholder');
+      const overlay = container.querySelector('.pe-avatar-overlay');
+      const existing = container.querySelector('img');
+      if (existing) existing.remove();
+
+      if (avatarUrl) {
+        if (placeholder) placeholder.style.display = 'none';
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = 'Avatar';
+        container.insertBefore(img, overlay);
+      } else {
+        if (placeholder) {
+          placeholder.style.display = '';
+          placeholder.textContent = (currentEmail || 'U')[0].toUpperCase();
+        }
+      }
+    }
+
+    function switchToEdit() {
+      populateEditForm();
+      document.getElementById('profile-view').style.display = 'none';
+      document.getElementById('profile-edit').style.display = 'flex';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchToView() {
+      populateView();
+      document.getElementById('profile-edit').style.display = 'none';
+      document.getElementById('profile-view').style.display = 'flex';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =============================================
+    // Avatar Upload
+    // =============================================
     document.getElementById('avatar-input').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      if (file.size > 2 * 1024 * 1024) {
-        showFeedback('Image must be under 2MB', true);
-        return;
-      }
+      if (file.size > 2 * 1024 * 1024) { showFeedback('Image must be under 2MB', true); return; }
 
       showFeedback('Uploading...', false);
-
       try {
         const blob = await cropToSquare(file, 400);
-
         if (currentProfile.avatar_url) {
           const oldPath = currentProfile.avatar_url.split('/').slice(-2).join('/');
           await window.sb.storage.from('avatars').remove([oldPath]);
         }
-
         const fileName = 'avatar-' + Date.now() + '.jpg';
         const filePath = currentUserId + '/' + fileName;
         const { error: uploadError } = await window.sb.storage
-          .from('avatars')
-          .upload(filePath, blob, { contentType: 'image/jpeg', upsert: false });
+          .from('avatars').upload(filePath, blob, { contentType: 'image/jpeg', upsert: false });
         if (uploadError) throw uploadError;
 
         const { data } = window.sb.storage.from('avatars').getPublicUrl(filePath);
         const newUrl = data.publicUrl;
 
-        await window.sb
-          .from('profiles')
+        await window.sb.from('profiles')
           .update({ avatar_url: newUrl, updated_at: new Date().toISOString() })
           .eq('id', currentUserId);
 
         currentProfile.avatar_url = newUrl;
-        renderAvatar(newUrl);
+        renderEditAvatar(newUrl);
         showFeedback('Avatar updated!', false);
       } catch (err) {
         showFeedback('Upload failed: ' + (err.message || 'Unknown error'), true);
       }
-
       e.target.value = '';
     });
 
@@ -309,17 +403,12 @@
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          canvas.width = size;
-          canvas.height = size;
+          canvas.width = size; canvas.height = size;
           const ctx = canvas.getContext('2d');
           const min = Math.min(img.width, img.height);
-          const sx = (img.width - min) / 2;
-          const sy = (img.height - min) / 2;
+          const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
           ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
-          canvas.toBlob(
-            (blob) => (blob ? resolve(blob) : reject(new Error('Canvas to blob failed'))),
-            'image/jpeg', 0.85
-          );
+          canvas.toBlob(b => b ? resolve(b) : reject(new Error('Blob failed')), 'image/jpeg', 0.85);
         };
         img.onerror = () => reject(new Error('Failed to load image'));
         img.src = URL.createObjectURL(file);
@@ -327,43 +416,20 @@
     }
 
     // =============================================
-    // Username availability check
+    // Username Check
     // =============================================
     document.getElementById('profile-username').addEventListener('input', (e) => {
       const val = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
       e.target.value = val;
-
       const statusEl = document.getElementById('username-status');
-      if (val === originalUsername) {
-        statusEl.textContent = '';
-        statusEl.className = 'username-status';
-        return;
-      }
-      if (val.length < 3) {
-        statusEl.textContent = 'Too short';
-        statusEl.className = 'username-status taken';
-        return;
-      }
-
-      statusEl.textContent = '...';
-      statusEl.className = 'username-status checking';
-
+      if (val === originalUsername) { statusEl.textContent = ''; statusEl.className = 'username-status'; return; }
+      if (val.length < 3) { statusEl.textContent = 'Too short'; statusEl.className = 'username-status taken'; return; }
+      statusEl.textContent = '...'; statusEl.className = 'username-status checking';
       clearTimeout(usernameCheckTimeout);
       usernameCheckTimeout = setTimeout(async () => {
-        const { data } = await window.sb
-          .from('profiles')
-          .select('id')
-          .eq('username', val)
-          .neq('id', currentUserId)
-          .single();
-
-        if (data) {
-          statusEl.textContent = 'Taken';
-          statusEl.className = 'username-status taken';
-        } else {
-          statusEl.textContent = 'Available';
-          statusEl.className = 'username-status available';
-        }
+        const { data } = await window.sb.from('profiles').select('id').eq('username', val).neq('id', currentUserId).single();
+        statusEl.textContent = data ? 'Taken' : 'Available';
+        statusEl.className = 'username-status ' + (data ? 'taken' : 'available');
       }, 400);
     });
 
@@ -382,17 +448,13 @@
     });
 
     function renderInterests() {
-      const container = document.getElementById('interests-tags');
-      container.innerHTML = researchInterests.map((tag, i) =>
+      document.getElementById('interests-tags').innerHTML = researchInterests.map((tag, i) =>
         '<span class="interest-tag">' + escapeHtml(tag) +
         '<button type="button" onclick="removeInterest(' + i + ')">&times;</button></span>'
       ).join('');
     }
 
-    function removeInterest(index) {
-      researchInterests.splice(index, 1);
-      renderInterests();
-    }
+    function removeInterest(index) { researchInterests.splice(index, 1); renderInterests(); }
 
     function escapeHtml(str) {
       const div = document.createElement('div');
@@ -405,14 +467,9 @@
     // =============================================
     async function handleSaveProfile(e) {
       e.preventDefault();
-
       const username = document.getElementById('profile-username').value;
       const statusEl = document.getElementById('username-status');
-
-      if (statusEl.classList.contains('taken')) {
-        showFeedback('Username is not available', true);
-        return;
-      }
+      if (statusEl.classList.contains('taken')) { showFeedback('Username is not available', true); return; }
 
       const btn = document.getElementById('save-btn');
       btn.querySelector('.auth-btn-text').style.display = 'none';
@@ -430,17 +487,16 @@
           updated_at: new Date().toISOString(),
         };
 
-        const { error } = await window.sb
-          .from('profiles')
-          .update(updates)
-          .eq('id', currentUserId);
-
+        const { error } = await window.sb.from('profiles').update(updates).eq('id', currentUserId);
         if (error) throw error;
 
         originalUsername = username;
         statusEl.textContent = '';
         currentProfile = { ...currentProfile, ...updates };
         showFeedback('Profile saved!', false);
+
+        // Switch back to view after short delay
+        setTimeout(() => switchToView(), 800);
       } catch (err) {
         showFeedback('Save failed: ' + (err.message || 'Unknown error'), true);
       }
@@ -457,28 +513,21 @@
       const el = document.getElementById('save-feedback');
       el.textContent = msg;
       el.className = 'save-feedback ' + (isError ? 'error' : 'success');
-      if (!isError) {
-        setTimeout(() => { el.className = 'save-feedback'; }, 3000);
-      }
+      if (!isError) setTimeout(() => { el.className = 'save-feedback'; }, 3000);
     }
 
     function openApp() {
       window.sb.auth.getSession().then(({ data: { session } }) => {
         if (session) {
-          const deepLink = APP_REDIRECT +
-            '?access_token=' + encodeURIComponent(session.access_token) +
-            '&refresh_token=' + encodeURIComponent(session.refresh_token);
-          launchDeepLink(deepLink);
+          launchDeepLink(APP_REDIRECT + '?access_token=' + encodeURIComponent(session.access_token) + '&refresh_token=' + encodeURIComponent(session.refresh_token));
         }
       });
     }
 
     function launchDeepLink(url) {
       const a = document.createElement('a');
-      a.href = url;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
+      a.href = url; a.style.display = 'none';
+      document.body.appendChild(a); a.click();
       setTimeout(() => a.remove(), 100);
     }
 
@@ -505,30 +554,23 @@
     }
 
     document.getElementById('delete-confirm-input').addEventListener('input', (e) => {
-      const match = e.target.value.trim().toLowerCase() === 'delete my account';
-      document.getElementById('confirm-delete-btn').disabled = !match;
+      document.getElementById('confirm-delete-btn').disabled =
+        e.target.value.trim().toLowerCase() !== 'delete my account';
     });
 
     async function handleDeleteAccount() {
       const btn = document.getElementById('confirm-delete-btn');
       const feedback = document.getElementById('delete-feedback');
-      btn.disabled = true;
-      btn.textContent = 'Deleting...';
-      feedback.textContent = '';
-
+      btn.disabled = true; btn.textContent = 'Deleting...'; feedback.textContent = '';
       try {
-        // Call Supabase database function (SECURITY DEFINER — runs with elevated privileges)
         const { error } = await window.sb.rpc('delete_own_account');
         if (error) throw error;
-
-        // Sign out locally and redirect
         await window.sb.auth.signOut();
         window.location.href = 'auth.html?deleted=1';
       } catch (err) {
         feedback.textContent = 'Deletion failed: ' + (err.message || 'Unknown error');
         feedback.className = 'save-feedback error';
-        btn.textContent = 'Permanently Delete';
-        btn.disabled = false;
+        btn.textContent = 'Permanently Delete'; btn.disabled = false;
       }
     }
   </script>

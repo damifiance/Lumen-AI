@@ -58,12 +58,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (window.electron?.onAuthSession) {
         window.electron.onAuthSession(async ({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) => {
           try {
-            const { error } = await supabase.auth.setSession({
+            const { data, error } = await supabase.auth.setSession({
               access_token: accessToken,
               refresh_token: refreshToken,
             });
             if (error) {
               set({ error: error.message });
+            } else if (data.session) {
+              // Explicitly update store — onAuthStateChange may not fire for programmatic setSession
+              set({ session: data.session, user: data.session.user });
             }
           } catch (err) {
             set({ error: 'Failed to restore session' });
