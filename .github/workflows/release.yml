@@ -29,6 +29,9 @@ jobs:
 
       - name: Build
         run: node scripts/build.js
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Package macOS installer
         run: npm run package:mac
@@ -64,6 +67,9 @@ jobs:
 
       - name: Build
         run: node scripts/build.js
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Package Windows installer
         run: npm run package:win
@@ -97,6 +103,9 @@ jobs:
 
       - name: Build
         run: node scripts/build.js
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Package Linux installer
         run: npm run package:linux
