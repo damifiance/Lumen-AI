@@ -7,28 +7,15 @@ const fs = require('fs');
 const { createTray, destroyTray } = require('./tray');
 const { checkForUpdates } = require('./updater');
 const secureStore = require('./secureStore');
-const { createClient } = require('@supabase/supabase-js');
 
 let mainWindow = null;
 let backendProcess = null;
 let backendPort = null;
 let isQuitting = false;
 let pendingOAuthUrl = null;
-let pendingAuthDeepLink = null;
 let pendingAuthSession = null;
 
 const isDev = process.env.ELECTRON_DEV === 'true';
-
-// Admin client for privileged operations (account deletion)
-// CRITICAL: service_role key must NEVER be exposed to renderer process
-let supabaseAdmin = null;
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (supabaseUrl && serviceRoleKey) {
-  supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  });
-}
 
 // Register custom protocol handler for OAuth deep linking
 if (process.defaultApp) {
@@ -101,28 +88,14 @@ function handleDeepLink(url) {
       console.log('[deep-link] auth/session - tokens received:', !!accessToken, !!refreshToken);
       const payload = { accessToken, refreshToken };
 
-      if (mainWindow && mainWindow.webContents) {
+      console.log('[deep-link] mainWindow exists:', !!mainWindow, 'isVisible:', mainWindow?.isVisible(), 'isDestroyed:', mainWindow?.isDestroyed());
+      forceShowWindow();
+      if (mainWindow && !mainWindow.isDestroyed()) {
         console.log('[deep-link] Sending auth-session to renderer');
         mainWindow.webContents.send('auth-session', payload);
-        // Show and focus window so user sees the auth update
-        mainWindow.show();
-        mainWindow.focus();
       } else {
         console.log('[deep-link] Window not ready, buffering auth session');
         pendingAuthSession = payload;
-      }
-    } else if (host === 'auth' && (pathname === '/confirm' || pathname === '/reset')) {
-      // Email verification or password reset flow
-      const tokenHash = urlObj.searchParams.get('token_hash');
-      const type = urlObj.searchParams.get('type');
-      const payload = { tokenHash, type };
-
-      // If window exists, send immediately
-      if (mainWindow && mainWindow.webContents) {
-        mainWindow.webContents.send('auth-deep-link', payload);
-      } else {
-        // Cold start: store for later
-        pendingAuthDeepLink = payload;
       }
     }
   } catch (err) {
@@ -236,6 +209,32 @@ function showWindow() {
   }
 }
 
+/**
+ * Aggressively brings the app window to the foreground.
+ * Handles: hidden window, minimized window, no window, macOS activation.
+ */
+function forceShowWindow() {
+  // macOS: activate the app first (brings it to the foreground)
+  if (process.platform === 'darwin') {
+    app.show();
+    app.focus({ steal: true });
+  }
+
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    console.log('[forceShow] Creating new window');
+    createWindow();
+    return;
+  }
+
+  if (mainWindow.isMinimized()) {
+    mainWindow.restore();
+  }
+  mainWindow.show();
+  mainWindow.moveTop();
+  mainWindow.focus();
+  console.log('[forceShow] Window shown, isVisible:', mainWindow.isVisible());
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -263,10 +262,6 @@ function createWindow() {
     if (pendingOAuthUrl) {
       mainWindow.webContents.send('oauth-callback', pendingOAuthUrl);
       pendingOAuthUrl = null;
-    }
-    if (pendingAuthDeepLink) {
-      mainWindow.webContents.send('auth-deep-link', pendingAuthDeepLink);
-      pendingAuthDeepLink = null;
     }
     if (pendingAuthSession) {
       mainWindow.webContents.send('auth-session', pendingAuthSession);
@@ -316,40 +311,6 @@ app.whenReady().then(async () => {
     // OAuth IPC handler — opens OAuth URL in external browser
     ipcMain.handle('start-oauth', async (_event, url) => {
       shell.openExternal(url);
-    });
-
-    // Account deletion IPC handler — uses admin API to cascade delete user data
-    ipcMain.handle('delete-user-account', async (_event, userId) => {
-      if (!supabaseAdmin) {
-        return { success: false, error: 'Admin API not configured (missing SUPABASE_SERVICE_ROLE_KEY)' };
-      }
-      try {
-        // 1. Delete avatar from Storage (prevent orphaned files)
-        const { data: profile } = await supabaseAdmin
-          .from('profiles')
-          .select('avatar_url')
-          .eq('id', userId)
-          .single();
-
-        if (profile?.avatar_url) {
-          const avatarPath = profile.avatar_url.split('/').slice(-2).join('/');
-          await supabaseAdmin.storage.from('avatars').remove([avatarPath]);
-        }
-
-        // 2. Delete profile record
-        await supabaseAdmin.from('profiles').delete().eq('id', userId);
-
-        // 3. Delete auth.users record (hard delete)
-        const { error } = await supabaseAdmin.auth.admin.deleteUser(userId, {
-          shouldSoftDelete: false,
-        });
-
-        if (error) throw error;
-        return { success: true };
-      } catch (err) {
-        console.error('Account deletion error:', err);
-        return { success: false, error: err.message || 'Deletion failed' };
-      }
     });
 
     if (!isDev) {

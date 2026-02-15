@@ -123,7 +123,28 @@
           <button class="auth-btn auth-btn-primary" onclick="openApp()">Open Lumen AI</button>
           <button class="auth-btn auth-btn-secondary" onclick="handleSignOut()">Sign Out</button>
         </div>
-        <p class="profile-footer-note">To delete your account, use the desktop app settings.</p>
+      </div>
+
+      <!-- Card: Danger Zone -->
+      <div class="profile-card danger-zone" style="margin-top:16px;">
+        <div class="profile-card-title">Danger Zone</div>
+        <p class="danger-zone-desc">
+          Permanently delete your account, profile, and all associated data. This action cannot be undone.
+        </p>
+        <button class="danger-zone-btn" id="delete-account-btn" onclick="showDeleteConfirm()">
+          Delete Account
+        </button>
+        <div class="delete-confirm-overlay" id="delete-confirm">
+          <p>To confirm, type <strong>delete my account</strong> below:</p>
+          <input type="text" id="delete-confirm-input" placeholder="delete my account" autocomplete="off" />
+          <div id="delete-feedback" class="save-feedback" style="margin-bottom:8px;"></div>
+          <div class="delete-confirm-actions">
+            <button class="cancel-btn" onclick="hideDeleteConfirm()">Cancel</button>
+            <button class="danger-zone-btn" id="confirm-delete-btn" onclick="handleDeleteAccount()" disabled>
+              Permanently Delete
+            </button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -464,6 +485,51 @@
     async function handleSignOut() {
       await window.sb.auth.signOut();
       window.location.href = 'auth.html';
+    }
+
+    // =============================================
+    // Account Deletion
+    // =============================================
+    function showDeleteConfirm() {
+      document.getElementById('delete-confirm').classList.add('visible');
+      document.getElementById('delete-account-btn').style.display = 'none';
+      document.getElementById('delete-confirm-input').focus();
+    }
+
+    function hideDeleteConfirm() {
+      document.getElementById('delete-confirm').classList.remove('visible');
+      document.getElementById('delete-account-btn').style.display = '';
+      document.getElementById('delete-confirm-input').value = '';
+      document.getElementById('confirm-delete-btn').disabled = true;
+      document.getElementById('delete-feedback').textContent = '';
+    }
+
+    document.getElementById('delete-confirm-input').addEventListener('input', (e) => {
+      const match = e.target.value.trim().toLowerCase() === 'delete my account';
+      document.getElementById('confirm-delete-btn').disabled = !match;
+    });
+
+    async function handleDeleteAccount() {
+      const btn = document.getElementById('confirm-delete-btn');
+      const feedback = document.getElementById('delete-feedback');
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+      feedback.textContent = '';
+
+      try {
+        // Call Supabase database function (SECURITY DEFINER — runs with elevated privileges)
+        const { error } = await window.sb.rpc('delete_own_account');
+        if (error) throw error;
+
+        // Sign out locally and redirect
+        await window.sb.auth.signOut();
+        window.location.href = 'auth.html?deleted=1';
+      } catch (err) {
+        feedback.textContent = 'Deletion failed: ' + (err.message || 'Unknown error');
+        feedback.className = 'save-feedback error';
+        btn.textContent = 'Permanently Delete';
+        btn.disabled = false;
+      }
     }
   </script>
 

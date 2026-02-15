@@ -36,7 +36,6 @@ export function AuthButton() {
   }
 
   if (!user) {
-    // Not logged in - show Sign In button
     return (
       <button
         onClick={handleSignIn}
@@ -48,28 +47,25 @@ export function AuthButton() {
     );
   }
 
-  // Logged in - show circular avatar + sign out
   return (
-    <div className="w-full space-y-1.5">
-      {/* Circular avatar — opens profile on website */}
+    <div className="flex items-center justify-between w-full px-2 py-1.5">
       <button
         onClick={handleOpenProfile}
-        className="flex items-center justify-center w-full py-2 cursor-pointer"
+        className="cursor-pointer"
         title="Edit profile on web"
       >
-        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-accent/10 border-2 border-transparent hover:border-accent/40 transition-colors">
+        <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-accent/10 border-2 border-transparent hover:border-accent/40 transition-colors">
           {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt="Avatar" className="w-8 h-8 object-cover" />
+            <img src={profile.avatar_url} alt="Avatar" className="w-7 h-7 object-cover" />
           ) : (
-            <User size={14} className="text-accent/60" />
+            <User size={13} className="text-accent/60" />
           )}
         </div>
       </button>
 
-      {/* Sign out */}
       <button
         onClick={handleSignOut}
-        className="flex items-center gap-2 w-full px-3 py-1.5 text-[11px] text-sidebar-text/40 hover:text-sidebar-text-bright hover:bg-sidebar-hover rounded-lg cursor-pointer transition-colors"
+        className="flex items-center gap-1.5 text-[11px] text-sidebar-text/40 hover:text-sidebar-text-bright cursor-pointer transition-colors"
       >
         <LogOut size={12} />
         Sign Out

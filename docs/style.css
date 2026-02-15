@@ -1528,6 +1528,106 @@ a:hover {
   margin-top: 12px;
 }
 
+/* Danger Zone */
+.danger-zone {
+  border: 1px solid #dc2626;
+  background: rgba(220, 38, 38, 0.04);
+}
+
+.danger-zone .profile-card-title {
+  color: #dc2626;
+}
+
+.danger-zone-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.danger-zone-btn {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.danger-zone-btn:hover {
+  background: #b91c1c;
+}
+
+.danger-zone-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Delete confirmation overlay */
+.delete-confirm-overlay {
+  display: none;
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 8px;
+}
+
+.delete-confirm-overlay.visible {
+  display: block;
+}
+
+.delete-confirm-overlay p {
+  font-size: 0.85rem;
+  color: var(--text-body);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.delete-confirm-overlay input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--white);
+  margin-bottom: 12px;
+}
+
+.delete-confirm-overlay input:focus {
+  outline: none;
+  border-color: #dc2626;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.delete-confirm-actions .danger-zone-btn {
+  flex: 1;
+}
+
+.delete-confirm-actions .cancel-btn {
+  flex: 1;
+  background: var(--border-light);
+  color: var(--text-body);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.delete-confirm-actions .cancel-btn:hover {
+  background: #d1d5db;
+}
+
 /* Profile page responsive */
 @media (max-width: 640px) {
   .profile-container {
