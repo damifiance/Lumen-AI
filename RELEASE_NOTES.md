@@ -18,6 +18,28 @@
 
 ## What's New
 
+### v0.3.0 — Authentication & Profiles
+
+**Sign In with Google or GitHub**
+- OAuth sign-in via Google and GitHub — no passwords needed
+- Web-based auth flow with automatic deep link back to the app
+- Session persists across app restarts
+
+**User Profiles**
+- Full profile page on the Lumen AI website (avatar, username, bio, institution, research interests)
+- View and edit your profile from the browser
+- Circular avatar in the app sidebar when signed in
+
+**Account Management**
+- Sign out from the app or website
+- Account deletion available on the profile page
+- Auth is optional — local AI via Ollama works without signing in
+
+**Website**
+- New auth page with modern dark card design
+- Profile editing page with portfolio-style layout
+- Signed-in users see their avatar in the website navbar
+
 ### v0.2.1 — System Tray, Auto-Update & New Logo
 
 **System Tray**
