@@ -32,91 +32,100 @@
     </div>
   </nav>
 
-  <!-- Profile Content -->
-  <div class="profile-page">
-    <div class="profile-card" id="profile-card">
+  <!-- Cover Banner -->
+  <div class="profile-cover"></div>
 
-      <!-- Loading state -->
-      <div id="profile-loading" style="text-align:center; padding:40px 0;">
-        <p style="color:var(--text-muted);">Loading profile...</p>
+  <!-- Loading state (centered) -->
+  <div id="profile-loading" style="text-align:center; padding:80px 0;">
+    <p style="color:var(--text-muted);">Loading profile...</p>
+  </div>
+
+  <!-- Profile Content (hidden until loaded) -->
+  <div class="profile-page" id="profile-content" style="display:none;">
+    <div class="profile-container">
+
+      <!-- Header: avatar + name -->
+      <div class="profile-header">
+        <div class="profile-avatar-preview" id="avatar-preview">
+          <span class="avatar-placeholder" id="avatar-placeholder">U</span>
+          <label class="profile-avatar-upload-overlay">
+            <span>Edit</span>
+            <input type="file" id="avatar-input" accept="image/*" />
+          </label>
+        </div>
+        <div class="profile-header-info">
+          <h2 id="profile-heading">Edit Profile</h2>
+          <p id="profile-email"></p>
+        </div>
       </div>
 
-      <!-- Profile form (hidden until loaded) -->
-      <div id="profile-content" style="display:none;">
-        <h2 id="profile-heading">Edit Profile</h2>
-        <p class="profile-subtitle" id="profile-email"></p>
+      <!-- Save feedback (between header and cards) -->
+      <div class="save-feedback" id="save-feedback" style="margin-bottom:12px;"></div>
 
-        <!-- Avatar -->
-        <div class="profile-avatar-section">
-          <div class="profile-avatar-preview" id="avatar-preview">
-            <span class="avatar-placeholder" id="avatar-placeholder">U</span>
-          </div>
-          <div class="profile-avatar-actions">
-            <label>
-              Upload Photo
-              <input type="file" id="avatar-input" accept="image/*" />
-            </label>
-            <span class="avatar-hint">Square image, max 2MB</span>
-          </div>
-        </div>
+      <!-- Form -->
+      <form id="profile-form" onsubmit="handleSaveProfile(event)">
 
-        <!-- Save feedback -->
-        <div class="save-feedback" id="save-feedback"></div>
-
-        <form class="profile-form" id="profile-form" onsubmit="handleSaveProfile(event)">
-          <!-- Username -->
-          <div class="auth-field">
-            <label for="profile-username">Username</label>
-            <div class="username-wrapper">
-              <input type="text" id="profile-username" placeholder="your_username" pattern="[a-z0-9_]{3,30}" title="3-30 characters: lowercase letters, numbers, underscores" required />
-              <span class="username-status" id="username-status"></span>
+        <!-- Card: Identity -->
+        <div class="profile-card">
+          <div class="profile-card-title">Identity</div>
+          <div class="profile-form">
+            <div class="profile-row">
+              <div class="profile-field">
+                <label for="profile-username">Username</label>
+                <div class="username-wrapper">
+                  <input type="text" id="profile-username" placeholder="your_username" pattern="[a-z0-9_]{3,30}" title="3-30 characters: lowercase letters, numbers, underscores" required />
+                  <span class="username-status" id="username-status"></span>
+                </div>
+              </div>
+              <div class="profile-field">
+                <label for="profile-display-name">Display Name</label>
+                <input type="text" id="profile-display-name" placeholder="Your Name" maxlength="100" />
+              </div>
+            </div>
+            <div class="profile-field">
+              <label for="profile-bio">Bio</label>
+              <textarea id="profile-bio" placeholder="Tell us about yourself..." maxlength="500"></textarea>
             </div>
           </div>
+        </div>
 
-          <!-- Display Name -->
-          <div class="auth-field">
-            <label for="profile-display-name">Display Name</label>
-            <input type="text" id="profile-display-name" placeholder="Your Name" maxlength="100" />
+        <!-- Card: Research -->
+        <div class="profile-card">
+          <div class="profile-card-title">Research</div>
+          <div class="profile-form">
+            <div class="profile-field">
+              <label for="profile-institution">Institution</label>
+              <input type="text" id="profile-institution" placeholder="University or organization" maxlength="200" />
+            </div>
+            <div class="profile-field">
+              <label for="profile-interests-input">Research Interests</label>
+              <input type="text" id="profile-interests-input" placeholder="Type and press Enter to add" maxlength="100" />
+              <div class="interests-tags" id="interests-tags"></div>
+            </div>
           </div>
+        </div>
 
-          <!-- Bio -->
-          <div class="auth-field">
-            <label for="profile-bio">Bio</label>
-            <textarea id="profile-bio" placeholder="Tell us about yourself..." maxlength="500"></textarea>
-          </div>
+        <!-- Save -->
+        <div class="profile-save-row">
+          <button type="submit" class="auth-btn auth-btn-primary" id="save-btn">
+            <span class="auth-btn-text">Save Changes</span>
+            <span class="auth-btn-loading" style="display:none;">Saving...</span>
+          </button>
+          <span class="save-feedback" id="save-feedback-inline"></span>
+        </div>
 
-          <!-- Institution -->
-          <div class="auth-field">
-            <label for="profile-institution">Institution</label>
-            <input type="text" id="profile-institution" placeholder="University or organization" maxlength="200" />
-          </div>
+      </form>
 
-          <!-- Research Interests -->
-          <div class="auth-field">
-            <label for="profile-interests-input">Research Interests</label>
-            <input type="text" id="profile-interests-input" placeholder="Type and press Enter to add" maxlength="100" />
-            <div class="interests-tags" id="interests-tags"></div>
-          </div>
-
-          <!-- Save -->
-          <div class="profile-actions">
-            <button type="submit" class="auth-btn auth-btn-primary" id="save-btn">
-              <span class="auth-btn-text">Save Changes</span>
-              <span class="auth-btn-loading" style="display:none;">Saving...</span>
-            </button>
-          </div>
-        </form>
-
-        <hr class="profile-divider" />
-
-        <div class="profile-footer-links">
+      <!-- Card: Account -->
+      <div class="profile-card" style="margin-top:16px;">
+        <div class="profile-card-title">Account</div>
+        <div class="profile-footer-actions">
           <button class="auth-btn auth-btn-primary" onclick="openApp()">Open Lumen AI</button>
           <button class="auth-btn auth-btn-secondary" onclick="handleSignOut()">Sign Out</button>
-          <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; margin-top:4px;">
-            To delete your account, use the desktop app settings.
-          </p>
         </div>
+        <p class="profile-footer-note">To delete your account, use the desktop app settings.</p>
       </div>
+
     </div>
   </div>
 
@@ -148,7 +157,6 @@
     (async function init() {
       const { data: { session } } = await window.sb.auth.getSession();
       if (!session) {
-        // Not signed in — redirect to auth page
         window.location.href = 'auth.html?redirect=profile';
         return;
       }
@@ -164,7 +172,6 @@
         .single();
 
       if (error && error.code === 'PGRST116') {
-        // No profile row — create one (same logic as profileStore.ts)
         const email = session.user.email || '';
         const baseName = email.split('@')[0] || 'user';
         const sanitized = baseName.toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 26);
@@ -192,7 +199,6 @@
       originalUsername = profile.username;
       researchInterests = profile.research_interests || [];
 
-      // Update heading for new users
       if (isSetup) {
         document.getElementById('profile-heading').textContent = 'Set Up Your Profile';
       }
@@ -205,9 +211,9 @@
       renderInterests();
       renderAvatar(profile.avatar_url, session.user.email);
 
-      // Show form
+      // Show content
       document.getElementById('profile-loading').style.display = 'none';
-      document.getElementById('profile-content').style.display = 'block';
+      document.getElementById('profile-content').style.display = 'flex';
     })();
 
     // =============================================
@@ -215,11 +221,22 @@
     // =============================================
     function renderAvatar(avatarUrl, email) {
       const preview = document.getElementById('avatar-preview');
+      // Keep the upload overlay label
+      const overlay = preview.querySelector('.profile-avatar-upload-overlay');
       if (avatarUrl) {
-        preview.innerHTML = '<img src="' + avatarUrl + '" alt="Avatar" />';
+        // Remove placeholder, add img before overlay
+        const existing = preview.querySelector('img');
+        const placeholder = preview.querySelector('.avatar-placeholder');
+        if (placeholder) placeholder.remove();
+        if (existing) existing.remove();
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = 'Avatar';
+        preview.insertBefore(img, overlay);
       } else {
         const initial = (email || 'U')[0].toUpperCase();
-        preview.innerHTML = '<span class="avatar-placeholder">' + initial + '</span>';
+        const placeholder = preview.querySelector('.avatar-placeholder');
+        if (placeholder) placeholder.textContent = initial;
       }
     }
 
@@ -234,16 +251,13 @@
       showFeedback('Uploading...', false);
 
       try {
-        // Center-crop to 400x400 JPEG
         const blob = await cropToSquare(file, 400);
 
-        // Delete old avatar if exists
         if (currentProfile.avatar_url) {
           const oldPath = currentProfile.avatar_url.split('/').slice(-2).join('/');
           await window.sb.storage.from('avatars').remove([oldPath]);
         }
 
-        // Upload
         const fileName = 'avatar-' + Date.now() + '.jpg';
         const filePath = currentUserId + '/' + fileName;
         const { error: uploadError } = await window.sb.storage
@@ -251,11 +265,9 @@
           .upload(filePath, blob, { contentType: 'image/jpeg', upsert: false });
         if (uploadError) throw uploadError;
 
-        // Get public URL
         const { data } = window.sb.storage.from('avatars').getPublicUrl(filePath);
         const newUrl = data.publicUrl;
 
-        // Update profile
         await window.sb
           .from('profiles')
           .update({ avatar_url: newUrl, updated_at: new Date().toISOString() })
@@ -279,16 +291,13 @@
           canvas.width = size;
           canvas.height = size;
           const ctx = canvas.getContext('2d');
-
           const min = Math.min(img.width, img.height);
           const sx = (img.width - min) / 2;
           const sy = (img.height - min) / 2;
           ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
-
           canvas.toBlob(
             (blob) => (blob ? resolve(blob) : reject(new Error('Canvas to blob failed'))),
-            'image/jpeg',
-            0.85
+            'image/jpeg', 0.85
           );
         };
         img.onerror = () => reject(new Error('Failed to load image'));
@@ -379,7 +388,6 @@
       const username = document.getElementById('profile-username').value;
       const statusEl = document.getElementById('username-status');
 
-      // Block save if username is taken
       if (statusEl.classList.contains('taken')) {
         showFeedback('Username is not available', true);
         return;
