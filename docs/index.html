@@ -7,6 +7,8 @@
   <meta name="description" content="A local AI-powered tool for reading academic papers. Highlight, annotate, and chat with AI about your research — all running on your machine." />
   <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="shared-auth.js" defer></script>
 </head>
 <body>
 
@@ -26,9 +28,8 @@
       Lumen AI
     </a>
     <div class="nav-right">
-      <a href="auth.html" class="btn-nav btn-nav-outline">Sign In</a>
-      <a href="https://github.com/damifiance/Lumen-AI" class="btn-nav btn-nav-outline">GitHub</a>
       <a href="#download" class="btn-nav btn-nav-amber">Download</a>
+      <a href="auth.html" class="btn-nav btn-nav-amber-dark" id="nav-signin-link">Sign In</a>
     </div>
   </nav>
 

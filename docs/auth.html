@@ -8,6 +8,7 @@
   <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="shared-auth.js"></script>
 </head>
 <body>
 
@@ -26,7 +27,6 @@
       Lumen AI
     </a>
     <div class="nav-right">
-      <a href="https://github.com/damifiance/Lumen-AI" class="btn-nav btn-nav-outline">GitHub</a>
       <a href="index.html#download" class="btn-nav btn-nav-amber">Download</a>
     </div>
   </nav>
@@ -167,18 +167,16 @@
 
   <script>
     // =============================================
-    // Supabase Init
+    // Supabase Init (uses window.sb from shared-auth.js)
     // =============================================
-    const SUPABASE_URL = 'https://yomowuzsfzypzpjtjvkd.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_mxKQ0Zh9RBrYn6q2rU6Zvg_sbjCPMOr';
+    const sb = window.sb;
     const APP_REDIRECT = 'lumenai://auth/session';
     const PAGE_URL = 'https://damifiance.github.io/Lumen-AI/auth.html';
 
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Track if user came from the Electron app
+    // Track if user came from the Electron app, and redirect target
     const urlParams = new URLSearchParams(window.location.search);
     const fromApp = urlParams.get('source') === 'app';
+    const redirectTarget = urlParams.get('redirect'); // e.g. 'profile'
     let pendingSignupEmail = null;
 
     // =============================================
@@ -225,9 +223,11 @@
         const refreshToken = hashParams.get('refresh_token');
 
         if (accessToken && refreshToken) {
+          await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
           history.replaceState(null, '', window.location.pathname);
-          showSuccess('Email Verified!', 'Your email has been verified. You can now use Lumen AI.');
-          redirectToApp(accessToken, refreshToken);
+          // New user — redirect to profile setup
+          showSuccess('Email Verified!', 'Redirecting to profile setup...');
+          setTimeout(() => { window.location.href = 'profile.html?setup=1'; }, 1500);
           return;
         }
       }
@@ -443,6 +443,13 @@
     // =============================================
     function redirectToApp(accessToken, refreshToken) {
       if (!accessToken || !refreshToken) return;
+
+      // If user was redirected here from profile page, go back there
+      if (redirectTarget === 'profile') {
+        showSuccess('Signed In!', 'Redirecting to your profile...');
+        setTimeout(() => { window.location.href = 'profile.html'; }, 1000);
+        return;
+      }
 
       const deepLink = APP_REDIRECT + '?access_token=' + encodeURIComponent(accessToken) + '&refresh_token=' + encodeURIComponent(refreshToken);
 

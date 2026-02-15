@@ -68,11 +68,15 @@ app.on('open-url', (event, url) => {
  * Extracts auth code/tokens and forwards to renderer via IPC.
  */
 function handleDeepLink(url) {
+  console.log('[deep-link] Received:', url);
   try {
     const urlObj = new URL(url);
-    const pathname = urlObj.pathname; // '/auth/callback', '/auth/confirm', '/auth/reset'
+    // lumenai://auth/session parses as hostname='auth', pathname='/session'
+    const host = urlObj.hostname;
+    const pathname = urlObj.pathname;
+    console.log('[deep-link] Host:', host, 'Pathname:', pathname);
 
-    if (pathname === '/auth/callback') {
+    if (host === 'auth' && pathname === '/callback') {
       // OAuth callback flow
       const code = urlObj.searchParams.get('code');
       const error = urlObj.searchParams.get('error');
@@ -90,18 +94,24 @@ function handleDeepLink(url) {
         // Cold start: store for later
         pendingOAuthUrl = payload;
       }
-    } else if (pathname === '/auth/session') {
+    } else if (host === 'auth' && pathname === '/session') {
       // Web-based auth completed — session tokens passed via deep link
       const accessToken = urlObj.searchParams.get('access_token');
       const refreshToken = urlObj.searchParams.get('refresh_token');
+      console.log('[deep-link] auth/session - tokens received:', !!accessToken, !!refreshToken);
       const payload = { accessToken, refreshToken };
 
       if (mainWindow && mainWindow.webContents) {
+        console.log('[deep-link] Sending auth-session to renderer');
         mainWindow.webContents.send('auth-session', payload);
+        // Show and focus window so user sees the auth update
+        mainWindow.show();
+        mainWindow.focus();
       } else {
+        console.log('[deep-link] Window not ready, buffering auth session');
         pendingAuthSession = payload;
       }
-    } else if (pathname === '/auth/confirm' || pathname === '/auth/reset') {
+    } else if (host === 'auth' && (pathname === '/confirm' || pathname === '/reset')) {
       // Email verification or password reset flow
       const tokenHash = urlObj.searchParams.get('token_hash');
       const type = urlObj.searchParams.get('type');

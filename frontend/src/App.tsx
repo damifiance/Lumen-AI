@@ -16,9 +16,6 @@ import { OnboardingModal } from './components/common/OnboardingModal';
 import { KeyboardShortcuts } from './components/common/KeyboardShortcuts';
 import { AboutModal } from './components/common/AboutModal';
 import { OllamaSetupCard } from './components/OllamaSetupCard';
-import { UsernameClaimModal } from './components/profile/UsernameClaimModal';
-import { ProfileEditModal } from './components/profile/ProfileEditModal';
-import { openUsernameClaimModal } from './components/profile/UsernameClaimModal';
 
 export default function App() {
   const { tabs, activeTabIndex, isLoading, setActivePaper, setLoading } =
@@ -26,7 +23,7 @@ export default function App() {
   const { loadHighlights, clearHighlights } = useHighlightStore();
   const { clearMessages, toggleOpen: toggleChat } = useChatStore();
   const { initialize, user } = useAuthStore();
-  const { fetchProfile, clearProfile, profile } = useProfileStore();
+  const { fetchProfile, clearProfile } = useProfileStore();
   const { openShortcuts } = useShortcutStore();
   const matchesEvent = useShortcutStore((s) => s.matchesEvent);
 
@@ -51,13 +48,6 @@ export default function App() {
       clearProfile();
     }
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Auto-open username claim modal for new users
-  useEffect(() => {
-    if (profile && !profile.username_claimed) {
-      openUsernameClaimModal();
-    }
-  }, [profile]);
 
   // Reload highlights when switching tabs
   useEffect(() => {
@@ -185,8 +175,6 @@ export default function App() {
       <OnboardingModal />
       <KeyboardShortcuts />
       <AboutModal />
-      <UsernameClaimModal />
-      <ProfileEditModal />
 
     </div>
   );

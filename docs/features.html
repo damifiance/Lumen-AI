@@ -7,6 +7,8 @@
   <meta name="description" content="Explore every feature of Lumen AI — the local AI-powered academic paper reader with highlighting, notes, multi-model AI chat, and more." />
   <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="shared-auth.js" defer></script>
   <style>
     /* ================================================
        FEATURES PAGE — additional styles
@@ -240,9 +242,8 @@
       Lumen AI
     </a>
     <div class="nav-right">
-      <a href="auth.html" class="btn-nav btn-nav-outline">Sign In</a>
-      <a href="https://github.com/damifiance/Lumen-AI" class="btn-nav btn-nav-outline">GitHub</a>
       <a href="index.html#download" class="btn-nav btn-nav-amber">Download</a>
+      <a href="auth.html" class="btn-nav btn-nav-amber-dark" id="nav-signin-link">Sign In</a>
     </div>
   </nav>
 

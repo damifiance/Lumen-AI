@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile — Lumen AI</title>
+  <meta name="description" content="Edit your Lumen AI profile — avatar, username, bio, and more." />
+  <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="shared-auth.js"></script>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="features.html">Features</a>
+      <a href="index.html#download">Download</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <img
+        src="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png"
+        alt="Lumen AI"
+      />
+      Lumen AI
+    </a>
+    <div class="nav-right">
+      <a href="index.html#download" class="btn-nav btn-nav-amber">Download</a>
+      <a href="auth.html" class="btn-nav btn-nav-amber-dark" id="nav-signin-link">Sign In</a>
+    </div>
+  </nav>
+
+  <!-- Profile Content -->
+  <div class="profile-page">
+    <div class="profile-card" id="profile-card">
+
+      <!-- Loading state -->
+      <div id="profile-loading" style="text-align:center; padding:40px 0;">
+        <p style="color:var(--text-muted);">Loading profile...</p>
+      </div>
+
+      <!-- Profile form (hidden until loaded) -->
+      <div id="profile-content" style="display:none;">
+        <h2 id="profile-heading">Edit Profile</h2>
+        <p class="profile-subtitle" id="profile-email"></p>
+
+        <!-- Avatar -->
+        <div class="profile-avatar-section">
+          <div class="profile-avatar-preview" id="avatar-preview">
+            <span class="avatar-placeholder" id="avatar-placeholder">U</span>
+          </div>
+          <div class="profile-avatar-actions">
+            <label>
+              Upload Photo
+              <input type="file" id="avatar-input" accept="image/*" />
+            </label>
+            <span class="avatar-hint">Square image, max 2MB</span>
+          </div>
+        </div>
+
+        <!-- Save feedback -->
+        <div class="save-feedback" id="save-feedback"></div>
+
+        <form class="profile-form" id="profile-form" onsubmit="handleSaveProfile(event)">
+          <!-- Username -->
+          <div class="auth-field">
+            <label for="profile-username">Username</label>
+            <div class="username-wrapper">
+              <input type="text" id="profile-username" placeholder="your_username" pattern="[a-z0-9_]{3,30}" title="3-30 characters: lowercase letters, numbers, underscores" required />
+              <span class="username-status" id="username-status"></span>
+            </div>
+          </div>
+
+          <!-- Display Name -->
+          <div class="auth-field">
+            <label for="profile-display-name">Display Name</label>
+            <input type="text" id="profile-display-name" placeholder="Your Name" maxlength="100" />
+          </div>
+
+          <!-- Bio -->
+          <div class="auth-field">
+            <label for="profile-bio">Bio</label>
+            <textarea id="profile-bio" placeholder="Tell us about yourself..." maxlength="500"></textarea>
+          </div>
+
+          <!-- Institution -->
+          <div class="auth-field">
+            <label for="profile-institution">Institution</label>
+            <input type="text" id="profile-institution" placeholder="University or organization" maxlength="200" />
+          </div>
+
+          <!-- Research Interests -->
+          <div class="auth-field">
+            <label for="profile-interests-input">Research Interests</label>
+            <input type="text" id="profile-interests-input" placeholder="Type and press Enter to add" maxlength="100" />
+            <div class="interests-tags" id="interests-tags"></div>
+          </div>
+
+          <!-- Save -->
+          <div class="profile-actions">
+            <button type="submit" class="auth-btn auth-btn-primary" id="save-btn">
+              <span class="auth-btn-text">Save Changes</span>
+              <span class="auth-btn-loading" style="display:none;">Saving...</span>
+            </button>
+          </div>
+        </form>
+
+        <hr class="profile-divider" />
+
+        <div class="profile-footer-links">
+          <button class="auth-btn auth-btn-primary" onclick="openApp()">Open Lumen AI</button>
+          <button class="auth-btn auth-btn-secondary" onclick="handleSignOut()">Sign Out</button>
+          <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; margin-top:4px;">
+            To delete your account, use the desktop app settings.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="https://github.com/damifiance/Lumen-AI">GitHub</a>
+      <a href="https://github.com/damifiance/Lumen-AI/releases">Releases</a>
+    </div>
+    <p class="copyright">
+      <span class="sun-dot"></span>
+      Lumen AI &mdash; by JaeHyung (Benjamin) Park
+    </p>
+  </footer>
+
+  <script>
+    const APP_REDIRECT = 'lumenai://auth/session';
+    let currentProfile = null;
+    let currentUserId = null;
+    let originalUsername = null;
+    let usernameCheckTimeout = null;
+    let researchInterests = [];
+    const isSetup = new URLSearchParams(window.location.search).get('setup') === '1';
+
+    // =============================================
+    // Init
+    // =============================================
+    (async function init() {
+      const { data: { session } } = await window.sb.auth.getSession();
+      if (!session) {
+        // Not signed in — redirect to auth page
+        window.location.href = 'auth.html?redirect=profile';
+        return;
+      }
+
+      currentUserId = session.user.id;
+      document.getElementById('profile-email').textContent = session.user.email || '';
+
+      // Fetch or create profile
+      let { data: profile, error } = await window.sb
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUserId)
+        .single();
+
+      if (error && error.code === 'PGRST116') {
+        // No profile row — create one (same logic as profileStore.ts)
+        const email = session.user.email || '';
+        const baseName = email.split('@')[0] || 'user';
+        const sanitized = baseName.toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 26);
+        const username = sanitized.length < 3 ? 'user_' + sanitized : sanitized;
+
+        const { data: newProfile, error: insertError } = await window.sb
+          .from('profiles')
+          .insert({ id: currentUserId, username, username_claimed: false })
+          .select()
+          .single();
+
+        if (insertError) {
+          document.getElementById('profile-loading').innerHTML =
+            '<p style="color:#dc2626;">Failed to create profile. Please try again.</p>';
+          return;
+        }
+        profile = newProfile;
+      } else if (error) {
+        document.getElementById('profile-loading').innerHTML =
+          '<p style="color:#dc2626;">Failed to load profile. Please try again.</p>';
+        return;
+      }
+
+      currentProfile = profile;
+      originalUsername = profile.username;
+      researchInterests = profile.research_interests || [];
+
+      // Update heading for new users
+      if (isSetup) {
+        document.getElementById('profile-heading').textContent = 'Set Up Your Profile';
+      }
+
+      // Populate form
+      document.getElementById('profile-username').value = profile.username || '';
+      document.getElementById('profile-display-name').value = profile.display_name || '';
+      document.getElementById('profile-bio').value = profile.bio || '';
+      document.getElementById('profile-institution').value = profile.institution || '';
+      renderInterests();
+      renderAvatar(profile.avatar_url, session.user.email);
+
+      // Show form
+      document.getElementById('profile-loading').style.display = 'none';
+      document.getElementById('profile-content').style.display = 'block';
+    })();
+
+    // =============================================
+    // Avatar
+    // =============================================
+    function renderAvatar(avatarUrl, email) {
+      const preview = document.getElementById('avatar-preview');
+      if (avatarUrl) {
+        preview.innerHTML = '<img src="' + avatarUrl + '" alt="Avatar" />';
+      } else {
+        const initial = (email || 'U')[0].toUpperCase();
+        preview.innerHTML = '<span class="avatar-placeholder">' + initial + '</span>';
+      }
+    }
+
+    document.getElementById('avatar-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        showFeedback('Image must be under 2MB', true);
+        return;
+      }
+
+      showFeedback('Uploading...', false);
+
+      try {
+        // Center-crop to 400x400 JPEG
+        const blob = await cropToSquare(file, 400);
+
+        // Delete old avatar if exists
+        if (currentProfile.avatar_url) {
+          const oldPath = currentProfile.avatar_url.split('/').slice(-2).join('/');
+          await window.sb.storage.from('avatars').remove([oldPath]);
+        }
+
+        // Upload
+        const fileName = 'avatar-' + Date.now() + '.jpg';
+        const filePath = currentUserId + '/' + fileName;
+        const { error: uploadError } = await window.sb.storage
+          .from('avatars')
+          .upload(filePath, blob, { contentType: 'image/jpeg', upsert: false });
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data } = window.sb.storage.from('avatars').getPublicUrl(filePath);
+        const newUrl = data.publicUrl;
+
+        // Update profile
+        await window.sb
+          .from('profiles')
+          .update({ avatar_url: newUrl, updated_at: new Date().toISOString() })
+          .eq('id', currentUserId);
+
+        currentProfile.avatar_url = newUrl;
+        renderAvatar(newUrl);
+        showFeedback('Avatar updated!', false);
+      } catch (err) {
+        showFeedback('Upload failed: ' + (err.message || 'Unknown error'), true);
+      }
+
+      e.target.value = '';
+    });
+
+    function cropToSquare(file, size) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+
+          const min = Math.min(img.width, img.height);
+          const sx = (img.width - min) / 2;
+          const sy = (img.height - min) / 2;
+          ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+
+          canvas.toBlob(
+            (blob) => (blob ? resolve(blob) : reject(new Error('Canvas to blob failed'))),
+            'image/jpeg',
+            0.85
+          );
+        };
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    // =============================================
+    // Username availability check
+    // =============================================
+    document.getElementById('profile-username').addEventListener('input', (e) => {
+      const val = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+      e.target.value = val;
+
+      const statusEl = document.getElementById('username-status');
+      if (val === originalUsername) {
+        statusEl.textContent = '';
+        statusEl.className = 'username-status';
+        return;
+      }
+      if (val.length < 3) {
+        statusEl.textContent = 'Too short';
+        statusEl.className = 'username-status taken';
+        return;
+      }
+
+      statusEl.textContent = '...';
+      statusEl.className = 'username-status checking';
+
+      clearTimeout(usernameCheckTimeout);
+      usernameCheckTimeout = setTimeout(async () => {
+        const { data } = await window.sb
+          .from('profiles')
+          .select('id')
+          .eq('username', val)
+          .neq('id', currentUserId)
+          .single();
+
+        if (data) {
+          statusEl.textContent = 'Taken';
+          statusEl.className = 'username-status taken';
+        } else {
+          statusEl.textContent = 'Available';
+          statusEl.className = 'username-status available';
+        }
+      }, 400);
+    });
+
+    // =============================================
+    // Research Interests
+    // =============================================
+    document.getElementById('profile-interests-input').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const val = e.target.value.trim();
+      if (val && researchInterests.length < 10 && !researchInterests.includes(val)) {
+        researchInterests.push(val);
+        renderInterests();
+      }
+      e.target.value = '';
+    });
+
+    function renderInterests() {
+      const container = document.getElementById('interests-tags');
+      container.innerHTML = researchInterests.map((tag, i) =>
+        '<span class="interest-tag">' + escapeHtml(tag) +
+        '<button type="button" onclick="removeInterest(' + i + ')">&times;</button></span>'
+      ).join('');
+    }
+
+    function removeInterest(index) {
+      researchInterests.splice(index, 1);
+      renderInterests();
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // =============================================
+    // Save Profile
+    // =============================================
+    async function handleSaveProfile(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('profile-username').value;
+      const statusEl = document.getElementById('username-status');
+
+      // Block save if username is taken
+      if (statusEl.classList.contains('taken')) {
+        showFeedback('Username is not available', true);
+        return;
+      }
+
+      const btn = document.getElementById('save-btn');
+      btn.querySelector('.auth-btn-text').style.display = 'none';
+      btn.querySelector('.auth-btn-loading').style.display = 'inline';
+      btn.disabled = true;
+
+      try {
+        const updates = {
+          username,
+          username_claimed: true,
+          display_name: document.getElementById('profile-display-name').value || null,
+          bio: document.getElementById('profile-bio').value || null,
+          institution: document.getElementById('profile-institution').value || null,
+          research_interests: researchInterests,
+          updated_at: new Date().toISOString(),
+        };
+
+        const { error } = await window.sb
+          .from('profiles')
+          .update(updates)
+          .eq('id', currentUserId);
+
+        if (error) throw error;
+
+        originalUsername = username;
+        statusEl.textContent = '';
+        currentProfile = { ...currentProfile, ...updates };
+        showFeedback('Profile saved!', false);
+      } catch (err) {
+        showFeedback('Save failed: ' + (err.message || 'Unknown error'), true);
+      }
+
+      btn.querySelector('.auth-btn-text').style.display = 'inline';
+      btn.querySelector('.auth-btn-loading').style.display = 'none';
+      btn.disabled = false;
+    }
+
+    // =============================================
+    // Helpers
+    // =============================================
+    function showFeedback(msg, isError) {
+      const el = document.getElementById('save-feedback');
+      el.textContent = msg;
+      el.className = 'save-feedback ' + (isError ? 'error' : 'success');
+      if (!isError) {
+        setTimeout(() => { el.className = 'save-feedback'; }, 3000);
+      }
+    }
+
+    function openApp() {
+      window.sb.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          const deepLink = APP_REDIRECT +
+            '?access_token=' + encodeURIComponent(session.access_token) +
+            '&refresh_token=' + encodeURIComponent(session.refresh_token);
+          window.location.href = deepLink;
+        }
+      });
+    }
+
+    async function handleSignOut() {
+      await window.sb.auth.signOut();
+      window.location.href = 'auth.html';
+    }
+  </script>
+
+</body>
+</html>
