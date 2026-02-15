@@ -89,6 +89,9 @@ a:hover {
   font-weight: 800;
   color: var(--text-dark);
   letter-spacing: -0.02em;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .nav-logo img {
