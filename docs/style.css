@@ -504,12 +504,24 @@ a:hover {
 /* ================================================
    INSTALLATION GUIDE BUTTONS (in download section)
    ================================================ */
+.guide-recommendation {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 0;
+}
+
+.guide-recommendation strong {
+  color: var(--amber-light);
+}
+
 .guide-buttons {
   display: flex;
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 40px;
+  margin-top: 12px;
 }
 
 .guide-button {
