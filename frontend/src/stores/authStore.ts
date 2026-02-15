@@ -57,6 +57,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Listen for session tokens from web-based auth (via deep link from GitHub Pages)
       if (window.electron?.onAuthSession) {
         window.electron.onAuthSession(async ({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) => {
+          console.log('[auth] Received auth-session IPC');
           try {
             const { data, error } = await supabase.auth.setSession({
               access_token: accessToken,
@@ -73,6 +74,17 @@ export const useAuthStore = create<AuthState>((set) => ({
           }
         });
       }
+
+      // Fallback: re-sync session when window regains focus (handles App Nap / missed IPC)
+      const handleVisibility = async () => {
+        if (document.visibilityState === 'visible') {
+          const { data } = await supabase.auth.getSession();
+          if (data.session && !useAuthStore.getState().session) {
+            set({ session: data.session, user: data.session.user });
+          }
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibility);
     } catch (err) {
       console.error('Auth initialization error:', err);
       set({ isInitialized: true });

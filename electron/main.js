@@ -89,13 +89,20 @@ function handleDeepLink(url) {
       const payload = { accessToken, refreshToken };
 
       console.log('[deep-link] mainWindow exists:', !!mainWindow, 'isVisible:', mainWindow?.isVisible(), 'isDestroyed:', mainWindow?.isDestroyed());
+      // Always buffer — did-finish-load will pick this up if window was just created
+      pendingAuthSession = payload;
       forceShowWindow();
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        console.log('[deep-link] Sending auth-session to renderer');
-        mainWindow.webContents.send('auth-session', payload);
+      if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.webContents.isLoading()) {
+        // Window exists and is loaded — send with delay to let renderer wake from App Nap
+        console.log('[deep-link] Sending auth-session to renderer (delayed)');
+        setTimeout(() => {
+          if (mainWindow && !mainWindow.isDestroyed() && pendingAuthSession) {
+            mainWindow.webContents.send('auth-session', pendingAuthSession);
+            pendingAuthSession = null;
+          }
+        }, 500);
       } else {
-        console.log('[deep-link] Window not ready, buffering auth session');
-        pendingAuthSession = payload;
+        console.log('[deep-link] Window loading or being created, will send on did-finish-load');
       }
     }
   } catch (err) {
