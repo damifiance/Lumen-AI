@@ -1147,45 +1147,29 @@ a:hover {
 
 .profile-cover {
   width: 100%;
-  height: 200px;
+  height: 120px;
   background: linear-gradient(135deg, var(--dark) 0%, #1e1b2e 50%, var(--dark-deep) 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.profile-cover::after {
-  content: '';
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 60%);
-  pointer-events: none;
 }
 
 .profile-container {
   width: 100%;
-  max-width: 680px;
-  padding: 0 24px 60px;
-  margin-top: -70px;
+  max-width: 760px;
+  padding: 0 32px 60px;
   position: relative;
-  z-index: 1;
 }
 
-/* ---- View Mode ---- */
+/* ---- View Mode Header ---- */
 .pv-header {
   display: flex;
-  align-items: flex-end;
-  gap: 24px;
-  margin-bottom: 36px;
+  gap: 40px;
+  margin-top: 40px;
+  margin-bottom: 48px;
 }
 
 .pv-avatar,
 .pe-avatar {
-  width: 140px;
-  height: 140px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   overflow: hidden;
   background: var(--amber-bg);
@@ -1194,7 +1178,7 @@ a:hover {
   justify-content: center;
   flex-shrink: 0;
   border: 5px solid var(--amber-page);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
@@ -1206,7 +1190,7 @@ a:hover {
 }
 
 .avatar-placeholder {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 800;
   color: var(--amber-dark);
   width: 100%;
@@ -1217,70 +1201,62 @@ a:hover {
 }
 
 .pv-info {
-  padding-bottom: 12px;
   flex: 1;
   min-width: 0;
+  padding-top: 16px;
 }
 
 .pv-name {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   color: var(--text-dark);
-  margin: 0;
+  margin: 0 0 4px;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
 .pv-username {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--amber-dark);
   font-weight: 600;
-  margin: 4px 0 0;
+  margin: 0 0 16px;
 }
 
 .pv-bio {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: var(--text-body);
-  margin: 12px 0 0;
-  line-height: 1.6;
+  margin: 0;
+  line-height: 1.7;
+  max-width: 440px;
 }
 
-/* Details grid */
-.pv-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  background: var(--white);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  border: 1px solid var(--border-light);
-  margin-bottom: 24px;
+/* ---- View Details ---- */
+.pv-details {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-bottom: 40px;
 }
 
-.pv-section {
-  padding: 24px 28px;
-  border-bottom: 1px solid var(--border-light);
+.pv-detail-row {
+  display: flex;
+  gap: 48px;
 }
 
-.pv-section:last-child {
-  border-bottom: none;
+.pv-detail-item {
+  flex: 1;
 }
 
-.pv-grid > .pv-section:nth-child(odd) {
-  border-right: 1px solid var(--border-light);
-}
-
-.pv-section-title {
-  font-size: 0.7rem;
+.pv-detail-label {
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 
-.pv-section-text {
+.pv-detail-value {
   font-size: 0.95rem;
   color: var(--text-dark);
   font-weight: 500;
@@ -1291,28 +1267,33 @@ a:hover {
 .pv-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .pv-tag {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 5px 14px;
   background: var(--amber-bg);
   color: var(--amber-dark);
   border-radius: 20px;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
+}
+
+.pv-divider {
+  height: 1px;
+  background: var(--border-light);
 }
 
 /* View actions */
 .pv-actions {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
 }
 
 .pv-btn {
-  padding: 12px 28px;
+  padding: 12px 32px;
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -1633,22 +1614,16 @@ a:hover {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    gap: 20px;
   }
 
-  .pv-avatar, .pe-avatar { width: 110px; height: 110px; }
-  .profile-cover { height: 160px; }
+  .pv-avatar, .pe-avatar { width: 120px; height: 120px; }
+  .pv-name { font-size: 1.6rem; }
+  .pv-bio { max-width: 100%; }
+  .profile-cover { height: 80px; }
 
-  .pv-grid {
-    grid-template-columns: 1fr;
-  }
+  .pv-detail-row { flex-direction: column; gap: 24px; }
 
-  .pv-grid > .pv-section:nth-child(odd) {
-    border-right: none;
-  }
-
-  .pv-actions, .pe-actions {
-    flex-direction: column;
-  }
-
+  .pv-actions, .pe-actions { flex-direction: column; }
   .pv-btn { width: 100%; }
 }
