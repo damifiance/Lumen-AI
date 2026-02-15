@@ -9,12 +9,18 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase not configured — auth features disabled');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: secureStorage,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false, // Not needed for Electron
-    flowType: 'pkce', // Use PKCE flow for OAuth (more secure for native apps)
+// Use a placeholder URL when Supabase is not configured to avoid createClient throwing.
+// All auth operations are guarded by the env var check in authStore.initialize().
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-key',
+  {
+    auth: {
+      storage: secureStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false, // Not needed for Electron
+      flowType: 'pkce', // Use PKCE flow for OAuth (more secure for native apps)
+    },
   },
-});
+);

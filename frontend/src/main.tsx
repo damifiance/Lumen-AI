@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/globals.css';
 import App from './App';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 async function init() {
   if ((window as any).electron) {
@@ -10,7 +11,9 @@ async function init() {
   }
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </StrictMode>
   );
 }
