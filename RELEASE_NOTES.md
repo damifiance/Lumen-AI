@@ -18,6 +18,11 @@
 
 ## What's New
 
+### v0.3.1 — Bug Fix
+
+- **Fixed:** App showing blank white screen after update (Supabase client crash when env vars not configured)
+- **Added:** Error boundary so future crashes show a helpful message instead of a white screen
+
 ### v0.3.0 — Authentication & Profiles
 
 **Sign In with Google or GitHub**
