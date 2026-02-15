@@ -848,6 +848,7 @@ a:hover {
 /* ================================================
    AUTH PAGE
    ================================================ */
+/* Auth Page */
 .auth-page {
   min-height: calc(100vh - 200px);
   display: flex;
@@ -866,86 +867,101 @@ a:hover {
   border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-/* Tabs */
-.auth-tabs {
+/* Dark variant for sign-in page */
+.auth-card-dark {
+  background: var(--dark);
+  max-width: 440px;
+  padding: 48px 40px;
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 80px rgba(245, 158, 11, 0.06);
+}
+
+.auth-logo {
   display: flex;
-  gap: 4px;
-  background: #f3f4f6;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 28px;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
-.auth-tab {
-  flex: 1;
-  padding: 10px 16px;
-  border: none;
-  background: transparent;
-  border-radius: 10px;
+.auth-logo img {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+}
+
+.auth-title {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+  text-align: center;
   font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 32px;
+  line-height: 1.5;
 }
 
-.auth-tab.active {
+/* OAuth provider buttons */
+.auth-oauth {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-btn-provider {
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.auth-btn-google {
   background: var(--white);
   color: var(--text-dark);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.auth-tab:hover:not(.active) {
-  color: var(--text-body);
+.auth-btn-google:hover {
+  background: #f8f8f8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 
-/* Forms */
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.auth-btn-github {
+  background: #24292f;
+  color: var(--white);
 }
 
-.auth-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.auth-btn-github:hover {
+  background: #32383f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
 }
 
-.auth-field label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-body);
-}
-
-.auth-field input {
-  padding: 12px 16px;
-  border: 2px solid var(--border-light);
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-family: inherit;
-  color: var(--text-dark);
-  transition: border-color 0.2s;
-  outline: none;
-}
-
-.auth-field input:focus {
-  border-color: var(--amber);
-}
-
-.auth-field input::placeholder {
-  color: var(--text-muted);
-}
-
-.auth-description {
-  font-size: 0.9rem;
-  color: var(--text-body);
+.auth-footer-text {
+  text-align: center;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 24px;
   line-height: 1.5;
-  margin-bottom: 4px;
 }
 
-/* Buttons */
+/* Shared auth button base (used by profile page too) */
 .auth-btn {
   padding: 12px 24px;
   border-radius: 12px;
@@ -990,72 +1006,11 @@ a:hover {
   gap: 8px;
 }
 
-.auth-link {
-  background: none;
-  border: none;
-  color: var(--amber-dark);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  padding: 0;
-  text-align: center;
-}
-
-.auth-link:hover {
-  color: var(--amber);
-}
-
-/* Divider */
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 24px 0;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border-light);
-}
-
-.auth-divider span {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-/* OAuth */
-.auth-oauth {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.auth-btn-oauth {
-  width: 100%;
-  background: #f9fafb;
-  color: var(--text-dark);
-  border: 2px solid var(--border-light);
-  border-radius: 12px;
-  padding: 14px 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.auth-btn-oauth:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-}
-
 /* Error */
 .auth-error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: #fca5a5;
   border-radius: 12px;
   padding: 12px 16px;
   font-size: 0.85rem;
@@ -1077,8 +1032,8 @@ a:hover {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #ecfdf5;
-  color: #059669;
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--amber);
   font-size: 1.5rem;
   display: flex;
   align-items: center;
@@ -1088,52 +1043,13 @@ a:hover {
 .auth-success h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--text-dark);
+  color: var(--white);
 }
 
 .auth-success p {
   font-size: 0.9rem;
-  color: var(--text-body);
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.5;
-}
-
-/* Pending Verification */
-.auth-pending {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 20px 0;
-  gap: 12px;
-}
-
-.auth-pending-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--amber-bg);
-  color: var(--amber-dark);
-  font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-pending h3 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.auth-pending p {
-  font-size: 0.9rem;
-  color: var(--text-body);
-  line-height: 1.5;
-}
-
-.auth-muted {
-  font-size: 0.8rem;
-  color: var(--text-muted);
 }
 
 /* Signed In State */
@@ -1149,12 +1065,12 @@ a:hover {
 .auth-signed-in h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--text-dark);
+  color: var(--white);
 }
 
 .auth-signed-in p {
   font-size: 0.9rem;
-  color: var(--text-body);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* Auth page responsive */
@@ -1163,8 +1079,8 @@ a:hover {
     padding: 28px 20px;
   }
 
-  .auth-oauth {
-    gap: 10px;
+  .auth-card-dark {
+    padding: 36px 24px;
   }
 }
 
