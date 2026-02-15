@@ -23,3 +23,4 @@ class ModelInfo(BaseModel):
     id: str
     name: str
     provider: str
+    locked: bool = False

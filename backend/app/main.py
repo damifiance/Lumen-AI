@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import init_db
-from app.routers import chat, files, highlights, papers
+from app.routers import chat, files, highlights, papers, subscription
 
 
 @asynccontextmanager
@@ -28,6 +28,7 @@ app.include_router(files.router, prefix="/api/files", tags=["files"])
 app.include_router(papers.router, prefix="/api/papers", tags=["papers"])
 app.include_router(highlights.router, prefix="/api/highlights", tags=["highlights"])
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
+app.include_router(subscription.router, prefix="/api/subscription", tags=["subscription"])
 
 
 @app.get("/api/health")

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing — Lumen AI</title>
+  <meta name="description" content="Lumen AI pricing plans. Free local AI, or upgrade for cloud model access." />
+  <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="features.html">Features</a>
+      <a href="pricing.html" style="color: var(--amber-dark); font-weight: 600;">Pricing</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <img src="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" alt="Lumen AI" />
+      Lumen AI
+    </a>
+    <div class="nav-right">
+      <a href="index.html#download" class="btn-nav btn-nav-amber">Download</a>
+    </div>
+  </nav>
+
+  <!-- Pricing Section -->
+  <section style="max-width: 960px; margin: 0 auto; padding: 80px 24px;">
+    <div style="text-align: center; margin-bottom: 48px;">
+      <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 12px;">Simple, transparent pricing</h1>
+      <p style="font-size: 1.1rem; color: var(--text-body); max-width: 520px; margin: 0 auto;">
+        Start for free with local AI. Upgrade when you need cloud models.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+
+      <!-- Basic -->
+      <div style="background: var(--white); border-radius: 16px; padding: 32px; border: 2px solid var(--border-light);">
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Basic</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">For local AI users</p>
+        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 24px;">Free</div>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; color: var(--text-body);">
+          <li>&#10003; Unlimited local AI via Ollama</li>
+          <li>&#10003; All local models supported</li>
+          <li>&#10003; No account required</li>
+          <li>&#10003; PDF reading &amp; annotation</li>
+          <li>&#10003; Highlight &amp; ask AI</li>
+        </ul>
+      </div>
+
+      <!-- Pro -->
+      <div style="background: var(--white); border-radius: 16px; padding: 32px; border: 2px solid var(--amber); position: relative;">
+        <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--amber); color: white; font-size: 0.7rem; font-weight: 700; padding: 4px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Popular</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Pro</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">For regular users</p>
+        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 4px;">$10<span style="font-size: 1rem; font-weight: 500; color: var(--text-muted);">/mo</span></div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 24px;">or &#8361;13,000/mo</p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; color: var(--text-body);">
+          <li>&#10003; Everything in Basic</li>
+          <li>&#10003; GPT-4o Mini access</li>
+          <li>&#10003; 500,000 tokens/month</li>
+          <li>&#10003; Token top-ups available</li>
+        </ul>
+      </div>
+
+      <!-- Max -->
+      <div style="background: var(--white); border-radius: 16px; padding: 32px; border: 2px solid var(--border-light);">
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Max</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">For power users</p>
+        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 4px;">$40<span style="font-size: 1rem; font-weight: 500; color: var(--text-muted);">/mo</span></div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 24px;">or &#8361;52,000/mo</p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; color: var(--text-body);">
+          <li>&#10003; Everything in Pro</li>
+          <li>&#10003; All cloud models (GPT-4o, Claude Sonnet, Claude Haiku)</li>
+          <li>&#10003; 2,000,000 tokens/month</li>
+          <li>&#10003; Token top-ups available</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Top-up info -->
+    <div style="text-align: center; margin-top: 40px; padding: 24px; background: var(--white); border-radius: 12px; border: 1px solid var(--border-light);">
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Need more tokens?</h3>
+      <p style="color: var(--text-body); font-size: 0.9rem;">
+        Purchase token top-ups for <strong>250,000 tokens at $5 (&#8361;6,500)</strong> each.
+        Top-ups add tokens to your current billing period. Available for Pro and Max subscribers.
+      </p>
+    </div>
+
+    <!-- FAQ -->
+    <div style="margin-top: 64px;">
+      <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 24px; text-align: center;">Frequently Asked Questions</h2>
+      <div style="display: flex; flex-direction: column; gap: 20px; max-width: 640px; margin: 0 auto;">
+        <div>
+          <h4 style="font-weight: 700; margin-bottom: 4px;">Do I need to pay to use Lumen AI?</h4>
+          <p style="color: var(--text-body); font-size: 0.9rem;">No. The Basic plan is completely free and gives you unlimited access to local AI models via Ollama. You only need a paid plan if you want access to cloud models like GPT-4o or Claude.</p>
+        </div>
+        <div>
+          <h4 style="font-weight: 700; margin-bottom: 4px;">What happens when I hit my token limit?</h4>
+          <p style="color: var(--text-body); font-size: 0.9rem;">Cloud models will be paused until your next billing period. You can purchase a token top-up to continue immediately. Local Ollama models are always available regardless of token usage.</p>
+        </div>
+        <div>
+          <h4 style="font-weight: 700; margin-bottom: 4px;">Can I cancel anytime?</h4>
+          <p style="color: var(--text-body); font-size: 0.9rem;">Yes. You can cancel your subscription at any time. You'll retain access until the end of your current billing period.</p>
+        </div>
+        <div>
+          <h4 style="font-weight: 700; margin-bottom: 4px;">Do top-ups change my model access?</h4>
+          <p style="color: var(--text-body); font-size: 0.9rem;">No. Top-ups only add tokens. A Pro subscriber who buys top-ups still only has access to GPT-4o Mini. Upgrade to Max for all cloud models.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 32px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border-light);">
+    <p>&copy; 2026 Lumen AI. <a href="terms.html">Terms of Service</a> &middot; <a href="privacy.html">Privacy Policy</a></p>
+  </footer>
+
+</body>
+</html>

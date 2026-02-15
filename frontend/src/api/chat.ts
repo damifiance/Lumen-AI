@@ -1,4 +1,4 @@
-import { apiFetch, apiStreamUrl } from './client';
+import { apiFetch, apiStreamUrl, getAuthHeaders } from './client';
 import type { ModelInfo } from '../types/chat';
 
 export function getModels(): Promise<ModelInfo[]> {
@@ -22,16 +22,18 @@ export function streamAsk(
 ): AbortController {
   const controller = new AbortController();
 
-  fetch(apiStreamUrl('/chat/ask'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-    signal: controller.signal,
-  })
-    .then((res) => handleSSEResponse(res, callbacks))
-    .catch((err) => {
-      if (err.name !== 'AbortError') callbacks.onError(err);
-    });
+  getAuthHeaders().then((authHeaders) => {
+    fetch(apiStreamUrl('/chat/ask'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders },
+      body: JSON.stringify(data),
+      signal: controller.signal,
+    })
+      .then((res) => handleSSEResponse(res, callbacks))
+      .catch((err) => {
+        if (err.name !== 'AbortError') callbacks.onError(err);
+      });
+  });
 
   return controller;
 }
@@ -46,16 +48,18 @@ export function streamConversation(
 ): AbortController {
   const controller = new AbortController();
 
-  fetch(apiStreamUrl('/chat/conversation'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-    signal: controller.signal,
-  })
-    .then((res) => handleSSEResponse(res, callbacks))
-    .catch((err) => {
-      if (err.name !== 'AbortError') callbacks.onError(err);
-    });
+  getAuthHeaders().then((authHeaders) => {
+    fetch(apiStreamUrl('/chat/conversation'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders },
+      body: JSON.stringify(data),
+      signal: controller.signal,
+    })
+      .then((res) => handleSSEResponse(res, callbacks))
+      .catch((err) => {
+        if (err.name !== 'AbortError') callbacks.onError(err);
+      });
+  });
 
   return controller;
 }
@@ -65,7 +69,14 @@ async function handleSSEResponse(
   callbacks: StreamCallbacks
 ): Promise<void> {
   if (!response.ok) {
-    callbacks.onError(new Error(`HTTP ${response.status}`));
+    let errorMsg = `HTTP ${response.status}`;
+    try {
+      const body = await response.json();
+      errorMsg = body.detail || errorMsg;
+    } catch {
+      // Use default error
+    }
+    callbacks.onError(new Error(errorMsg));
     return;
   }
 
