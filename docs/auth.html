@@ -253,6 +253,11 @@
       // Check for existing session (e.g. user navigated here while logged in)
       const { data: { session } } = await sb.auth.getSession();
       if (session) {
+        // If user came from the Electron app, auto-redirect via deep link
+        if (fromApp) {
+          redirectToApp(session.access_token, session.refresh_token);
+          return;
+        }
         showSignedIn(session);
       }
     })();
@@ -453,16 +458,27 @@
 
       const deepLink = APP_REDIRECT + '?access_token=' + encodeURIComponent(accessToken) + '&refresh_token=' + encodeURIComponent(refreshToken);
 
-      showSuccess('Signed In!', 'Redirecting to Lumen AI...');
+      showSuccess('Signed In!', 'Opening Lumen AI...');
       document.getElementById('success-action').style.display = 'inline-flex';
+      document.getElementById('success-action').textContent = 'Open Lumen AI';
       document.getElementById('success-action').onclick = function() {
-        window.location.href = deepLink;
+        launchDeepLink(deepLink);
       };
 
-      // Auto-redirect after a short delay
-      setTimeout(() => {
-        window.location.href = deepLink;
-      }, 1500);
+      // Auto-launch after a short delay
+      setTimeout(() => { launchDeepLink(deepLink); }, 1500);
+    }
+
+    /**
+     * Launches a deep link using a hidden anchor click (more reliable than window.location.href).
+     */
+    function launchDeepLink(url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => a.remove(), 100);
     }
 
     // =============================================
@@ -542,7 +558,7 @@
       sb.auth.getSession().then(({ data: { session } }) => {
         if (session) {
           const deepLink = APP_REDIRECT + '?access_token=' + encodeURIComponent(session.access_token) + '&refresh_token=' + encodeURIComponent(session.refresh_token);
-          window.location.href = deepLink;
+          launchDeepLink(deepLink);
         }
       });
     }

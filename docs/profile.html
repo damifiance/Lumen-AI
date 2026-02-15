@@ -447,9 +447,18 @@
           const deepLink = APP_REDIRECT +
             '?access_token=' + encodeURIComponent(session.access_token) +
             '&refresh_token=' + encodeURIComponent(session.refresh_token);
-          window.location.href = deepLink;
+          launchDeepLink(deepLink);
         }
       });
+    }
+
+    function launchDeepLink(url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => a.remove(), 100);
     }
 
     async function handleSignOut() {
