@@ -43,6 +43,8 @@ jobs:
         run: node scripts/build.js
         env:
           CI: true
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Package Windows installer
         run: npm run package:win
