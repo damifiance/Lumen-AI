@@ -140,6 +140,15 @@
         <p class="auth-muted">Click the link in your email to verify your account, then you'll be redirected back here.</p>
         <button class="auth-btn auth-btn-secondary" id="resend-btn" onclick="handleResend()">Resend Email</button>
       </div>
+
+      <!-- Already Signed In -->
+      <div class="auth-signed-in" id="auth-signed-in" style="display:none;">
+        <div class="auth-success-icon">&#128100;</div>
+        <h3>You're signed in</h3>
+        <p id="signed-in-email"></p>
+        <button class="auth-btn auth-btn-primary" onclick="openApp()">Open Lumen AI</button>
+        <button class="auth-btn auth-btn-secondary" onclick="handleSignOut()" style="margin-top: 8px;">Sign Out</button>
+      </div>
     </div>
   </div>
 
@@ -244,7 +253,7 @@
       // Check for existing session (e.g. user navigated here while logged in)
       const { data: { session } } = await sb.auth.getSession();
       if (session) {
-        redirectToApp(session.access_token, session.refresh_token);
+        showSignedIn(session);
       }
     })();
 
@@ -504,6 +513,37 @@
 
       document.getElementById('pending-email').textContent = email;
       document.getElementById('auth-pending').style.display = 'flex';
+    }
+
+    function showSignedIn(session) {
+      document.getElementById('signin-form').style.display = 'none';
+      document.getElementById('signup-form').style.display = 'none';
+      document.getElementById('forgot-form').style.display = 'none';
+      document.getElementById('reset-form').style.display = 'none';
+      document.getElementById('auth-divider').style.display = 'none';
+      document.getElementById('auth-oauth').style.display = 'none';
+      document.querySelector('.auth-tabs').style.display = 'none';
+      document.getElementById('auth-error').style.display = 'none';
+      document.getElementById('auth-success').style.display = 'none';
+      document.getElementById('auth-pending').style.display = 'none';
+
+      document.getElementById('signed-in-email').textContent = session.user?.email || 'Signed in';
+      document.getElementById('auth-signed-in').style.display = 'flex';
+    }
+
+    function openApp() {
+      sb.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          const deepLink = APP_REDIRECT + '?access_token=' + encodeURIComponent(session.access_token) + '&refresh_token=' + encodeURIComponent(session.refresh_token);
+          window.location.href = deepLink;
+        }
+      });
+    }
+
+    async function handleSignOut() {
+      await sb.auth.signOut();
+      document.getElementById('auth-signed-in').style.display = 'none';
+      switchTab('signin');
     }
 
     function translateError(error) {

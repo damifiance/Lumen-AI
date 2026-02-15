@@ -1120,6 +1120,27 @@ a:hover {
   color: var(--text-muted);
 }
 
+/* Signed In State */
+.auth-signed-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 0;
+  gap: 12px;
+}
+
+.auth-signed-in h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.auth-signed-in p {
+  font-size: 0.9rem;
+  color: var(--text-body);
+}
+
 /* Auth page responsive */
 @media (max-width: 480px) {
   .auth-card {
