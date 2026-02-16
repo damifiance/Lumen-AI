@@ -221,25 +221,8 @@ The app opens automatically in your browser at `http://localhost:5173`.
 9. **Switch Models** — Use the model dropdown in the chat panel header
 10. **Shortcuts** — Press `Option/Alt + K` to view and customize all keyboard shortcuts
 
-## Using Cloud AI Models (Optional)
+## Using Cloud AI Models (Paid tiers comming soon...)
 
-If you want to use GPT-4o or Claude instead of (or alongside) local models:
-
-**macOS / Linux:**
-```bash
-cp backend/.env.example backend/.env
-```
-
-**Windows:**
-```
-copy backend\.env.example backend\.env
-```
-
-Then edit `backend/.env` and add your API keys:
-```
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-```
 
 ## Tech Stack
 
