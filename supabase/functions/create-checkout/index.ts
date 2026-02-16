@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient(
+const serviceClient = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
@@ -20,15 +20,24 @@ serve(async (req: Request) => {
   }
 
   try {
-    // Verify Supabase JWT
+    // Verify Supabase JWT — create a per-request client with the user's token
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return jsonResponse({ error: "Missing authorization" }, 401);
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    // Create a client that uses the user's JWT to verify identity
+    const userClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: `Bearer ${token}` } } },
+    );
+
+    const { data: { user }, error: authError } = await userClient.auth.getUser();
     if (authError || !user) {
+      console.error("Auth error:", authError?.message, "token length:", token.length);
       return jsonResponse({ error: "Invalid token" }, 401);
     }
 
@@ -62,7 +71,7 @@ async function handlePaddleCheckout(
 
   // Find or create Paddle customer
   let customerId: string | undefined;
-  const { data: sub } = await supabase
+  const { data: sub } = await serviceClient
     .from("subscriptions")
     .select("provider_customer_id")
     .eq("user_id", user.id)
@@ -93,7 +102,7 @@ async function handlePaddleCheckout(
     customerId = customerData.data?.id;
 
     // Store the customer mapping so webhook can find the user
-    await supabase.from("subscriptions").upsert(
+    await serviceClient.from("subscriptions").upsert(
       {
         user_id: user.id,
         payment_provider: "paddle",
@@ -131,12 +140,16 @@ async function handlePaddleCheckout(
   });
 
   const txnData = await txnResp.json();
-  const checkoutUrl = txnData.data?.checkout?.url;
+  const txnId = txnData.data?.id;
 
-  if (!checkoutUrl) {
-    console.error("No checkout URL in Paddle response:", txnData);
+  if (!txnId) {
+    console.error("No transaction ID in Paddle response:", txnData);
     return jsonResponse({ error: "Failed to create checkout" }, 500);
   }
+
+  // Build checkout URL — points to our checkout page which loads Paddle.js
+  const checkoutPage = Deno.env.get("CHECKOUT_PAGE_URL") || "https://damifiance.github.io/Lumen-AI/checkout.html";
+  const checkoutUrl = `${checkoutPage}?_ptxn=${txnId}`;
 
   return jsonResponse({ url: checkoutUrl });
 }

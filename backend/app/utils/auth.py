@@ -34,10 +34,9 @@ async def get_optional_user_id(request: Request) -> str | None:
             audience="authenticated",
         )
         return payload.get("sub")
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
+        logger.debug("JWT validation failed: %s", e)
+        return None
 
 
 async def get_required_user_id(request: Request) -> str:

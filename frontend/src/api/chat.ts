@@ -21,19 +21,18 @@ export function streamAsk(
   callbacks: StreamCallbacks
 ): AbortController {
   const controller = new AbortController();
+  const authHeaders = getAuthHeaders();
 
-  getAuthHeaders().then((authHeaders) => {
-    fetch(apiStreamUrl('/chat/ask'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders },
-      body: JSON.stringify(data),
-      signal: controller.signal,
-    })
-      .then((res) => handleSSEResponse(res, callbacks))
-      .catch((err) => {
-        if (err.name !== 'AbortError') callbacks.onError(err);
-      });
-  });
+  fetch(apiStreamUrl('/chat/ask'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders },
+    body: JSON.stringify(data),
+    signal: controller.signal,
+  })
+    .then((res) => handleSSEResponse(res, callbacks))
+    .catch((err) => {
+      if (err.name !== 'AbortError') callbacks.onError(err);
+    });
 
   return controller;
 }
@@ -47,19 +46,18 @@ export function streamConversation(
   callbacks: StreamCallbacks
 ): AbortController {
   const controller = new AbortController();
+  const authHeaders = getAuthHeaders();
 
-  getAuthHeaders().then((authHeaders) => {
-    fetch(apiStreamUrl('/chat/conversation'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders },
-      body: JSON.stringify(data),
-      signal: controller.signal,
-    })
-      .then((res) => handleSSEResponse(res, callbacks))
-      .catch((err) => {
-        if (err.name !== 'AbortError') callbacks.onError(err);
-      });
-  });
+  fetch(apiStreamUrl('/chat/conversation'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders },
+    body: JSON.stringify(data),
+    signal: controller.signal,
+  })
+    .then((res) => handleSSEResponse(res, callbacks))
+    .catch((err) => {
+      if (err.name !== 'AbortError') callbacks.onError(err);
+    });
 
   return controller;
 }

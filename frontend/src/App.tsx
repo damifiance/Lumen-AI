@@ -47,9 +47,12 @@ export default function App() {
       fetchProfile(user.id).catch((err) => {
         console.error('Failed to fetch profile:', err);
       });
-      fetchSubscription().catch((err) => {
-        console.error('Failed to fetch subscription:', err);
-      });
+      // Delay subscription fetch to allow Supabase session to propagate
+      setTimeout(() => {
+        fetchSubscription().catch((err) => {
+          console.error('Failed to fetch subscription:', err);
+        });
+      }, 1000);
     } else {
       clearProfile();
       clearSubscription();

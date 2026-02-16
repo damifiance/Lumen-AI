@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { useAuthStore } from '../stores/authStore';
 
 function getBaseUrl(): string {
   if ((window as any).__BACKEND_PORT__) {
@@ -7,20 +7,17 @@ function getBaseUrl(): string {
   return '/api';
 }
 
-async function getAuthHeaders(): Promise<Record<string, string>> {
-  try {
-    const { data } = await supabase.auth.getSession();
-    if (data.session?.access_token) {
-      return { Authorization: `Bearer ${data.session.access_token}` };
-    }
-  } catch {
-    // Auth not available
+function getAuthHeaders(): Record<string, string> {
+  // Read token directly from auth store — no async, no supabase.auth.getSession()
+  const session = useAuthStore.getState().session;
+  if (session?.access_token) {
+    return { Authorization: `Bearer ${session.access_token}` };
   }
   return {};
 }
 
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const authHeaders = await getAuthHeaders();
+  const authHeaders = getAuthHeaders();
   const res = await fetch(`${getBaseUrl()}${path}`, {
     ...options,
     headers: {
@@ -41,4 +38,4 @@ export function apiStreamUrl(path: string): string {
   return `${getBaseUrl()}${path}`;
 }
 
-export { getAuthHeaders };
+export { getAuthHeaders, getBaseUrl };

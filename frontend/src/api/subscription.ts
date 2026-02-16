@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { useAuthStore } from '../stores/authStore';
 import { apiFetch } from './client';
 
 export interface SubscriptionStatus {
@@ -16,16 +17,32 @@ export function getSubscriptionStatus(): Promise<SubscriptionStatus> {
 }
 
 async function callEdgeFunction(fnName: string, body: Record<string, unknown>): Promise<any> {
-  const { data: { session } } = await supabase.auth.getSession();
+  // Try auth store session first (already loaded from secure storage),
+  // then fall back to getSession()
+  // First try refreshing the session to ensure we have a valid token
+  const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+  const storeSession = useAuthStore.getState().session;
+  const session = refreshedSession || storeSession;
   if (!session) throw new Error('Not authenticated');
+  console.log('[callEdgeFunction] token expires_at:', session.expires_at, 'now:', Math.floor(Date.now() / 1000));
 
-  const { data, error } = await supabase.functions.invoke(fnName, {
-    body,
-    headers: { Authorization: `Bearer ${session.access_token}` },
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const res = await fetch(`${supabaseUrl}/functions/v1/${fnName}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify(body),
   });
 
-  if (error) throw error;
-  return data;
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Edge Function returned a non-2xx status code: ${text}`);
+  }
+
+  return res.json();
 }
 
 // --- Paddle (international users) ---

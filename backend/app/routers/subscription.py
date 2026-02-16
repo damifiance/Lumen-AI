@@ -1,13 +1,22 @@
 from fastapi import APIRouter, Depends
 
 from app.services.subscription_service import get_user_subscription
-from app.utils.auth import get_required_user_id
+from app.utils.auth import get_optional_user_id
 
 router = APIRouter()
 
 
 @router.get("/status")
-async def subscription_status(user_id: str = Depends(get_required_user_id)):
+async def subscription_status(user_id: str | None = Depends(get_optional_user_id)):
+    if not user_id:
+        return {
+            "tier": "basic",
+            "status": "active",
+            "token_limit": 0,
+            "tokens_used": 0,
+            "topup_tokens": 0,
+        }
+
     sub = await get_user_subscription(user_id)
     if not sub:
         return {
