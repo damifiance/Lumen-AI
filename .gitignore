@@ -29,3 +29,9 @@ backend/build/
 backend/dist/
 dist/
 electron/node_modules/
+
+# Supabase CLI temp
+supabase/.temp/
+
+# Workspace files
+*.code-workspace
