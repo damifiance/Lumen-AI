@@ -1,6 +1,7 @@
 import { LogIn, LogOut, User } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useProfileStore } from '../../stores/profileStore';
+import { useSubscriptionStore } from '../../stores/subscriptionStore';
 
 const AUTH_PAGE_URL = 'https://damifiance.github.io/Lumen-AI/auth.html?source=app';
 const PROFILE_PAGE_URL = 'https://damifiance.github.io/Lumen-AI/profile.html';
@@ -8,6 +9,7 @@ const PROFILE_PAGE_URL = 'https://damifiance.github.io/Lumen-AI/profile.html';
 export function AuthButton() {
   const { user, signOut } = useAuthStore();
   const { profile, clearProfile } = useProfileStore();
+  const tier = useSubscriptionStore((s) => s.tier);
 
   const handleSignIn = () => {
     if (window.electron?.startOAuth) {
@@ -62,6 +64,17 @@ export function AuthButton() {
           )}
         </div>
       </button>
+
+      {tier === 'pro' && (
+        <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-full bg-amber-500/20 text-amber-400 tracking-wide">
+          PRO
+        </span>
+      )}
+      {tier === 'max' && (
+        <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-full bg-purple-500/20 text-purple-400 tracking-wide">
+          MAX
+        </span>
+      )}
 
       <button
         onClick={handleSignOut}

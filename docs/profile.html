@@ -48,7 +48,7 @@
         </div>
         <div class="pv-info">
           <h1 class="pv-name" id="view-display-name"></h1>
-          <p class="pv-username" id="view-username"></p>
+          <p class="pv-username"><span id="view-username"></span><span class="tier-badge" id="view-tier-badge" style="display:none;"></span></p>
           <p class="pv-bio" id="view-bio"></p>
         </div>
       </div>
@@ -72,6 +72,13 @@
           <div class="pv-detail-item">
             <h3 class="pv-detail-label">Research Interests</h3>
             <div class="pv-tags" id="view-interests"></div>
+          </div>
+        </div>
+
+        <div class="pv-detail-row" id="view-subscription-section" style="display:none;">
+          <div class="pv-detail-item">
+            <h3 class="pv-detail-label">Subscription</h3>
+            <p class="pv-detail-value" id="view-subscription"></p>
           </div>
         </div>
 
@@ -206,6 +213,7 @@
     let originalUsername = null;
     let usernameCheckTimeout = null;
     let researchInterests = [];
+    let currentSubscription = null;
     const isSetup = new URLSearchParams(window.location.search).get('setup') === '1';
 
     // =============================================
@@ -250,6 +258,11 @@
       originalUsername = profile.username;
       researchInterests = profile.research_interests || [];
 
+      // Fetch subscription
+      const { data: sub } = await window.sb
+        .from('subscriptions').select('tier, status').eq('user_id', currentUserId).single();
+      if (sub) currentSubscription = sub;
+
       document.getElementById('profile-loading').style.display = 'none';
 
       // If setup mode, go straight to edit
@@ -278,6 +291,27 @@
       document.getElementById('view-bio').textContent = p.bio || '';
       document.getElementById('view-bio').style.display = p.bio ? '' : 'none';
       document.getElementById('view-email').textContent = currentEmail;
+
+      // Tier badge
+      const tierBadge = document.getElementById('view-tier-badge');
+      if (currentSubscription && currentSubscription.tier && currentSubscription.tier !== 'basic') {
+        tierBadge.textContent = currentSubscription.tier.toUpperCase();
+        tierBadge.className = 'tier-badge tier-badge-' + currentSubscription.tier;
+        tierBadge.style.display = '';
+      } else {
+        tierBadge.style.display = 'none';
+      }
+
+      // Subscription row
+      const subSection = document.getElementById('view-subscription-section');
+      if (currentSubscription && currentSubscription.tier && currentSubscription.tier !== 'basic') {
+        const tierName = currentSubscription.tier.charAt(0).toUpperCase() + currentSubscription.tier.slice(1);
+        const statusName = currentSubscription.status.charAt(0).toUpperCase() + currentSubscription.status.slice(1);
+        document.getElementById('view-subscription').textContent = tierName + ' — ' + statusName;
+        subSection.style.display = '';
+      } else {
+        subSection.style.display = 'none';
+      }
 
       // Institution
       const instSection = document.getElementById('view-institution-section');

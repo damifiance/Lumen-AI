@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Lumen AI</title>
+  <link rel="icon" href="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="features.html">Features</a>
+      <a href="pricing.html">Pricing</a>
+    </div>
+    <a href="index.html" class="nav-logo">
+      <img src="https://raw.githubusercontent.com/damifiance/Lumen-AI/master/electron/build/icon.png" alt="Lumen AI" />
+      Lumen AI
+    </a>
+    <div class="nav-right">
+      <a href="index.html#download" class="btn-nav btn-nav-amber">Download</a>
+    </div>
+  </nav>
+
+  <section style="max-width: 720px; margin: 0 auto; padding: 80px 24px; font-size: 0.95rem; color: var(--text-body); line-height: 1.8;">
+    <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 8px;">Privacy Policy</h1>
+    <p style="color: var(--text-muted); margin-bottom: 40px;">Last updated: February 16, 2026</p>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">1. Overview</h2>
+    <p>Lumen AI is designed with privacy in mind. Your PDFs and documents are stored locally on your device and are never uploaded to our servers. This policy explains what data we collect, why, and how we protect it.</p>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">2. Data We Collect</h2>
+
+    <h3 style="font-size: 1rem; font-weight: 600; margin: 20px 0 8px;">2.1 Account Information</h3>
+    <p>If you create an account (required for paid plans), we collect:</p>
+    <ul style="margin: 12px 0 12px 24px;">
+      <li>Email address</li>
+      <li>Display name (optional)</li>
+      <li>Profile information you choose to provide (bio, institution, research interests)</li>
+      <li>Authentication tokens</li>
+    </ul>
+    <p>Account data is stored in Supabase (hosted on AWS).</p>
+
+    <h3 style="font-size: 1rem; font-weight: 600; margin: 20px 0 8px;">2.2 Subscription and Payment Data</h3>
+    <p>Payment processing is handled by our partners:</p>
+    <ul style="margin: 12px 0 12px 24px;">
+      <li><strong>Paddle</strong> (international users): Processes payments as Merchant of Record. We receive your subscription status and customer ID — not your payment card details.</li>
+      <li><strong>PortOne</strong> (Korean users): Processes payments through Korean PGs. We receive transaction confirmations — not your card details.</li>
+    </ul>
+    <p>We store: subscription tier, token usage counts, billing period dates, and provider customer IDs.</p>
+
+    <h3 style="font-size: 1rem; font-weight: 600; margin: 20px 0 8px;">2.3 AI Chat Data</h3>
+    <p>When you use <strong>cloud AI models</strong> (Pro/Max plans), the text you send (selected passages, questions) is transmitted to third-party AI providers (OpenAI, Anthropic) for processing. These providers have their own privacy policies. We record token usage counts (not the content of your messages).</p>
+    <p style="margin-top: 8px;">When you use <strong>local AI</strong> (Ollama), all processing happens on your device. No data is sent to any external server.</p>
+
+    <h3 style="font-size: 1rem; font-weight: 600; margin: 20px 0 8px;">2.4 Documents and Files</h3>
+    <p><strong>Your PDFs, highlights, and annotations are stored entirely on your local device.</strong> They are never uploaded to our servers or any third-party service.</p>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">3. How We Use Your Data</h2>
+    <ul style="margin: 12px 0 12px 24px;">
+      <li>To provide and maintain the service (authentication, subscription management)</li>
+      <li>To enforce token limits and subscription tiers</li>
+      <li>To process payments through our payment partners</li>
+      <li>To communicate important service updates</li>
+    </ul>
+    <p>We do not sell your data. We do not use your data for advertising. We do not share your data with third parties except as needed to provide the service (authentication, payments, cloud AI processing).</p>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">4. Data Storage and Security</h2>
+    <ul style="margin: 12px 0 12px 24px;">
+      <li>Account and subscription data: Supabase (PostgreSQL on AWS)</li>
+      <li>Authentication: Supabase Auth with encrypted tokens</li>
+      <li>Payment data: Handled by Paddle/PortOne (PCI-DSS compliant)</li>
+      <li>Local data: Stored in your device's filesystem and local SQLite database</li>
+    </ul>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">5. Your Rights</h2>
+    <p>You have the right to:</p>
+    <ul style="margin: 12px 0 12px 24px;">
+      <li><strong>Access</strong> your personal data stored in your profile</li>
+      <li><strong>Correct</strong> inaccurate profile information</li>
+      <li><strong>Delete</strong> your account and associated data</li>
+      <li><strong>Export</strong> your profile data</li>
+    </ul>
+    <p>To exercise these rights, use the account settings in the app or contact us via GitHub Issues.</p>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">6. Cookies and Tracking</h2>
+    <p>The desktop application does not use cookies or tracking pixels. The website (this site) does not use analytics or tracking cookies.</p>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">7. Children's Privacy</h2>
+    <p>Lumen AI is not directed at children under 13. We do not knowingly collect data from children under 13.</p>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">8. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date.</p>
+
+    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 32px 0 8px;">9. Contact</h2>
+    <p>For privacy-related questions, contact us via <a href="https://github.com/damifiance/Lumen-AI/issues">GitHub Issues</a>.</p>
+  </section>
+
+  <footer style="text-align: center; padding: 32px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border-light);">
+    <p>&copy; 2026 Lumen AI. <a href="terms.html">Terms of Service</a> &middot; <a href="privacy.html">Privacy Policy</a></p>
+  </footer>
+
+</body>
+</html>

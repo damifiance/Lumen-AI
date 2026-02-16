@@ -16,6 +16,8 @@ import { OnboardingModal } from './components/common/OnboardingModal';
 import { KeyboardShortcuts } from './components/common/KeyboardShortcuts';
 import { AboutModal } from './components/common/AboutModal';
 import { OllamaSetupCard } from './components/OllamaSetupCard';
+import { UpgradeModal } from './components/subscription/UpgradeModal';
+import { useSubscriptionStore } from './stores/subscriptionStore';
 
 export default function App() {
   const { tabs, activeTabIndex, isLoading, setActivePaper, setLoading } =
@@ -24,6 +26,7 @@ export default function App() {
   const { clearMessages, toggleOpen: toggleChat } = useChatStore();
   const { initialize, user } = useAuthStore();
   const { fetchProfile, clearProfile } = useProfileStore();
+  const { fetchSubscription, clearSubscription } = useSubscriptionStore();
   const { openShortcuts } = useShortcutStore();
   const matchesEvent = useShortcutStore((s) => s.matchesEvent);
 
@@ -44,8 +47,15 @@ export default function App() {
       fetchProfile(user.id).catch((err) => {
         console.error('Failed to fetch profile:', err);
       });
+      // Delay subscription fetch to allow Supabase session to propagate
+      setTimeout(() => {
+        fetchSubscription().catch((err) => {
+          console.error('Failed to fetch subscription:', err);
+        });
+      }, 1000);
     } else {
       clearProfile();
+      clearSubscription();
     }
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -175,6 +185,7 @@ export default function App() {
       <OnboardingModal />
       <KeyboardShortcuts />
       <AboutModal />
+      <UpgradeModal />
 
     </div>
   );

@@ -1,4 +1,4 @@
-import { apiFetch, apiStreamUrl } from './client';
+import { apiFetch, apiStreamUrl, getAuthHeaders } from './client';
 import type { ModelInfo } from '../types/chat';
 
 export function getModels(): Promise<ModelInfo[]> {
@@ -21,10 +21,11 @@ export function streamAsk(
   callbacks: StreamCallbacks
 ): AbortController {
   const controller = new AbortController();
+  const authHeaders = getAuthHeaders();
 
   fetch(apiStreamUrl('/chat/ask'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders },
     body: JSON.stringify(data),
     signal: controller.signal,
   })
@@ -45,10 +46,11 @@ export function streamConversation(
   callbacks: StreamCallbacks
 ): AbortController {
   const controller = new AbortController();
+  const authHeaders = getAuthHeaders();
 
   fetch(apiStreamUrl('/chat/conversation'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders },
     body: JSON.stringify(data),
     signal: controller.signal,
   })
@@ -65,7 +67,14 @@ async function handleSSEResponse(
   callbacks: StreamCallbacks
 ): Promise<void> {
   if (!response.ok) {
-    callbacks.onError(new Error(`HTTP ${response.status}`));
+    let errorMsg = `HTTP ${response.status}`;
+    try {
+      const body = await response.json();
+      errorMsg = body.detail || errorMsg;
+    } catch {
+      // Use default error
+    }
+    callbacks.onError(new Error(errorMsg));
     return;
   }
 

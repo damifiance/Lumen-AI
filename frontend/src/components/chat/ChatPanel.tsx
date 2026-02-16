@@ -6,6 +6,7 @@ import { usePaperStore } from '../../stores/paperStore';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { ModelSelector } from './ModelSelector';
+import { UsageWarningBanner } from '../subscription/UsageWarningBanner';
 
 export function ChatPanel() {
   const {
@@ -102,6 +103,9 @@ export function ChatPanel() {
           </>
         )}
       </div>
+
+      {/* Usage Warning */}
+      <UsageWarningBanner />
 
       {/* Input */}
       <ChatInput

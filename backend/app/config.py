@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     papers_root: str = str(Path.home() / "Documents")
     database_url: str = ""
+    supabase_url: str = ""
+    supabase_service_key: str = ""
+    supabase_jwt_secret: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

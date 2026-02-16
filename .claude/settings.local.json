@@ -55,7 +55,9 @@
       "Bash(gh release edit:*)",
       "Bash(gh release delete:*)",
       "Bash(gh run list:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(gh run watch:*)"
     ]
   }
 }

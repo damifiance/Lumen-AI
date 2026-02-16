@@ -1,8 +1,7 @@
 import json
 import logging
-import os
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sse_starlette.sse import EventSourceResponse
 
 from app.schemas.chat import AskRequest, ConversationRequest, ModelInfo
@@ -11,7 +10,17 @@ from app.services.context_service import (
     build_paper_prompt,
     prepare_paper_context,
 )
-from app.services.llm_service import get_available_models, stream_completion
+from app.services.llm_service import (
+    get_available_models,
+    stream_completion_with_tracking,
+)
+from app.services.subscription_service import (
+    check_token_limit,
+    get_allowed_models,
+    get_user_subscription,
+    is_model_allowed,
+)
+from app.utils.auth import get_optional_user_id
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -29,14 +38,64 @@ def _resolve_model(model: str) -> str:
     return model
 
 
+async def _check_cloud_access(user_id: str | None, model: str):
+    """Enforce tier-based gating for cloud models. Raises HTTPException if denied."""
+    if model.startswith("ollama/"):
+        return  # Local models always allowed
+
+    if not user_id:
+        raise HTTPException(status_code=403, detail="Sign in required to use cloud models")
+
+    sub = await get_user_subscription(user_id)
+    if not sub:
+        raise HTTPException(status_code=403, detail="Sign in required to use cloud models")
+
+    tier = sub.get("tier", "basic")
+
+    if not is_model_allowed(tier, model):
+        raise HTTPException(
+            status_code=403,
+            detail=f"Model {model} requires a higher subscription tier",
+        )
+
+    if not check_token_limit(sub):
+        raise HTTPException(
+            status_code=429,
+            detail="Monthly token limit reached. Purchase a top-up or upgrade your plan.",
+        )
+
+
 @router.get("/models", response_model=list[ModelInfo])
-async def list_models():
-    return [ModelInfo(**m) for m in get_available_models()]
+async def list_models(user_id: str | None = Depends(get_optional_user_id)):
+    all_models = get_available_models()
+
+    if not user_id:
+        # Unauthenticated: return all models but mark cloud ones as locked
+        return [
+            ModelInfo(**m, locked=not m["id"].startswith("ollama/"))
+            for m in all_models
+        ]
+
+    sub = await get_user_subscription(user_id)
+    tier = sub.get("tier", "basic") if sub else "basic"
+    allowed = get_allowed_models(tier)
+
+    return [
+        ModelInfo(
+            **m,
+            locked=not m["id"].startswith("ollama/") and m["id"] not in allowed,
+        )
+        for m in all_models
+    ]
 
 
 @router.post("/ask")
-async def ask_about_selection(request: AskRequest):
+async def ask_about_selection(
+    request: AskRequest,
+    user_id: str | None = Depends(get_optional_user_id),
+):
     model = _resolve_model(request.model)
+    await _check_cloud_access(user_id, model)
 
     try:
         paper_context = prepare_paper_context(
@@ -58,7 +117,7 @@ async def ask_about_selection(request: AskRequest):
 
     async def event_generator():
         try:
-            async for token in stream_completion(model, messages):
+            async for token in stream_completion_with_tracking(model, messages, user_id):
                 yield {"event": "token", "data": json.dumps({"content": token})}
             yield {"event": "done", "data": "{}"}
         except Exception as e:
@@ -72,8 +131,12 @@ async def ask_about_selection(request: AskRequest):
 
 
 @router.post("/conversation")
-async def chat_conversation(request: ConversationRequest):
+async def chat_conversation(
+    request: ConversationRequest,
+    user_id: str | None = Depends(get_optional_user_id),
+):
     model = _resolve_model(request.model)
+    await _check_cloud_access(user_id, model)
 
     try:
         paper_context = prepare_paper_context(
@@ -94,7 +157,7 @@ async def chat_conversation(request: ConversationRequest):
 
     async def event_generator():
         try:
-            async for token in stream_completion(model, messages):
+            async for token in stream_completion_with_tracking(model, messages, user_id):
                 yield {"event": "token", "data": json.dumps({"content": token})}
             yield {"event": "done", "data": "{}"}
         except Exception as e:
